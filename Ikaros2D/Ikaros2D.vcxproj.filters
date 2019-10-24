@@ -23,5 +23,8 @@
     <ClInclude Include="IkarosCore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Libs\Box2D\Box2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

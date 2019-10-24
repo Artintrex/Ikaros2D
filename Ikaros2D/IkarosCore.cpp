@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-//#include "Box2D.h"
+#include "Box2D\Box2D.h"
 
 //WindowProperties
 #define CLASS_NAME     "MainWindow"
@@ -15,8 +15,8 @@
 #define SCREEN_HEIGHT  (576)
 
 
-static LPDIRECT3D9 g_pD3D = NULL;             // Direct3Dインターフェース
-static LPDIRECT3DDEVICE9 pD3DDevice = NULL; // Direct3Dデバイス
+static LPDIRECT3D9 g_pD3D = NULL;             //Direct3D interface
+static LPDIRECT3DDEVICE9 pD3DDevice = NULL;  //Direct3D device
 
 static HWND g_hWnd; //Window Handler
 
@@ -26,6 +26,8 @@ static bool Initialize(HINSTANCE hInst);
 static void Finalize(void);
 static void Update(void);
 static void Draw(void);
+static bool D3D_Initialize(HWND hWnd);
+static void D3D_Finalize();
 
 int TickCount = 0;
 
@@ -49,7 +51,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	DWORD window_style = WS_OVERLAPPEDWINDOW & ~(WS_MAXIMIZEBOX | WS_THICKFRAME);
 	RECT window_rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
-	// 指定したクライアント領域を確保するために新たな矩形座標を計算
 	AdjustWindowRect(&window_rect, window_style, FALSE);
 
 	// Calculate window rect dimensions
@@ -103,35 +104,32 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			TickCount++;
 		}
 	}
-
-	// ゲームの終了処理
 	Finalize();
 
 	return (int)msg.wParam;
 }
 
-// ウィンドウプロシージャ(コールバック関数)
+//Callback function
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
 	case WM_KEYDOWN:
 		if (wParam == VK_ESCAPE) {
-			SendMessage(hWnd, WM_CLOSE, 0, 0); // WM_CLOSEメッセージの送信
+			SendMessage(hWnd, WM_CLOSE, 0, 0);
 		}
 		break;
 
 	case WM_CLOSE:
-		//		if (MessageBox(hWnd, "本当に終了してよろしいですか？", "確認", MB_OKCANCEL | MB_DEFBUTTON2) == IDOK) {
-		DestroyWindow(hWnd); // 指定のウィンドウにWM_DESTROYメッセージを送る
-//		}
-		return 0; // DefWindowProc関数にメッセージを流さず終了することによって何もなかったことにする
+				if (MessageBox(hWnd, "Are you sure you want to quit?", WINDOW_CAPTION, MB_OKCANCEL | MB_DEFBUTTON2) == IDOK) {
+		DestroyWindow(hWnd);
+		}
+		return 0;
 
-	case WM_DESTROY: // ウィンドウの破棄メッセージ
-		PostQuitMessage(0); // WM_QUITメッセージの送信
+	case WM_DESTROY:
+		PostQuitMessage(0);
 		return 0;
 	};
 
-	// 通常メッセージ処理はこの関数に任せる
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -140,11 +138,10 @@ bool Initialize(HINSTANCE hInst)
 	//RNG Seed
 	srand((unsigned int)time(NULL));
 
-	// ゲームの初期化(Direct3Dの初期化)
-	//if (!D3D_Initialize(g_hWnd)) {
-		// ゲームの初期化に失敗した
-	//	return false;
-	//}
+	if (!D3D_Initialize(g_hWnd)) {
+		return false;
+	}
+
 	// DirectInputの初期化（キーボード）
 	//if (!Keyboard_Initialize(hInst, g_hWnd)) {
 	//	return false;
@@ -176,7 +173,7 @@ void Finalize(void)
 	//Keyboard_Finalize();
 
 	// ゲームの終了処理(Direct3Dの終了処理)
-	//D3D_Finalize();
+	D3D_Finalize();
 }
 
 // ゲームの更新関数
