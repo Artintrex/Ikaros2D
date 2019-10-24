@@ -1,11 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <chrono>
-#include <windows.h>
-#include <d3d9.h>
-#include <d3dx9.h>
-#include "Box2D\Box2D.h"
+#include "IkarosCore.h"
 
 //WindowProperties
 #define CLASS_NAME     "MainWindow"

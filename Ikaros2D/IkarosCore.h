@@ -1,13 +1,47 @@
-#pragma once
+#include <iostream>
+#include <vector>
+#include <string>
+#include <chrono>
+#include <windows.h>
+#include <d3d9.h>
+#include <d3dx9.h>
+#include "Box2D\Box2D.h"
 
-//Object
-//GameObject:Object
-//Component:Object
-//Behavior:Component
-//MonoBehavior:Behavior
+class Object {
+public:
+	std::string name;
 
-//Sprite:Object
+	//Create method
+	//Destroy method
 
-//Renderer:Component
+	//Static list
+};
 
-//RigidBody:Component
+class GameObject : Object {
+
+};
+
+class Component : Object {
+
+};
+
+class Behavior : Component {
+
+};
+
+class MonoBehavior : Behavior {
+	//Start
+	//Update
+};
+
+class Sprite : Object {
+
+};
+
+class Renderer : Component {
+
+};
+
+class RigidBody : Component {
+
+};
