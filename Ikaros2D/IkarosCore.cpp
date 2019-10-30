@@ -7,6 +7,7 @@
 #define SCREEN_WIDTH  (1024)
 #define SCREEN_HEIGHT  (576)
 
+//test
 
 static LPDIRECT3D9 g_pD3D = NULL;             //Direct3D interface
 static LPDIRECT3DDEVICE9 pD3DDevice = NULL;  //Direct3D device
