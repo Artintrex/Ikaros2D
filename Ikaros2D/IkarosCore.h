@@ -12,9 +12,6 @@ typedef D3DXVECTOR2 Vector2;
 typedef D3DXVECTOR3 Vector3;
 
 class Object {
-private:
-	static std::vector<Object*> ObjectList;
-
 public:
 	std::string name;
 	bool isHidden;
@@ -24,7 +21,7 @@ public:
 		ObjectList.push_back(this);
 	}
 
-	~Object() {
+	virtual ~Object() {
 		for (std::vector<Object*>::iterator it = ObjectList.begin(); it != ObjectList.end(); it++)
 		{
 			if (this == (*it)) {
@@ -32,16 +29,18 @@ public:
 			}
 		}
 	}
+
+private:
+	static std::vector<Object*> ObjectList;
+
 };
 
 class Component : public Object {
 public:
-	Object* parent;
-
-	Component(std::string Name) : Object(Name) {
-
+	Component(std::string Name = "EmptyComponent") : Object(Name) {
+		parent = nullptr;
 	}
-
+	Object* parent;
 	void AssignParent(Object* p) {
 		parent = p;
 	}
@@ -88,6 +87,7 @@ public:
 	RigidBody() : Component("RigidBody") {
 		//write stuff here
 	}
+
 };
 
 class Transform : public Component {
@@ -112,8 +112,6 @@ class Camera : public Behavior {
 };
 
 class Time {
-private:
-	std::chrono::time_point<std::chrono::high_resolution_clock> t1, t2;
 public:
 	float DeltaTime;
 
@@ -124,14 +122,13 @@ public:
 		t2 = std::chrono::high_resolution_clock::now();
 		DeltaTime = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
 	}
+private:
+	std::chrono::time_point<std::chrono::high_resolution_clock> t1, t2;
+
 };
 
 
 class GameObject : public Object {
-private:
-	static std::vector<GameObject*> GameObjectList;
-	std::vector<Object*> ComponentList;
-
 public:
 	Transform transform;
 
@@ -180,5 +177,25 @@ public:
 		}
 	}
 
-	//Constructor with name parameter send to object and destructor to destroy all components
+	GameObject(std::string Name) : Object(Name){
+		transform = Transform();
+	}
+
+	~GameObject() {
+		for (std::vector<GameObject*>::iterator it = GameObjectList.begin(); it != GameObjectList.end(); it++)
+		{
+			if (this == (*it)) {
+				GameObjectList.erase(it);
+			}
+		}
+
+		for (auto p : ComponentList) {
+			delete p;
+		}
+		ComponentList.clear();
+	}
+private:
+	static std::vector<GameObject*> GameObjectList;
+	std::vector<Object*> ComponentList;
+
 };
