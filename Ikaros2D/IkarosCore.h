@@ -8,7 +8,8 @@
 #include <d3dx9.h>
 #include "Box2D\Box2D.h"
 
-
+typedef D3DXVECTOR2 Vector2;
+typedef D3DXVECTOR3 Vector3;
 
 class Object {
 private:
@@ -23,50 +24,37 @@ public:
 		ObjectList.push_back(this);
 	}
 
-	static Object* FindbyName(std::string Name) {
+	~Object() {
 		for (std::vector<Object*>::iterator it = ObjectList.begin(); it != ObjectList.end(); it++)
 		{
-			if (Name == (*it)->name)return *it;
-			else return nullptr;
-		}
-	}
-
-	static void Destroy(std::string Name) {
-		for (std::vector<Object*>::iterator it = ObjectList.begin(); it != ObjectList.end(); it++)
-		{
-			if (Name == (*it)->name) {
-				delete* it;
+			if (this == (*it)) {
 				ObjectList.erase(it);
 			}
-			//if component remove from component list
-			
 		}
 	}
 };
 
-class GameObject : Object {
-private:
-	std::vector<Object*> ComponentList;
-
+class Component : public Object {
 public:
-	void AddComponent() {
-		//add to list
+	Object* parent;
+
+	Component(std::string Name) : Object(Name) {
+
 	}
-	Object* GetComponent(std::string Name) {
-		Object* p;
-		//search component list
-		return p;
+
+	void AssignParent(Object* p) {
+		parent = p;
 	}
 };
-class Component : Object {
 
+class Behavior : public Component {
+public:
+	Behavior(std::string Name) : Component(Name) {
+
+	}
 };
 
-class Behavior : Component {
-
-};
-
-class MonoBehavior : Behavior {
+class MonoBehavior : public Behavior {
 public:
 	virtual void Start() {
 		//Run only once
@@ -74,28 +62,53 @@ public:
 	virtual void Update() {
 		//Run every frame
 	}
+
+	MonoBehavior() : Behavior("MonoBehavior") {
+		//write stuff here
+	}
 };
 
-class Sprite : Object {
-
+class Sprite : public Object {
+	//load texture
+	//list of sprites
 };
 
-class Renderer : Component {
+class Renderer : public Component {
+public:
+	Renderer() : Component("Renderer") {
 
+	}
+	//assign sprite
+
+	//render stuff
 };
 
-class RigidBody : Component {
-
+class RigidBody : public Component {
+public:
+	RigidBody() : Component("RigidBody") {
+		//write stuff here
+	}
 };
 
-class Tranform : Component {
-	D3DXVECTOR3 position;
-	D3DXVECTOR2 rotation;
-	D3DXVECTOR2 scale;
+class Transform : public Component {
+public:
+	Vector3 position;
+	Vector2 rotation;
+	Vector2 scale;
+
+	Transform(Vector3 Position = Vector3(0, 0, 0), Vector2 Rotation = Vector2(0, 0), Vector2 Scale = Vector2(0, 0)) : Component("Transform") {
+		position = Position;
+		rotation = Rotation;
+		scale = Scale;
+	}
+
+	//Translate	
+	//Rotate
 };
 
-class Camera : Behavior {
-
+class Camera : public Behavior {
+	//Camera calculations
+	//maybe move all objects relative to camera here
 };
 
 class Time {
@@ -111,4 +124,61 @@ public:
 		t2 = std::chrono::high_resolution_clock::now();
 		DeltaTime = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
 	}
+};
+
+
+class GameObject : public Object {
+private:
+	static std::vector<GameObject*> GameObjectList;
+	std::vector<Object*> ComponentList;
+
+public:
+	Transform transform;
+
+	void AddComponent(std::string type) {
+		if (type == "Renderer") {
+			Renderer* p = new Renderer();
+			p->AssignParent(static_cast<Object*>(this));
+			ComponentList.push_back((Object*)p);
+		}
+		else if (type == "RigidBody") {
+			RigidBody* p = new RigidBody();
+			p->AssignParent(static_cast<Object*>(this));
+			ComponentList.push_back((Object*)p);
+		}
+		else if (type == "MonoBehavior") {
+			MonoBehavior* p = new MonoBehavior();
+			p->AssignParent(static_cast<Object*>(this));
+			ComponentList.push_back((Object*)p);
+		}
+	}
+
+	void RemoveComponent(std::string type) {
+		for (std::vector<Object*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		{
+			if (type == (*it)->name) {
+				delete (*it);
+				ComponentList.erase(it);
+			}
+		}
+	}
+
+	Component* GetComponent(std::string Name) {
+		Object* p;
+		for (std::vector<Object*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		{
+			if (Name == (*it)->name)return static_cast<Component*>(*it);
+			else return nullptr;
+		}
+	}
+
+	static GameObject* FindbyName(std::string Name) {
+		for (std::vector<GameObject*>::iterator it = GameObjectList.begin(); it != GameObjectList.end(); it++)
+		{
+			if (Name == (*it)->name)return *it;
+			else return nullptr;
+		}
+	}
+
+	//Constructor with name parameter send to object and destructor to destroy all components
 };
