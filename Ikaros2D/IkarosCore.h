@@ -55,21 +55,57 @@ public:
 
 class MonoBehavior : public Behavior {
 public:
+	virtual void Awake() {
+		//Only once for this script instance
+	}
 	virtual void Start() {
-		//Run only once
+		//Run only once for each object instance
 	}
 	virtual void Update() {
 		//Run every frame
 	}
 
 	MonoBehavior() : Behavior("MonoBehavior") {
-		//write stuff here
+		//NEED UPDATE : what should be inside MB constructor ???
 	}
+
+	//NEED UPDATE: MonoBehavior List
+};
+
+struct TextureIndexData {
+	LPDIRECT3DTEXTURE9* texturedata;
+	std::string name;
 };
 
 class Sprite : public Object {
-	//load texture
-	//list of sprites
+public:
+	//File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
+	static LPDIRECT3DTEXTURE9* LoadTexture(std::string TextureName ,LPCTSTR FilePath) {
+		LPDIRECT3DTEXTURE9* tex = new LPDIRECT3DTEXTURE9;
+		if (CreateTexture(FilePath, tex)) {
+			TextureIndexData NewEntry;
+			NewEntry.texturedata = tex;
+			NewEntry.name = TextureName;
+			TextureList.push_back(NewEntry);
+
+			return tex;
+		}
+		else delete tex;
+	}
+
+	//NEED UPDATE: static find by name
+
+	static void ReleaseTextures() {
+		for (auto p : TextureList) {
+			delete p.texturedata;
+		}
+		TextureList.clear();
+	}
+
+private:
+	static std::vector<TextureIndexData> TextureList;
+
+	static bool CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata);
 };
 
 class Renderer : public Component {
@@ -77,15 +113,15 @@ public:
 	Renderer() : Component("Renderer") {
 
 	}
-	//assign sprite
+	//NEED UPDATE: assign sprite
 
-	//render stuff
+	//NEED UPDATE: render stuff
 };
 
 class RigidBody : public Component {
 public:
 	RigidBody() : Component("RigidBody") {
-		//write stuff here
+		//NEED UPDATE: actually add physics instad of husk
 	}
 
 };
@@ -93,22 +129,23 @@ public:
 class Transform : public Component {
 public:
 	Vector3 position;
-	Vector2 rotation;
+	Vector3 rotation;
 	Vector2 scale;
 
-	Transform(Vector3 Position = Vector3(0, 0, 0), Vector2 Rotation = Vector2(0, 0), Vector2 Scale = Vector2(0, 0)) : Component("Transform") {
+	Transform(Vector3 Position = Vector3(0, 0, 0), Vector3 Rotation = Vector3(0, 0, 0), Vector2 Scale = Vector2(0, 0)) : Component("Transform") {
 		position = Position;
 		rotation = Rotation;
 		scale = Scale;
 	}
 
-	//Translate	
-	//Rotate
+	//NEED UPDATE: Translate	
+	//NEED UPDATE: Rotate
 };
 
 class Camera : public Behavior {
-	//Camera calculations
-	//maybe move all objects relative to camera here
+
+	//NEED UPDATE:Camera calculations
+	//NEED UPDATE:maybe move all objects relative to camera here
 };
 
 class Time {
@@ -197,5 +234,12 @@ public:
 private:
 	static std::vector<GameObject*> GameObjectList;
 	std::vector<Object*> ComponentList;
-
 };
+
+//NEED UPDATE:camera and input class required next
+//NEED UPDATE:colliderclasses aka fixtures
+//NEED UPDATE:scene loader
+
+double frand() {
+	return (double)rand() / RAND_MAX;
+}
