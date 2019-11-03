@@ -143,7 +143,64 @@ public:
 };
 
 class Camera : public Behavior {
+	/*
+	typedef struct
+	{
+		D3DXVECTOR3 posV;			// 視点
+		D3DXVECTOR3 posR;			// 注視点
+		D3DXVECTOR3 vecU;			// 上方向ベクトル
+		D3DXMATRIX mtxProjection;	// プロジェクションマトリックス
+		D3DXMATRIX mtxView;			// ビューマトリックス
+	} CAMERA;
 
+	CAMERA g_camera;
+
+	void Camera_Initialize(void)
+	{
+		g_camera.posV = D3DXVECTOR3(CAM_POS_V_X, CAM_POS_V_Y, CAM_POS_V_Z);
+		g_camera.posR = D3DXVECTOR3(CAM_POS_R_X, CAM_POS_R_X, CAM_POS_R_X);
+		g_camera.vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	}
+
+	void Camera_Finalize(void)
+	{
+	}
+
+	void Camera_Update(void)
+	{
+	}
+
+	void Camera_SetCamera(void)
+	{
+		
+		LPDIRECT3DDEVICE9 pDevice = GetD3DDevice();
+
+		// プロジェクションマトリックスの初期化
+		D3DXMatrixIdentity(&g_camera.mtxProjection);
+
+		// プロジェクションマトリックスの作成
+		D3DXMatrixPerspectiveFovLH(&g_camera.mtxProjection,
+			VIEW_ANGLE,				// ビュー平面の視野角
+			VIEW_ASPECT,			// ビュー平面のアスペクト比
+			VIEW_NEAR_Z,			// ビュー平面のNearZ値
+			VIEW_FAR_Z);			// ビュー平面のFarZ値
+
+// プロジェクションマトリックスの設定
+		pDevice->SetTransform(D3DTS_PROJECTION, &g_camera.mtxProjection);
+
+		// ビューマトリックスの初期化
+		D3DXMatrixIdentity(&g_camera.mtxView);
+
+		// ビューマトリックスの作成
+		D3DXMatrixLookAtLH(&g_camera.mtxView,
+			&g_camera.posV,		// カメラの視点
+			&g_camera.posR,		// カメラの注視点
+			&g_camera.vecU);	// カメラの上方向ベクトル
+
+// ビューマトリックスの設定
+		pDevice->SetTransform(D3DTS_VIEW, &g_camera.mtxView);
+	}
+	*/
 	//NEED UPDATE:Camera calculations
 	//NEED UPDATE:maybe move all objects relative to camera here
 };

@@ -231,7 +231,6 @@ bool D3D_Initialize(HWND hWnd)
 	//	g_pD3DDevice->SetRenderState(D3DRS_ALPHAREF, 0x80);
 	//	g_pD3DDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 
-
 	// Alpha blend settings
 	pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
