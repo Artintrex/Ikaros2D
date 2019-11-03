@@ -7,12 +7,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ikaros2D", "Ikaros2D\Ikaros
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		BuildPrefab|x64 = BuildPrefab|x64
+		BuildPrefab|x86 = BuildPrefab|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{74D41DFE-A1D8-467D-BFBE-8BA73BAF2194}.BuildPrefab|x64.ActiveCfg = BuildPrefab|x64
+		{74D41DFE-A1D8-467D-BFBE-8BA73BAF2194}.BuildPrefab|x64.Build.0 = BuildPrefab|x64
+		{74D41DFE-A1D8-467D-BFBE-8BA73BAF2194}.BuildPrefab|x86.ActiveCfg = BuildPrefab|Win32
+		{74D41DFE-A1D8-467D-BFBE-8BA73BAF2194}.BuildPrefab|x86.Build.0 = BuildPrefab|Win32
 		{74D41DFE-A1D8-467D-BFBE-8BA73BAF2194}.Debug|x64.ActiveCfg = Debug|x64
 		{74D41DFE-A1D8-467D-BFBE-8BA73BAF2194}.Debug|x64.Build.0 = Debug|x64
 		{74D41DFE-A1D8-467D-BFBE-8BA73BAF2194}.Debug|x86.ActiveCfg = Debug|Win32

@@ -28,6 +28,7 @@ static void D3D_Finalize();
 
 int TickCount = 0;
 
+#ifndef _BUILD
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	//NEED UPDATE: need to redirect printf output to a file for release version
@@ -110,6 +111,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	return (int)msg.wParam;
 }
+#elif _BUILD
+int main() {
+	////NEED UPDATE: BuilderCode
+	return 0;
+}
+#endif
 
 //Callback function
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
