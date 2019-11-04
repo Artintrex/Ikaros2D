@@ -3,19 +3,20 @@
 //WindowProperties
 #define CLASS_NAME     "MainWindow"
 #define WINDOW_CAPTION "Ikaros2D"
-//NEED UPDATE: Change Resolution Settings needs to read from file!! Also set d3d parameters like fullscreen etc
-#define SCREEN_WIDTH  (1024)
-#define SCREEN_HEIGHT  (576)
 
 static LPDIRECT3D9 g_pD3D = NULL;             //Direct3D interface
 static LPDIRECT3DDEVICE9 pD3DDevice = NULL;  //Direct3D device
 
 static HWND g_hWnd; //Window Handler
 
-//List definitions
+//Class static definitions
 std::vector<Object*> Object::ObjectList{};
 std::vector<TextureIndexData>Sprite::TextureList{};
 std::vector<GameObject*> GameObject::GameObjectList{};
+std::vector<Renderer*> Renderer::RendererList{};
+std::vector<Camera*> Camera::CameraList{};
+
+LPDIRECT3DDEVICE9 Camera::pD3DDevice;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -113,7 +114,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 }
 #elif _BUILD
 int main() {
-	////NEED UPDATE: BuilderCode
+	//NEED UPDATE: BuilderCode
 	return 0;
 }
 #endif
@@ -172,6 +173,114 @@ bool D3D_Initialize(HWND hWnd)
 		return false;
 	}
 
+	Camera::pD3DDevice = pD3DDevice;
+
+	return true;
+}
+
+void Transform::SetMatrix() {
+	D3DXMATRIX MatTemp;
+
+	D3DXMatrixScaling(&MatTemp, scale.x, scale.y, scale.z);
+	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
+	D3DXMatrixRotationYawPitchRoll(&MatTemp, rotation.y, rotation.x, rotation.z);
+	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
+	D3DXMatrixTranslation(&MatTemp, position.x, position.y, position.z);
+	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
+}
+
+//File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
+bool Sprite::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
+{
+	HRESULT hr = D3DXCreateTextureFromFile(pD3DDevice, FilePath, texturedata);
+	if (hr != D3D_OK){
+		switch (hr) {
+		case D3DERR_NOTAVAILABLE:
+			std::cout << "ERROR::Failed to load Texture: " << FilePath << std::endl << "ERROR::NOTAVAILABLE" << std::endl;
+			break;
+		case D3DERR_OUTOFVIDEOMEMORY:
+			std::cout << "ERROR::Failed to load Texture: " << FilePath << std::endl << "ERROR::OUTOFVIDEOMEMORY" << std::endl;
+			break;
+		case D3DERR_INVALIDCALL:
+			std::cout << "ERROR::Failed to load Texture: " << FilePath << std::endl << "ERROR::INVALIDCALL" << std::endl;
+			break;
+		case D3DXERR_INVALIDDATA:
+			std::cout << "ERROR::Failed to load Texture: " << FilePath << std::endl << "ERROR::INVALIDDATA" << std::endl;
+			break;
+		case E_OUTOFMEMORY:
+			std::cout << "ERROR::Failed to load Texture: " << FilePath << std::endl << "ERROR::E_OUTOFMEMORY" << std::endl;
+			break;
+		default:
+			std::cout << "ERROR::Failed to load Texture: " << FilePath << std::endl << "ERROR::Unknown Error" << std::endl;
+		}
+		return false;
+
+	}else {
+		return true;
+
+	}
+}
+
+void Sprite::SetTexture(std::string Name) {
+	texture = FindTexturebyName(Name);
+
+	if (FAILED(pD3DDevice->CreateVertexBuffer(sizeof(VertexBufferData),
+		D3DUSAGE_WRITEONLY,
+		(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1),
+		D3DPOOL_MANAGED,
+		&VertexBuffer,
+		NULL)))
+	{
+		std::cout << "ERROR::Failed to create vertex buffer for object: " << parent->name << std::endl;
+	}
+	else {
+		vertices = nullptr;
+		VertexBuffer->Lock(0,0, (void**)&vertices, 0);
+
+		vertices[0].position = Vector3(-0.5f, 0.5f, 0);
+		vertices[1].position = Vector3(0.5f, 0.5f, 0);
+		vertices[2].position = Vector3(-0.5f, -0.5f, 0);
+		vertices[3].position = Vector3(0.5f, -0.5f, 0);
+
+		vertices[0].uv = Vector2(0, 0);
+		vertices[1].uv = Vector2(1, 0);
+		vertices[2].uv = Vector2(0, 1);
+		vertices[3].uv = Vector2(1, 1);
+
+		for (int i = 0; i < 4; i++) {
+			vertices[i].position.x *= texture.Width;
+			vertices[i].position.y *= texture.Height;
+
+			vertices[i].color = D3DCOLOR_RGBA(255, 255, 255, 255);
+			vertices[i].normal = Vector3(0, 0, 0);
+		}
+
+		VertexBuffer->Unlock();
+	}
+}
+
+//Init renderer
+Renderer::Renderer() : Component("Renderer") {
+	sprite = nullptr;
+	sortingOrder = 0;
+
+	RendererList.push_back(this);
+}
+
+//Main draw function for each camera
+void Camera::draw() {
+	pD3DDevice->SetTransform(D3DTS_VIEW, &View);
+	pD3DDevice->SetTransform(D3DTS_PROJECTION, &Projection);
+	for (auto p : Renderer::RendererList) {
+		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform.localToWorldMatrix);
+
+		pD3DDevice->SetStreamSource(0, p->sprite->VertexBuffer, 0, sizeof(VertexBufferData));
+		pD3DDevice->SetTexture(0, *(p->sprite->texture.texturedata));
+		pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 4);
+	}
+}
+
+void Camera::SetD3DDevice() {
 	//Turn off lighting
 	pD3DDevice->SetRenderState(D3DRS_LIGHTING, false);
 	//	g_pD3DDevice->SetRenderState(D3DRS_ZENABLE, true);
@@ -187,8 +296,8 @@ bool D3D_Initialize(HWND hWnd)
 	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
 
 	/*
-	Similar to D3DTADDRESS_WRAP, except that the texture is flipped at every integer junction. 
-	For u values between 0 and 1, for example, the texture is addressed normally; between 1 and 2, the texture is flipped (mirrored); 
+	Similar to D3DTADDRESS_WRAP, except that the texture is flipped at every integer junction.
+	For u values between 0 and 1, for example, the texture is addressed normally; between 1 and 2, the texture is flipped (mirrored);
 	between 2 and 3, the texture is normal again; and so on.
 	*/
 	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
@@ -208,17 +317,17 @@ bool D3D_Initialize(HWND hWnd)
 	pD3DDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(255, 0, 0, 255));
 
 	/*
-	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER, 
-	specifies that point filtering is to be used as the texture magnification or 
-	minification filter respectively. When used with D3DSAMP_MIPFILTER, 
+	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER,
+	specifies that point filtering is to be used as the texture magnification or
+	minification filter respectively. When used with D3DSAMP_MIPFILTER,
 	enables mipmapping and specifies that the rasterizer chooses the color from the texel of the nearest mip level.
 	*/
 	pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 
 	/*
-	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER, 
-	specifies that linear filtering is to be used as the texture magnification or 
+	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER,
+	specifies that linear filtering is to be used as the texture magnification or
 	minification filter respectively. When used with D3DSAMP_MIPFILTER, enables mipmapping and trilinear filtering;
 	it specifies that the rasterizer interpolates between the two nearest mip levels.
 	*/
@@ -227,8 +336,8 @@ bool D3D_Initialize(HWND hWnd)
 
 	/*
 	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER,
-	specifies that anisotropic texture filtering used as a texture magnification or 
-	minification filter respectively. Compensates for distortion caused by the difference in angle between the texture polygon 
+	specifies that anisotropic texture filtering used as a texture magnification or
+	minification filter respectively. Compensates for distortion caused by the difference in angle between the texture polygon
 	and the plane of the screen. Use with D3DSAMP_MIPFILTER is undefined.
 	*/
 	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
@@ -256,20 +365,7 @@ bool D3D_Initialize(HWND hWnd)
 
 	// D3DTEXTUREOP Texture blending settings
 	//	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-
-	return true;
 }
-
-//File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
-bool Sprite::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
-{
-	if (FAILED(D3DXCreateTextureFromFile(pD3DDevice, FilePath, texturedata))) {
-		std::cout << "ERROR:: Failed to load Texture: " << FilePath << std::endl;
-		return false;
-	}
-	else return true;
-}
-
 
 // Uninitialization
 void D3D_Finalize(void)
@@ -370,13 +466,6 @@ void Draw(void)
 	// シーンのチェック
 	//Scene_Check();
 }
-
-
-//load objects into a list
-
-//update list
-
-//draw list
 
 //controller
 
