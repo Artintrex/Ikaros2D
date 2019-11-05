@@ -59,15 +59,6 @@ public:
 
 class Behavior : public Component {
 public:
-	virtual void Awake() {
-		//Only once for this script instance
-	}
-	virtual void Start() {
-		//Run only once for each object instance
-	}
-	virtual void Update() {
-		//Run every frame
-	}
 	Behavior(std::string Name) : Component(Name) {
 		//NEED UPDATE : what should be inside B constructor ???
 	}
@@ -79,6 +70,16 @@ class MonoBehavior : public Behavior {
 public:
 	MonoBehavior() : Behavior("MonoBehavior") {
 		//NEED UPDATE : what should be inside MB constructor ???
+	}
+
+	virtual void Awake() {
+		//Only once for this script instance
+	}
+	virtual void Start() {
+		//Run only once for each object instance
+	}
+	virtual void Update() {
+		//Run every frame
 	}
 };
 
