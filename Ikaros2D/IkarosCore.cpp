@@ -11,12 +11,11 @@ static HWND g_hWnd; //Window Handler
 
 //Class static definitions
 std::vector<Object*> Object::ObjectList{};
-std::vector<TextureIndexData>Sprite::TextureList{};
+std::vector<Texture*> Texture::TextureList{};
 std::vector<GameObject*> GameObject::GameObjectList{};
 std::vector<Renderer*> Renderer::RendererList{};
 std::vector<Camera*> Camera::CameraList{};
-
-LPDIRECT3DDEVICE9 Camera::pD3DDevice;
+std::vector<MonoBehavior*> MonoBehaviorList{};
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -173,8 +172,6 @@ bool D3D_Initialize(HWND hWnd)
 		return false;
 	}
 
-	Camera::pD3DDevice = pD3DDevice;
-
 	return true;
 }
 
@@ -190,7 +187,7 @@ void Transform::SetMatrix() {
 }
 
 //File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
-bool Sprite::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
+bool Texture::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
 {
 	HRESULT hr = D3DXCreateTextureFromFile(pD3DDevice, FilePath, texturedata);
 	if (hr != D3D_OK){
@@ -222,7 +219,7 @@ bool Sprite::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
 }
 
 void Sprite::SetTexture(std::string Name) {
-	texture = FindTexturebyName(Name);
+	texture = texture->FindTexturebyName(Name);
 
 	if (FAILED(pD3DDevice->CreateVertexBuffer(sizeof(VertexBufferData),
 		D3DUSAGE_WRITEONLY,
@@ -231,7 +228,7 @@ void Sprite::SetTexture(std::string Name) {
 		&VertexBuffer,
 		NULL)))
 	{
-		std::cout << "ERROR::Failed to create vertex buffer for object: " << parent->name << std::endl;
+		std::cout << "ERROR::Failed to create vertex buffer for Texture: " << Name << std::endl;
 	}
 	else {
 		vertices = nullptr;
@@ -248,8 +245,8 @@ void Sprite::SetTexture(std::string Name) {
 		vertices[3].uv = Vector2(1, 1);
 
 		for (int i = 0; i < 4; i++) {
-			vertices[i].position.x *= texture.Width;
-			vertices[i].position.y *= texture.Height;
+			vertices[i].position.x *= texture->Width;
+			vertices[i].position.y *= texture->Height;
 
 			vertices[i].color = D3DCOLOR_RGBA(255, 255, 255, 255);
 			vertices[i].normal = Vector3(0, 0, 0);
@@ -275,7 +272,7 @@ void Camera::draw() {
 		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
 
 		pD3DDevice->SetStreamSource(0, p->sprite->VertexBuffer, 0, sizeof(VertexBufferData));
-		pD3DDevice->SetTexture(0, *(p->sprite->texture.texturedata));
+		pD3DDevice->SetTexture(0, *(p->sprite->texture->texturedata));
 		pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 4);
 	}
 }
@@ -407,16 +404,16 @@ bool Initialize(HINSTANCE hInst)
 	//Collision_Initialize();
 
 	test = new GameObject("test");
-	test->AddComponent("RigidBody");
-	test->AddComponent("Renderer");
+	test->AddComponent<RigidBody>();
+	test->AddComponent<Renderer>();
 	
-	Renderer* Rtest = static_cast<Renderer*>(test->GetComponent("RigidBody"));
+	Renderer* Rtest = test->GetComponent<Renderer>();
 	return true;
 }
 
 void Update(void)
 {
-	printf("Object number %d \n GameObject number %d\n", Object::GetSize(), GameObject::GetSize());
+	printf("Object number %d \nGameObject number %d\n", Object::GetSize(), GameObject::GetSize());
 	//キーボードの状態を更新する
 	//Keyboard_Update();
 
@@ -460,7 +457,7 @@ void Draw(void)
 
 void Finalize(void)
 {
-	Sprite::ReleaseTextures();
+	Texture::ReleaseTextures();
 
 	// DirectInputの終了処理
 	//GamePad_Finalize();

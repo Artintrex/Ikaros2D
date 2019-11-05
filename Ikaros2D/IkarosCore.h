@@ -45,6 +45,7 @@ public:
 		return ObjectList.size();
 	}
 #endif
+	//NEED UPDATE: UNLOAD function clear list
 private:
 	static std::vector<Object*> ObjectList;
 
@@ -52,12 +53,10 @@ private:
 
 class Component : public Object {
 public:
+	Object* parent;
+
 	Component(std::string Name = "EmptyComponent") : Object(Name) {
 		parent = nullptr;
-	}
-	Object* parent;
-	void AssignParent(Object* p) {
-		parent = p;
 	}
 };
 
@@ -66,8 +65,6 @@ public:
 	Behavior(std::string Name) : Component(Name) {
 		//NEED UPDATE : what should be inside B constructor ???
 	}
-
-	//NEED UPDATE: MonoBehavior List
 };
 
 class MonoBehavior : public Behavior {
@@ -85,74 +82,86 @@ public:
 	virtual void Update() {
 		//Run every frame
 	}
+
+	//NEED UPDATE: clear list
+private:
+	static std::vector<MonoBehavior*> MonoBehaviorList;
 };
 
-struct TextureIndexData {
+class Texture : public Object {
+public:
 	LPDIRECT3DTEXTURE9* texturedata;
-	std::string name;
 	UINT Width;
 	UINT Height;
+	D3DSURFACE_DESC graphicsFormat;
+
+	Texture(std::string Name) : Object(Name){
+		texturedata = nullptr;
+		graphicsFormat = D3DSURFACE_DESC();
+		Width = 0;
+		Height = 0;
+	}
+
+	//File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
+	static Texture* LoadTexture(std::string TextureName, LPCTSTR FilePath) {
+		LPDIRECT3DTEXTURE9* tex = new LPDIRECT3DTEXTURE9;
+		if (CreateTexture(FilePath, tex)) {
+			Texture* texture = new Texture("TextureName");
+			texture->texturedata = tex;
+			D3DSURFACE_DESC format;
+
+			(*tex)->GetLevelDesc(0, &format);
+
+			texture->graphicsFormat;
+			texture->Width = format.Width;
+			texture->Height = format.Height;
+
+			TextureList.push_back(texture);
+
+			return texture;
+		}
+		else delete tex;
+	}
+
+	static void ReleaseTextures() {
+		for (auto p : TextureList) {
+			(*(p->texturedata))->Release();
+			delete p;
+		}
+		TextureList.clear();
+	}
+
+	static Texture* FindTexturebyName(std::string Name) {
+		for (std::vector<Texture*>::iterator it = TextureList.begin(); it != TextureList.end(); it++)
+		{
+			if (Name == (*it)->name)return *it;
+			else return nullptr;
+		}
+	}
+
+private:
+	static std::vector<Texture*> TextureList;
+	static bool CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata);
 };
 
 class Sprite : public Object {
 public:
-	TextureIndexData texture;
-	Object* parent;
+	Object* renderer;
+	Texture* texture;
 	VertexBufferData* vertices;
 
 	LPDIRECT3DVERTEXBUFFER9 VertexBuffer;
 
 	Sprite() : Object("Sprite"){
-		texture = {nullptr, "NoTextureSet", 0, 0};
 		VertexBuffer = nullptr;
-		parent = nullptr;
+		renderer = nullptr;
 	}
 
-	//File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
-	static TextureIndexData LoadTexture(std::string TextureName ,LPCTSTR FilePath) {
-		LPDIRECT3DTEXTURE9* tex = new LPDIRECT3DTEXTURE9;
-		if (CreateTexture(FilePath, tex)) {
-			TextureIndexData NewEntry;
-			NewEntry.texturedata = tex;
-			NewEntry.name = TextureName;
-			
-			D3DSURFACE_DESC format;
-
-			(*tex)->GetLevelDesc(0, &format);
-			NewEntry.Width = format.Width;
-			NewEntry.Height = format.Height;
-
-			TextureList.push_back(NewEntry);
-
-			return NewEntry;
-		}
-		else delete tex;
+	~Sprite() {
+		VertexBuffer->Release();
 	}
-	//NEED UPDATE: Call Release() method for Buffers in destructor and set to NULL
-	//NEED UPDATE: Move texture serialization and format to a new texture class
 
 	void SetTexture(std::string Name);
-
-	static void ReleaseTextures() {
-		for (auto p : TextureList) {
-			(*(p.texturedata))->Release();
-			delete p.texturedata;
-		}
-		TextureList.clear();
-	}
-
-private:
-	static std::vector<TextureIndexData> TextureList;
-
-	static bool CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata);
-
-	static TextureIndexData FindTexturebyName(std::string Name) {
-		for (std::vector<TextureIndexData>::iterator it = TextureList.begin(); it != TextureList.end(); it++)
-		{
-			if (Name == (*it).name)return *it;
-			else return { nullptr, "NoTextureSet", 0, 0 };
-		}
-	}
 };
 
 class Renderer : public Component {
@@ -164,8 +173,11 @@ public:
 
 	Renderer();
 
-	//NEED UPDATE::delete renderer clear list
-	//Set Sprite
+	~Renderer() {
+
+	}
+	//NEED UPDATE::Set Sprite
+	//clear list
 	static std::vector<Renderer*> RendererList;
 };
 
@@ -221,8 +233,7 @@ struct Rect {
 
 class Camera : public Behavior {
 public:
-	static LPDIRECT3DDEVICE9 pD3DDevice;
-	Transform transform;
+	Transform* transform;
 	float fieldOfView;
 	float aspect;
 	float farClipPlane;
@@ -231,17 +242,16 @@ public:
 	float orthographicSize;
 	Rect rect;
 
-
 	void Draw() {
 		for (auto p : CameraList) {
 			p->Draw();
 		}
 	}
 
-	//NEED UPDATE:maybe move all objects relative to camera here
-	//Add Layers to game object
+	//NEED UPDATE: Add Layer systems to filter objects for cameras and clear camera list
 
-	Camera(std::string Name) : Behavior(Name) {
+	Camera(std::string Name = "Camera") : Behavior(Name) {
+		transform = nullptr;
 		fieldOfView = 60.0f;
 		nearClipPlane = 0.3f;
 		farClipPlane = 1000.0f;
@@ -293,7 +303,7 @@ private:
 
 	void SetCamera() {
 
-		D3DXMatrixRotationYawPitchRoll(&mCameraRot, transform.rotation.y, transform.rotation.x, transform.rotation.z);
+		D3DXMatrixRotationYawPitchRoll(&mCameraRot, transform->rotation.y, transform->rotation.x, transform->rotation.z);
 
 		Vector3 vWorldUp, vWorldAhead;
 		Vector3 vLocalUp(0, 1, 0);
@@ -306,11 +316,9 @@ private:
 		//D3DXVec3TransformCoord(&vPosWorld, &vDelta, &mCameraRot);
 		//add postworld to transform for movement
 
-		//NEED UPDATE: Move transformation matrices to transform
+		Vector3 LookAt = transform->position + vWorldAhead;
 
-		Vector3 LookAt = transform.position + vWorldAhead;
-
-		D3DXMatrixLookAtLH(&View, &transform.position, &LookAt, &vWorldUp);
+		D3DXMatrixLookAtLH(&View, &(transform->position), &LookAt, &vWorldUp);
 		D3DXMatrixInverse(&mCameraWorld, NULL, &View);
 	}
 };
@@ -336,23 +344,30 @@ class GameObject : public Object {
 public:
 	Transform *transform;
 
-	void AddComponent(std::string type) {
-		if (type == "Renderer") {
-			Renderer* p = new Renderer();
-			p->AssignParent(static_cast<Object*>(this));
-			ComponentList.push_back((Object*)p);
-		}
-		else if (type == "RigidBody") {
-			RigidBody* p = new RigidBody();
-			p->AssignParent(static_cast<Object*>(this));
-			ComponentList.push_back((Object*)p);
-		}
-		else if (type == "MonoBehavior") {
-			MonoBehavior* p = new MonoBehavior();
-			p->AssignParent(static_cast<Object*>(this));
-			ComponentList.push_back((Object*)p);
-		}
-		//NEED UPDATE: Return pointer
+	template <typename T> T* AddComponent();
+
+	template <> Renderer* AddComponent<Renderer>() {
+		Renderer* p = new Renderer();
+		p->parent = static_cast<Object*>(this);
+		ComponentList.push_back((Object*)p);
+
+		return p;
+	}
+
+	template <> RigidBody* AddComponent<RigidBody>() {
+		RigidBody* p = new RigidBody();
+		p->parent = static_cast<Object*>(this);
+		ComponentList.push_back((Object*)p);
+
+		return p;
+	}
+
+	template <> MonoBehavior* AddComponent<MonoBehavior>() {
+		MonoBehavior* p = new MonoBehavior();
+		p->parent = static_cast<Object*>(this);
+		ComponentList.push_back((Object*)p);
+
+		return p;
 	}
 
 	void RemoveComponent(std::string type) {
@@ -365,13 +380,29 @@ public:
 		}
 	}
 
-	Component* GetComponent(std::string Name) {
+	template <typename T> T* GetComponent();
+
+	template <> Renderer* GetComponent<Renderer>() {
 		for (std::vector<Object*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
 		{
-			if (Name == (*it)->name)return static_cast<Component*>(*it);
-			else return nullptr;
+			if ("Renderer" == (*it)->name)return static_cast<Renderer*>(*it);
+		else return nullptr;
+		}
+	}
 
-			//Need static cast per component type
+	template <> RigidBody* GetComponent<RigidBody>() {
+		for (std::vector<Object*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		{
+			if ("RigidBody" == (*it)->name)return static_cast<RigidBody*>(*it);
+			else return nullptr;
+		}
+	}
+
+	template <> MonoBehavior* GetComponent<MonoBehavior>() {
+		for (std::vector<Object*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		{
+			if ("MonoBehavior" == (*it)->name)return static_cast<MonoBehavior*>(*it);
+			else return nullptr;
 		}
 	}
 
@@ -386,8 +417,6 @@ public:
 	GameObject(std::string Name = "GameObject") : Object(Name){
 		transform = new Transform();
 		GameObjectList.push_back(this);
-		//transform = Transform();//NEED UPDATE: Error after entering here
-		//std::vector<Object*>ComponentList{};
 	}
 
 	~GameObject() {
@@ -413,7 +442,7 @@ private:
 	std::vector<Object*> ComponentList;
 };
 
-//NEED UPDATE:camera and input class required next
+//NEED UPDATE:input class required next
 //NEED UPDATE:colliderclasses aka fixtures
 //NEED UPDATE:scene loader
 
