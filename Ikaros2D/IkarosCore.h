@@ -40,7 +40,11 @@ public:
 			}
 		}
 	}
-
+#ifdef _DEBUG
+	static int GetSize() {
+		return ObjectList.size();
+	}
+#endif
 private:
 	static std::vector<Object*> ObjectList;
 
@@ -130,6 +134,7 @@ public:
 
 	static void ReleaseTextures() {
 		for (auto p : TextureList) {
+			(*(p.texturedata))->Release();
 			delete p.texturedata;
 		}
 		TextureList.clear();
@@ -328,7 +333,7 @@ private:
 
 class GameObject : public Object {
 public:
-	Transform transform;
+	Transform *transform;
 
 	void AddComponent(std::string type) {
 		if (type == "Renderer") {
@@ -346,6 +351,7 @@ public:
 			p->AssignParent(static_cast<Object*>(this));
 			ComponentList.push_back((Object*)p);
 		}
+		//NEED UPDATE: Return pointer
 	}
 
 	void RemoveComponent(std::string type) {
@@ -363,6 +369,8 @@ public:
 		{
 			if (Name == (*it)->name)return static_cast<Component*>(*it);
 			else return nullptr;
+
+			//Need static cast per component type
 		}
 	}
 
@@ -374,8 +382,11 @@ public:
 		}
 	}
 
-	GameObject(std::string Name) : Object(Name){
-		transform = Transform();
+	GameObject(std::string Name = "GameObject") : Object(Name){
+		transform = new Transform();
+		GameObjectList.push_back(this);
+		//transform = Transform();//NEED UPDATE: Error after entering here
+		//std::vector<Object*>ComponentList{};
 	}
 
 	~GameObject() {
@@ -391,6 +402,11 @@ public:
 		}
 		ComponentList.clear();
 	}
+#ifdef _DEBUG
+	static int GetSize() {
+		return GameObjectList.size();
+	}
+#endif
 private:
 	static std::vector<GameObject*> GameObjectList;
 	std::vector<Object*> ComponentList;
