@@ -15,11 +15,38 @@
 typedef D3DXVECTOR2 Vector2;
 typedef D3DXVECTOR3 Vector3;
 
+//NEED UPDATE:
+//class SceneLoader
+//class Input
+//class Collider(Types)
+class Time;
+class Object;
+class GameObject;
+class Component;
+class Behavior;
+class Texture;
+class Sprite;
+//Components
+class Transform;
+class MonoBehavior;
+class Renderer;
+class RigidBody;
+class Camera;
+
+
+
 struct VertexBufferData {
 	D3DXVECTOR3 position;
 	D3DXVECTOR3 normal;
 	D3DCOLOR color;
 	D3DXVECTOR2 uv;
+};
+
+struct Rect {
+	float X;
+	float Y;
+	float W;
+	float H;
 };
 
 class Object {
@@ -53,10 +80,12 @@ private:
 
 class Component : public Object {
 public:
-	Object* parent;
+	GameObject* parent;
+	Transform* transform;
 
 	Component(std::string Name = "EmptyComponent") : Object(Name) {
 		parent = nullptr;
+		transform = nullptr;
 	}
 };
 
@@ -72,6 +101,9 @@ public:
 	MonoBehavior() : Behavior("MonoBehavior") {
 		//NEED UPDATE : what should be inside MB constructor ???
 	}
+
+	~MonoBehavior();
+
 
 	virtual void Awake() {
 		//Only once for this script instance
@@ -172,10 +204,8 @@ public:
 	int sortingOrder;
 
 	Renderer();
+	~Renderer();
 
-	~Renderer() {
-
-	}
 	//NEED UPDATE::Set Sprite
 	//clear list
 	static std::vector<Renderer*> RendererList;
@@ -187,6 +217,7 @@ public:
 		//NEED UPDATE: actually add physics instad of husk
 	}
 
+	~RigidBody();
 };
 
 class Transform : public Component {
@@ -205,6 +236,8 @@ public:
 		SetMatrix();
 	}
 
+	~Transform();
+
 	void Translate(Vector3 translation) {
 		position = translation;
 		SetMatrix();
@@ -222,13 +255,6 @@ public:
 	//NEED UPDATE: forward
 private:
 	void SetMatrix();
-};
-
-struct Rect {
-	float X;
-	float Y;
-	float W;
-	float H;
 };
 
 class Camera : public Behavior {
@@ -270,6 +296,8 @@ public:
 		D3DXMatrixIdentity(&Projection);
 		D3DXMatrixIdentity(&View);
 	}
+
+	~Camera();
 
 private:
 	static std::vector<Camera*> CameraList;
@@ -348,30 +376,30 @@ public:
 
 	template <> Renderer* AddComponent<Renderer>() {
 		Renderer* p = new Renderer();
-		p->parent = static_cast<Object*>(this);
-		ComponentList.push_back((Object*)p);
+		p->parent = this;
+		ComponentList.push_back((Component*)p);
 
 		return p;
 	}
 
 	template <> RigidBody* AddComponent<RigidBody>() {
 		RigidBody* p = new RigidBody();
-		p->parent = static_cast<Object*>(this);
-		ComponentList.push_back((Object*)p);
+		p->parent = this;
+		ComponentList.push_back((Component*)p);
 
 		return p;
 	}
 
 	template <> MonoBehavior* AddComponent<MonoBehavior>() {
 		MonoBehavior* p = new MonoBehavior();
-		p->parent = static_cast<Object*>(this);
-		ComponentList.push_back((Object*)p);
+		p->parent = this;
+		ComponentList.push_back((Component*)p);
 
 		return p;
 	}
 
 	void RemoveComponent(std::string type) {
-		for (std::vector<Object*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
 		{
 			if (type == (*it)->name) {
 				delete (*it);
@@ -383,40 +411,40 @@ public:
 	template <typename T> T* GetComponent();
 
 	template <> Renderer* GetComponent<Renderer>() {
-		for (std::vector<Object*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
 		{
 			if ("Renderer" == (*it)->name)return static_cast<Renderer*>(*it);
-		else return nullptr;
 		}
+		return nullptr;
 	}
 
 	template <> RigidBody* GetComponent<RigidBody>() {
-		for (std::vector<Object*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
 		{
 			if ("RigidBody" == (*it)->name)return static_cast<RigidBody*>(*it);
-			else return nullptr;
 		}
+			return nullptr;
 	}
 
 	template <> MonoBehavior* GetComponent<MonoBehavior>() {
-		for (std::vector<Object*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
 		{
 			if ("MonoBehavior" == (*it)->name)return static_cast<MonoBehavior*>(*it);
-			else return nullptr;
 		}
+		return nullptr;
 	}
 
 	static GameObject* FindbyName(std::string Name) {
 		for (std::vector<GameObject*>::iterator it = GameObjectList.begin(); it != GameObjectList.end(); it++)
 		{
 			if (Name == (*it)->name)return *it;
-			else return nullptr;
 		}
+		return nullptr;
 	}
 
 	GameObject(std::string Name = "GameObject") : Object(Name){
 		transform = new Transform();
-		GameObjectList.push_back(this);
+		transform->parent = this;
 	}
 
 	~GameObject() {
@@ -430,6 +458,7 @@ public:
 		for (auto p : ComponentList) {
 			delete p;
 		}
+		delete transform;
 		ComponentList.clear();
 	}
 #ifdef _DEBUG
@@ -437,14 +466,11 @@ public:
 		return GameObjectList.size();
 	}
 #endif
+
+	std::vector<Component*> ComponentList;
 private:
 	static std::vector<GameObject*> GameObjectList;
-	std::vector<Object*> ComponentList;
 };
-
-//NEED UPDATE:input class required next
-//NEED UPDATE:colliderclasses aka fixtures
-//NEED UPDATE:scene loader
 
 double frand() {
 	return (double)rand() / RAND_MAX;

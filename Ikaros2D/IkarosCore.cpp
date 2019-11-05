@@ -364,6 +364,72 @@ void Camera::SetD3DDevice() {
 	//	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 }
 
+//Component Destructor Definitions
+MonoBehavior::~MonoBehavior() {
+	if (parent != nullptr) {
+		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
+		{
+			if (this == (*it)) {
+				parent->ComponentList.erase(it);
+				break;
+			}
+		}
+	}
+}
+
+Transform::~Transform() {
+	if (parent != nullptr) {
+		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
+		{
+			if (this == (*it)) {
+				parent->ComponentList.erase(it);
+				break;
+			}
+		}
+	}
+}
+
+int cnt = 0;
+Renderer::~Renderer() {
+	if (parent != nullptr) {
+		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)//Iterator ++i!!!
+		{
+			if (this == (*it)) {
+				//parent->ComponentList.erase(it);
+				//DEBUG
+				printf("%d\n", parent->ComponentList.size());
+				cnt++;
+				break;
+			}
+		}
+	}
+}
+
+RigidBody::~RigidBody(){
+	if (parent != nullptr) {
+		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
+		{
+			if (this == (*it)) {
+				parent->ComponentList.erase(it);
+				break;
+			}
+		}
+	}
+}
+
+Camera::~Camera() {
+	if (parent != nullptr) {
+		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); it++)
+		{
+			if (this == (*it)) {
+				parent->ComponentList.erase(it);
+				break;
+			}
+		}
+	}
+}
+
+
 // Uninitialization
 void D3D_Finalize(void)
 {
@@ -406,14 +472,19 @@ bool Initialize(HINSTANCE hInst)
 	test = new GameObject("test");
 	test->AddComponent<RigidBody>();
 	test->AddComponent<Renderer>();
+	test->AddComponent<MonoBehavior>();
+	test->AddComponent<MonoBehavior>();
 	
 	Renderer* Rtest = test->GetComponent<Renderer>();
+	//delete Rtest;
+	printf("%d\n", test->ComponentList.size());
+
 	return true;
 }
 
 void Update(void)
 {
-	printf("Object number %d \nGameObject number %d\n", Object::GetSize(), GameObject::GetSize());
+	//printf("Object number %d \nGameObject number %d\n", Object::GetSize(), GameObject::GetSize());
 	//キーボードの状態を更新する
 	//Keyboard_Update();
 
