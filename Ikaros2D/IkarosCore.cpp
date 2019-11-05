@@ -272,7 +272,7 @@ void Camera::draw() {
 	pD3DDevice->SetTransform(D3DTS_VIEW, &View);
 	pD3DDevice->SetTransform(D3DTS_PROJECTION, &Projection);
 	for (auto p : Renderer::RendererList) {
-		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform.localToWorldMatrix);
+		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
 
 		pD3DDevice->SetStreamSource(0, p->sprite->VertexBuffer, 0, sizeof(VertexBufferData));
 		pD3DDevice->SetTexture(0, *(p->sprite->texture.texturedata));
@@ -382,6 +382,7 @@ void D3D_Finalize(void)
 	}
 }
 
+GameObject* test;
 bool Initialize(HINSTANCE hInst)
 {
 	//Initilize RNG Seed
@@ -405,26 +406,17 @@ bool Initialize(HINSTANCE hInst)
 	//Scene_Initialize(SCENE_INDEX_TITLE);
 	//Collision_Initialize();
 
+	test = new GameObject("test");
+	test->AddComponent("RigidBody");
+	test->AddComponent("Renderer");
+	
+	Renderer* Rtest = static_cast<Renderer*>(test->GetComponent("RigidBody"));
 	return true;
 }
 
-void Finalize(void)
-{
-	Sprite::ReleaseTextures();
-
-	// DirectInputの終了処理
-	//GamePad_Finalize();
-
-	// DirectInputの終了処理
-	//Keyboard_Finalize();
-
-	// Kill D3D
-	D3D_Finalize();
-}
-
-// ゲームの更新関数
 void Update(void)
 {
+	printf("Object number %d \n GameObject number %d\n", Object::GetSize(), GameObject::GetSize());
 	//キーボードの状態を更新する
 	//Keyboard_Update();
 
@@ -438,7 +430,6 @@ void Update(void)
 	//Fade_Update();
 }
 
-// ゲームの描画関数
 void Draw(void)
 {
 
@@ -467,6 +458,16 @@ void Draw(void)
 	//Scene_Check();
 }
 
-//controller
+void Finalize(void)
+{
+	Sprite::ReleaseTextures();
 
-//sound
+	// DirectInputの終了処理
+	//GamePad_Finalize();
+
+	// DirectInputの終了処理
+	//Keyboard_Finalize();
+
+	// Kill D3D
+	D3D_Finalize();
+}
