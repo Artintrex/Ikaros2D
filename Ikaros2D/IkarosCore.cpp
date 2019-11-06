@@ -389,18 +389,21 @@ Transform::~Transform() {
 	}
 }
 
-int cnt = 0;
 Renderer::~Renderer() {
 	if (parent != nullptr) {
-		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)//Iterator ++i!!!
+		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
 		{
 			if (this == (*it)) {
-				//parent->ComponentList.erase(it);
-				//DEBUG
-				printf("%d\n", parent->ComponentList.size());
-				cnt++;
+				parent->ComponentList.erase(it);
 				break;
 			}
+		}
+	}
+	for (std::vector<Renderer*>::iterator it = RendererList.begin(); it != RendererList.end(); ++it)
+	{
+		if (this == (*it)) {
+			RendererList.erase(it);
+			break;
 		}
 	}
 }
@@ -473,18 +476,13 @@ bool Initialize(HINSTANCE hInst)
 	test->AddComponent<RigidBody>();
 	test->AddComponent<Renderer>();
 	test->AddComponent<MonoBehavior>();
-	test->AddComponent<MonoBehavior>();
 	
-	Renderer* Rtest = test->GetComponent<Renderer>();
-	//delete Rtest;
-	printf("%d\n", test->ComponentList.size());
-
 	return true;
 }
 
 void Update(void)
 {
-	//printf("Object number %d \nGameObject number %d\n", Object::GetSize(), GameObject::GetSize());
+	
 	//キーボードの状態を更新する
 	//Keyboard_Update();
 

@@ -60,18 +60,8 @@ public:
 	}
 
 	virtual ~Object() {
-		for (std::vector<Object*>::iterator it = ObjectList.begin(); it != ObjectList.end(); it++)
-		{
-			if (this == (*it)) {
-				ObjectList.erase(it);
-			}
-		}
+		ObjectList.erase(std::remove(ObjectList.begin(), ObjectList.end(), this), ObjectList.end());
 	}
-#ifdef _DEBUG
-	static int GetSize() {
-		return ObjectList.size();
-	}
-#endif
 	//NEED UPDATE: UNLOAD function clear list
 private:
 	static std::vector<Object*> ObjectList;
@@ -86,6 +76,10 @@ public:
 	Component(std::string Name = "EmptyComponent") : Object(Name) {
 		parent = nullptr;
 		transform = nullptr;
+	}
+
+	virtual ~Component() {
+
 	}
 };
 
@@ -164,7 +158,7 @@ public:
 	}
 
 	static Texture* FindTexturebyName(std::string Name) {
-		for (std::vector<Texture*>::iterator it = TextureList.begin(); it != TextureList.end(); it++)
+		for (std::vector<Texture*>::iterator it = TextureList.begin(); it != TextureList.end(); ++it)
 		{
 			if (Name == (*it)->name)return *it;
 			else return nullptr;
@@ -187,9 +181,11 @@ public:
 	Sprite() : Object("Sprite"){
 		VertexBuffer = nullptr;
 		renderer = nullptr;
+		texture = nullptr;
+		vertices = nullptr;
 	}
 
-	~Sprite() {
+	virtual ~Sprite() {
 		VertexBuffer->Release();
 	}
 
@@ -399,7 +395,7 @@ public:
 	}
 
 	void RemoveComponent(std::string type) {
-		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); ++it)
 		{
 			if (type == (*it)->name) {
 				delete (*it);
@@ -411,7 +407,7 @@ public:
 	template <typename T> T* GetComponent();
 
 	template <> Renderer* GetComponent<Renderer>() {
-		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); ++it)
 		{
 			if ("Renderer" == (*it)->name)return static_cast<Renderer*>(*it);
 		}
@@ -419,7 +415,7 @@ public:
 	}
 
 	template <> RigidBody* GetComponent<RigidBody>() {
-		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); ++it)
 		{
 			if ("RigidBody" == (*it)->name)return static_cast<RigidBody*>(*it);
 		}
@@ -427,7 +423,7 @@ public:
 	}
 
 	template <> MonoBehavior* GetComponent<MonoBehavior>() {
-		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); it++)
+		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); ++it)
 		{
 			if ("MonoBehavior" == (*it)->name)return static_cast<MonoBehavior*>(*it);
 		}
@@ -435,7 +431,7 @@ public:
 	}
 
 	static GameObject* FindbyName(std::string Name) {
-		for (std::vector<GameObject*>::iterator it = GameObjectList.begin(); it != GameObjectList.end(); it++)
+		for (std::vector<GameObject*>::iterator it = GameObjectList.begin(); it != GameObjectList.end(); ++it)
 		{
 			if (Name == (*it)->name)return *it;
 		}
@@ -445,10 +441,11 @@ public:
 	GameObject(std::string Name = "GameObject") : Object(Name){
 		transform = new Transform();
 		transform->parent = this;
+		GameObjectList.push_back(this);
 	}
 
 	~GameObject() {
-		for (std::vector<GameObject*>::iterator it = GameObjectList.begin(); it != GameObjectList.end(); it++)
+		for (std::vector<GameObject*>::iterator it = GameObjectList.begin(); it != GameObjectList.end(); ++it)
 		{
 			if (this == (*it)) {
 				GameObjectList.erase(it);
@@ -461,11 +458,6 @@ public:
 		delete transform;
 		ComponentList.clear();
 	}
-#ifdef _DEBUG
-	static int GetSize() {
-		return GameObjectList.size();
-	}
-#endif
 
 	std::vector<Component*> ComponentList;
 private:
