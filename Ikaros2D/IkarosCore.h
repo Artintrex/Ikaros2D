@@ -19,7 +19,7 @@ typedef D3DXVECTOR3 Vector3;
 //class SceneLoader
 //class Input
 //class Collider(Types)
-class Time;
+class iTime;
 class Object;
 class GameObject;
 class Component;
@@ -33,6 +33,7 @@ class Renderer;
 class RigidBody;
 class Camera;
 
+extern iTime Time;
 
 
 struct VertexBufferData {
@@ -63,8 +64,9 @@ public:
 		ObjectList.erase(std::remove(ObjectList.begin(), ObjectList.end(), this), ObjectList.end());
 	}
 	//NEED UPDATE: UNLOAD function clear list
-private:
 	static std::vector<Object*> ObjectList;
+private:
+	
 
 };
 
@@ -78,9 +80,7 @@ public:
 		transform = nullptr;
 	}
 
-	virtual ~Component() {
-
-	}
+	~Component();
 };
 
 class Behavior : public Component {
@@ -347,7 +347,7 @@ private:
 	}
 };
 
-class Time {
+class iTime {
 public:
 	float DeltaTime;
 
@@ -356,7 +356,8 @@ public:
 	}
 	void End() {
 		t2 = std::chrono::high_resolution_clock::now();
-		DeltaTime = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
+		DeltaTime = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+		DeltaTime /= 1000000;
 	}
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> t1, t2;
@@ -392,16 +393,6 @@ public:
 		ComponentList.push_back((Component*)p);
 
 		return p;
-	}
-
-	void RemoveComponent(std::string type) {
-		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); ++it)
-		{
-			if (type == (*it)->name) {
-				delete (*it);
-				ComponentList.erase(it);
-			}
-		}
 	}
 
 	template <typename T> T* GetComponent();
@@ -445,18 +436,21 @@ public:
 	}
 
 	~GameObject() {
+		delete transform;
+
+		for (int j = 0, i = ComponentList.size(); j < i; j++) {
+			delete ComponentList.at(0);
+		}
+
+		ComponentList.clear();
+
 		for (std::vector<GameObject*>::iterator it = GameObjectList.begin(); it != GameObjectList.end(); ++it)
 		{
 			if (this == (*it)) {
 				GameObjectList.erase(it);
+				break;
 			}
 		}
-
-		for (auto p : ComponentList) {
-			delete p;
-		}
-		delete transform;
-		ComponentList.clear();
 	}
 
 	std::vector<Component*> ComponentList;

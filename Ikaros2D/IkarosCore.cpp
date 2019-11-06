@@ -17,6 +17,8 @@ std::vector<Renderer*> Renderer::RendererList{};
 std::vector<Camera*> Camera::CameraList{};
 std::vector<MonoBehavior*> MonoBehaviorList{};
 
+iTime Time;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 static bool Initialize(HINSTANCE hInst);
@@ -91,7 +93,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	ShowWindow(g_hWnd, nCmdShow);
 	UpdateWindow(g_hWnd);
 	Initialize(hInstance);
-
 	//Main Loop
 	MSG msg = {};
 	while (WM_QUIT != msg.message) {
@@ -101,10 +102,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			DispatchMessage(&msg);
 		}
 		else {
+			Time.Start();
 			//NEED UPDATE: Want an outer loop for scene management
 			Update();
 			Draw();
 			TickCount++;
+
+			Time.End();
 		}
 	}
 	Finalize();
@@ -389,8 +393,8 @@ Transform::~Transform() {
 	}
 }
 
-Renderer::~Renderer() {
-	if (parent != nullptr) {
+Component::~Component(){
+		if (parent != nullptr) {
 		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
 		{
 			if (this == (*it)) {
@@ -399,6 +403,9 @@ Renderer::~Renderer() {
 			}
 		}
 	}
+}
+
+Renderer::~Renderer() {
 	for (std::vector<Renderer*>::iterator it = RendererList.begin(); it != RendererList.end(); ++it)
 	{
 		if (this == (*it)) {
@@ -409,27 +416,11 @@ Renderer::~Renderer() {
 }
 
 RigidBody::~RigidBody(){
-	if (parent != nullptr) {
-		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
-		{
-			if (this == (*it)) {
-				parent->ComponentList.erase(it);
-				break;
-			}
-		}
-	}
+	//NEED UPDATE: Release fixtures etc
 }
 
 Camera::~Camera() {
-	if (parent != nullptr) {
-		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); it++)
-		{
-			if (this == (*it)) {
-				parent->ComponentList.erase(it);
-				break;
-			}
-		}
-	}
+	//NEED UPDATE: Clear Camera list
 }
 
 
@@ -448,7 +439,6 @@ void D3D_Finalize(void)
 	}
 }
 
-GameObject* test;
 bool Initialize(HINSTANCE hInst)
 {
 	//Initilize RNG Seed
@@ -471,18 +461,11 @@ bool Initialize(HINSTANCE hInst)
 	//Fade_Initialize();
 	//Scene_Initialize(SCENE_INDEX_TITLE);
 	//Collision_Initialize();
-
-	test = new GameObject("test");
-	test->AddComponent<RigidBody>();
-	test->AddComponent<Renderer>();
-	test->AddComponent<MonoBehavior>();
-	
 	return true;
 }
 
 void Update(void)
 {
-	
 	//キーボードの状態を更新する
 	//Keyboard_Update();
 
