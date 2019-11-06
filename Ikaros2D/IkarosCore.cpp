@@ -15,7 +15,7 @@ std::vector<Texture*> Texture::TextureList{};
 std::vector<GameObject*> GameObject::GameObjectList{};
 std::vector<Renderer*> Renderer::RendererList{};
 std::vector<Camera*> Camera::CameraList{};
-std::vector<MonoBehavior*> MonoBehaviorList{};
+std::vector<MonoBehavior*> MonoBehavior::MonoBehaviorList{};
 
 iTime Time;
 
@@ -93,6 +93,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	ShowWindow(g_hWnd, nCmdShow);
 	UpdateWindow(g_hWnd);
 	Initialize(hInstance);
+
+	MonoBehavior::StartMonoBehaviorArray(); //Start MonoBehavior
+
+
 	//Main Loop
 	MSG msg = {};
 	while (WM_QUIT != msg.message) {
@@ -104,7 +108,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		else {
 			Time.Start();
 			//NEED UPDATE: Want an outer loop for scene management
-			Update();
+			MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
 			Draw();
 			TickCount++;
 
@@ -369,7 +373,8 @@ void Camera::SetD3DDevice() {
 }
 
 //Component Destructor Definitions
-MonoBehavior::~MonoBehavior() {
+
+Component::~Component() {
 	if (parent != nullptr) {
 		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
 		{
@@ -393,14 +398,12 @@ Transform::~Transform() {
 	}
 }
 
-Component::~Component(){
-		if (parent != nullptr) {
-		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
-		{
-			if (this == (*it)) {
-				parent->ComponentList.erase(it);
-				break;
-			}
+MonoBehavior::~MonoBehavior() {
+	for (std::vector<MonoBehavior*>::iterator it = MonoBehaviorList.begin(); it != MonoBehaviorList.end(); ++it)
+	{
+		if (this == (*it)) {
+			MonoBehaviorList.erase(it);
+			break;
 		}
 	}
 }
@@ -420,7 +423,13 @@ RigidBody::~RigidBody(){
 }
 
 Camera::~Camera() {
-	//NEED UPDATE: Clear Camera list
+	for (std::vector<Camera*>::iterator it = CameraList.begin(); it != CameraList.end(); ++it)
+	{
+		if (this == (*it)) {
+			CameraList.erase(it);
+			break;
+		}
+	}
 }
 
 
@@ -458,53 +467,23 @@ bool Initialize(HINSTANCE hInst)
 	//	return false;
 	//}
 
-	//Fade_Initialize();
-	//Scene_Initialize(SCENE_INDEX_TITLE);
-	//Collision_Initialize();
 	return true;
-}
-
-void Update(void)
-{
-	//キーボードの状態を更新する
-	//Keyboard_Update();
-
-	//キーボードの状態を更新する
-	//GamePad_Update();
-
-	//シーンの更新
-	//Scene_Update();
-
-	//フェードの更新
-	//Fade_Update();
 }
 
 void Draw(void)
 {
-
-	// 画面のクリア
+	//Clear screen
 	pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(50, 50, 50, 255), 1.0f, 0);
 
-	// 描画バッチ命令の開始
+	//Begin drawing
 	pD3DDevice->BeginScene();
 
 
-	// シーンの描画
-	//Scene_Draw();
-
-	// フェードの描画
-	//Fade_Draw();
-
-
-	// 描画バッチ命令の終了
+	//End drawing
 	pD3DDevice->EndScene();
 
-	// バックバッファをフリップ（タイミングはD3DPRESENT_PARAMETERSの設定による）
+	// Back buffer flip（Timing depends on D3DPRESENT_PARAMETERS）
 	pD3DDevice->Present(NULL, NULL, NULL, NULL);
-
-
-	// シーンのチェック
-	//Scene_Check();
 }
 
 void Finalize(void)

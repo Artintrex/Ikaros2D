@@ -64,8 +64,8 @@ public:
 		ObjectList.erase(std::remove(ObjectList.begin(), ObjectList.end(), this), ObjectList.end());
 	}
 	//NEED UPDATE: UNLOAD function clear list
-	static std::vector<Object*> ObjectList;
 private:
+	static std::vector<Object*> ObjectList;
 	
 
 };
@@ -93,7 +93,7 @@ public:
 class MonoBehavior : public Behavior {
 public:
 	MonoBehavior() : Behavior("MonoBehavior") {
-		//NEED UPDATE : what should be inside MB constructor ???
+		MonoBehaviorList.push_back(this);
 	}
 
 	~MonoBehavior();
@@ -109,6 +109,23 @@ public:
 		//Run every frame
 	}
 
+	static void AwakeMonoBehaviorArray() {
+		for (auto p : MonoBehaviorList) {
+			p->Awake();
+		}
+	}
+
+	static void StartMonoBehaviorArray() {
+		for (auto p : MonoBehaviorList) {
+			p->Start();
+		}
+	}
+
+	static void UpdateMonoBehaviorArray() {
+		for (auto p : MonoBehaviorList) {
+			p->Update();
+		}
+	}
 	//NEED UPDATE: clear list
 private:
 	static std::vector<MonoBehavior*> MonoBehaviorList;
@@ -291,6 +308,8 @@ public:
 		D3DXMatrixIdentity(&mCameraWorld);
 		D3DXMatrixIdentity(&Projection);
 		D3DXMatrixIdentity(&View);
+
+		CameraList.push_back(this);
 	}
 
 	~Camera();
