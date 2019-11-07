@@ -1,3 +1,2 @@
 #pragma once
-
-class MyScript;
+#include "IkarosCore.h"

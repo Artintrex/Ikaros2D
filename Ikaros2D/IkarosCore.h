@@ -54,10 +54,6 @@ struct Rect {
 	float H;
 };
 
-double frand() {
-	return (double)rand() / RAND_MAX;
-}
-
 class iTime {
 public:
 	///Time it took to render previous frame
@@ -286,20 +282,20 @@ public:
 		Camera* p = new Camera();
 		p->parent = this;
 		ComponentList.push_back((Component*)p);
-
 		return p;
 	}
 
 	///Method to add custom Component
 	/*
-	template <> C* AddComponent<C>() {
-		Component* p = new C();
+	template <typedef T> T* AddComponent<T>() {
+		Component* p = new T();
 		p->parent = this;
 		ComponentList.push_back(p);
 
 		return p;
 	}
 	*/
+
 	template <typename T> T* GetComponent();
 
 	template <> Renderer* GetComponent<Renderer>() {
