@@ -169,7 +169,7 @@ public:
 	Vector2 size;
 	int sortingOrder;
 
-	Renderer::Renderer(std::string Name = "Renderer");
+	Renderer(std::string Name = "Renderer");
 	~Renderer();
 
 	static std::vector<Renderer*> RendererList;
@@ -181,7 +181,7 @@ public:
 		//NEED UPDATE: actually add physics instad of husk
 	}
 
-	RigidBody::~RigidBody() {
+	~RigidBody() {
 		//NEED UPDATE: Release fixtures etc
 	}
 };
