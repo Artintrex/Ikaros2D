@@ -209,9 +209,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="IkarosCore.cpp" />
+    <ClCompile Include="test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Libs\Box2D\Box2D.h" />
+    <ClInclude Include="GameHeader.h" />
     <ClInclude Include="IkarosCore.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

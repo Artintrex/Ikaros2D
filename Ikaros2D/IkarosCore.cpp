@@ -23,12 +23,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 static bool Initialize(HINSTANCE hInst);
 static void Finalize(void);
-static void Update(void);
-static void Draw(void);
 static bool D3D_Initialize(HWND hWnd);
 static void D3D_Finalize();
-
-int TickCount = 0;
 
 #ifndef _BUILD
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -96,7 +92,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	MonoBehavior::StartMonoBehaviorArray(); //Start MonoBehavior
 
-
 	//Main Loop
 	MSG msg = {};
 	while (WM_QUIT != msg.message) {
@@ -108,9 +103,22 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		else {
 			Time.Start();
 			//NEED UPDATE: Want an outer loop for scene management
+
 			MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
-			Draw();
-			TickCount++;
+			
+			//Clear screen
+			pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(50, 50, 50, 255), 1.0f, 0);
+
+			//Begin drawing
+			pD3DDevice->BeginScene();
+
+			Camera::Draw();
+
+			//End drawing
+			pD3DDevice->EndScene();
+
+			// Back buffer flip（Timing depends on D3DPRESENT_PARAMETERS）
+			pD3DDevice->Present(NULL, NULL, NULL, NULL);
 
 			Time.End();
 		}
@@ -194,11 +202,112 @@ void Transform::SetMatrix() {
 	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
 }
 
+//Class Method Definitions
+Object::Object(std::string Name) {
+	name = Name;
+	ObjectList.push_back(this);
+}
+
+Object::~Object() {
+	ObjectList.erase(std::remove(ObjectList.begin(), ObjectList.end(), this), ObjectList.end());
+}
+
+Component::Component(std::string Name) : Object(Name) {
+	parent = nullptr;
+	transform = nullptr;
+}
+Component::~Component() {
+	if (parent != nullptr) {
+		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
+		{
+			if (this == (*it)) {
+				parent->ComponentList.erase(it);
+				break;
+			}
+		}
+	}
+}
+
+MonoBehavior::MonoBehavior(std::string Name) : Behavior(Name) {
+	MonoBehaviorList.push_back(this);
+}
+
+MonoBehavior::~MonoBehavior() {
+	for (std::vector<MonoBehavior*>::iterator it = MonoBehaviorList.begin(); it != MonoBehaviorList.end(); ++it)
+	{
+		if (this == (*it)) {
+			MonoBehaviorList.erase(it);
+			break;
+		}
+	}
+}
+
+void MonoBehavior::AwakeMonoBehaviorArray() {
+	for (auto p : MonoBehaviorList) {
+		p->Awake();
+	}
+}
+
+void MonoBehavior::StartMonoBehaviorArray() {
+	for (auto p : MonoBehaviorList) {
+		p->Start();
+	}
+}
+
+void MonoBehavior::UpdateMonoBehaviorArray() {
+	for (auto p : MonoBehaviorList) {
+		p->Update();
+	}
+}
+
+Texture::Texture(std::string Name) : Object(Name) {
+	texturedata = nullptr;
+	graphicsFormat = D3DSURFACE_DESC();
+	Width = 0;
+	Height = 0;
+}
+
 //File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
+Texture* Texture::LoadTexture(std::string TextureName, LPCTSTR FilePath) {
+		LPDIRECT3DTEXTURE9* tex = new LPDIRECT3DTEXTURE9;
+		if (CreateTexture(FilePath, tex)) {
+			Texture* texture = new Texture("TextureName");
+			texture->texturedata = tex;
+			D3DSURFACE_DESC format;
+
+			(*tex)->GetLevelDesc(0, &format);
+
+			texture->graphicsFormat;
+			texture->Width = format.Width;
+			texture->Height = format.Height;
+
+			TextureList.push_back(texture);
+
+			return texture;
+		}
+		else delete tex;
+}
+
+void Texture::ReleaseTextures() {
+	for (auto p : TextureList) {
+		(*(p->texturedata))->Release();
+		delete p;
+	}
+	TextureList.clear();
+}
+
+Texture* Texture::FindTexturebyName(std::string Name) {
+	for (std::vector<Texture*>::iterator it = TextureList.begin(); it != TextureList.end(); ++it)
+	{
+		if (Name == (*it)->name)return *it;
+		else return nullptr;
+	}
+}
+
 bool Texture::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
 {
 	HRESULT hr = D3DXCreateTextureFromFile(pD3DDevice, FilePath, texturedata);
-	if (hr != D3D_OK){
+	if (hr != D3D_OK) {
 		switch (hr) {
 		case D3DERR_NOTAVAILABLE:
 			std::cout << "ERROR::Failed to load Texture: " << FilePath << std::endl << "ERROR::NOTAVAILABLE" << std::endl;
@@ -220,10 +329,22 @@ bool Texture::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
 		}
 		return false;
 
-	}else {
+	}
+	else {
 		return true;
 
 	}
+}
+
+Sprite::Sprite(std::string Name) : Object(Name) {
+	VertexBuffer = nullptr;
+	renderer = nullptr;
+	texture = nullptr;
+	vertices = nullptr;
+}
+
+Sprite::~Sprite() {
+	VertexBuffer->Release();
 }
 
 void Sprite::SetTexture(std::string Name) {
@@ -240,7 +361,7 @@ void Sprite::SetTexture(std::string Name) {
 	}
 	else {
 		vertices = nullptr;
-		VertexBuffer->Lock(0,0, (void**)&vertices, 0);
+		VertexBuffer->Lock(0, 0, (void**)&vertices, 0);
 
 		vertices[0].position = Vector3(-0.5f, 0.5f, 0);
 		vertices[1].position = Vector3(0.5f, 0.5f, 0);
@@ -264,15 +385,100 @@ void Sprite::SetTexture(std::string Name) {
 	}
 }
 
-//Init renderer
-Renderer::Renderer() : Component("Renderer") {
+Renderer::Renderer(std::string Name) : Component(Name) {
 	sprite = nullptr;
 	sortingOrder = 0;
 
 	RendererList.push_back(this);
 }
 
-//Main draw function for each camera
+Renderer::~Renderer() {
+	for (std::vector<Renderer*>::iterator it = RendererList.begin(); it != RendererList.end(); ++it)
+	{
+		if (this == (*it)) {
+			RendererList.erase(it);
+			break;
+		}
+	}
+}
+
+Transform::Transform(Vector3 Position, Vector3 Rotation, Vector3 Scale) : Component("Transform") {
+	position = Position;
+	rotation = Rotation;
+	scale = Scale;
+
+	D3DXMatrixIdentity(&localToWorldMatrix);
+	SetMatrix();
+}
+
+Transform::~Transform() {
+	if (parent != nullptr) {
+		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
+		{
+			if (this == (*it)) {
+				parent->ComponentList.erase(it);
+				break;
+			}
+		}
+	}
+}
+
+void Transform::Translate(Vector3 translation) {
+	position = translation;
+	SetMatrix();
+}
+
+void Transform::Rotate(Vector3 eulers) {
+	rotation = eulers;
+	SetMatrix();
+}
+
+void Transform::Scale(Vector3 scales) {
+	scale = scales;
+	SetMatrix();
+}
+
+Camera::Camera(std::string Name) : Behavior(Name) {
+	transform = nullptr;
+	fieldOfView = 60.0f;
+	nearClipPlane = 0.3f;
+	farClipPlane = 1000.0f;
+	rect.X = 0;
+	rect.Y = 0;
+	rect.W = 1;
+	rect.H = 1;
+	aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+
+	orthographic = false;
+	orthographicSize = 10.0f;
+
+	SetD3DDevice();
+
+	D3DXMatrixIdentity(&mCameraWorld);
+	D3DXMatrixIdentity(&Projection);
+	D3DXMatrixIdentity(&View);
+
+	CameraList.push_back(this);
+}
+
+Camera::~Camera() {
+	for (std::vector<Camera*>::iterator it = CameraList.begin(); it != CameraList.end(); ++it)
+	{
+		if (this == (*it)) {
+			CameraList.erase(it);
+			break;
+		}
+	}
+}
+
+//Draw all cameras
+void Camera::Draw() {
+	for (auto p : CameraList) {
+		p->draw();
+	}
+}
+
+//Main draw function for a camera
 void Camera::draw() {
 	pD3DDevice->SetTransform(D3DTS_VIEW, &View);
 	pD3DDevice->SetTransform(D3DTS_PROJECTION, &Projection);
@@ -372,64 +578,74 @@ void Camera::SetD3DDevice() {
 	//	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 }
 
-//Component Destructor Definitions
+void Camera::SetProjection() {
+	D3DXMatrixPerspectiveFovLH(&Projection,
+		fieldOfView,
+		aspect,
+		nearClipPlane,
+		farClipPlane);
+	if (orthographic) {
+		D3DXMatrixIdentity(&Projection);
 
-Component::~Component() {
-	if (parent != nullptr) {
-		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
-		{
-			if (this == (*it)) {
-				parent->ComponentList.erase(it);
-				break;
-			}
-		}
+		D3DXMatrixOrthoLH(&Projection,
+			SCREEN_WIDTH * rect.W * orthographicSize,
+			SCREEN_HEIGHT * rect.H * orthographicSize,
+			nearClipPlane,
+			farClipPlane);
 	}
 }
 
-Transform::~Transform() {
-	if (parent != nullptr) {
-		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
-		{
-			if (this == (*it)) {
-				parent->ComponentList.erase(it);
-				break;
-			}
-		}
-	}
+void Camera::SetCamera() {
+
+	D3DXMatrixRotationYawPitchRoll(&mCameraRot, transform->rotation.y, transform->rotation.x, transform->rotation.z);
+
+	Vector3 vWorldUp, vWorldAhead;
+	Vector3 vLocalUp(0, 1, 0);
+	Vector3 vLocalAhead(0, 0, 1);
+
+	D3DXVec3TransformCoord(&vWorldUp, &vLocalUp, &mCameraRot);
+	D3DXVec3TransformCoord(&vWorldAhead, &vLocalAhead, &mCameraRot);
+
+	//Local to World Coord for relative camera translation
+	//D3DXVec3TransformCoord(&vPosWorld, &vDelta, &mCameraRot);
+	//add postworld to transform for movement
+
+	Vector3 LookAt = transform->position + vWorldAhead;
+
+	D3DXMatrixLookAtLH(&View, &(transform->position), &LookAt, &vWorldUp);
+	D3DXMatrixInverse(&mCameraWorld, NULL, &View);
 }
 
-MonoBehavior::~MonoBehavior() {
-	for (std::vector<MonoBehavior*>::iterator it = MonoBehaviorList.begin(); it != MonoBehaviorList.end(); ++it)
+GameObject::GameObject(std::string Name) : Object(Name) {
+	transform = new Transform();
+	transform->parent = this;
+	GameObjectList.push_back(this);
+}
+
+GameObject::~GameObject() {
+	delete transform;
+
+	for (int j = 0, i = ComponentList.size(); j < i; j++) {
+		delete ComponentList.at(0);
+	}
+
+	ComponentList.clear();
+
+	for (std::vector<GameObject*>::iterator it = GameObjectList.begin(); it != GameObjectList.end(); ++it)
 	{
 		if (this == (*it)) {
-			MonoBehaviorList.erase(it);
+			GameObjectList.erase(it);
 			break;
 		}
 	}
 }
 
-Renderer::~Renderer() {
-	for (std::vector<Renderer*>::iterator it = RendererList.begin(); it != RendererList.end(); ++it)
+GameObject* GameObject::Find(std::string Name) {
+	for (std::vector<GameObject*>::iterator it = GameObjectList.begin(); it != GameObjectList.end(); ++it)
 	{
-		if (this == (*it)) {
-			RendererList.erase(it);
-			break;
-		}
+		if (Name == (*it)->name)return *it;
 	}
-}
-
-RigidBody::~RigidBody(){
-	//NEED UPDATE: Release fixtures etc
-}
-
-Camera::~Camera() {
-	for (std::vector<Camera*>::iterator it = CameraList.begin(); it != CameraList.end(); ++it)
-	{
-		if (this == (*it)) {
-			CameraList.erase(it);
-			break;
-		}
-	}
+	return nullptr;
 }
 
 
@@ -468,22 +684,6 @@ bool Initialize(HINSTANCE hInst)
 	//}
 
 	return true;
-}
-
-void Draw(void)
-{
-	//Clear screen
-	pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(50, 50, 50, 255), 1.0f, 0);
-
-	//Begin drawing
-	pD3DDevice->BeginScene();
-
-
-	//End drawing
-	pD3DDevice->EndScene();
-
-	// Back buffer flip（Timing depends on D3DPRESENT_PARAMETERS）
-	pD3DDevice->Present(NULL, NULL, NULL, NULL);
 }
 
 void Finalize(void)
