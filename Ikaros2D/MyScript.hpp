@@ -8,13 +8,13 @@ public:
 	GameObject* cam;
 	void Awake() {
 	//DONT USE YET
-		//asset/texture/field000.jpg
+
 	}
 
 	void Start() {
 		camObj = new GameObject("MainCamera");
 		camObj->AddComponent<Camera>();
-		camObj->transform->Translate(Vector3(0, 0, -100));
+		camObj->transform->Translate(Vector3(0, 0, 0));
 
 
 		test = new GameObject("Tester");
@@ -22,10 +22,11 @@ public:
 		Sprite* tsprite = new Sprite();
 		
 		tsprite->texture = tex;
-		//tsprite->SetTexture();
+		Renderer* rend = test->AddComponent<Renderer>();
+		rend->sprite = tsprite;
+		tsprite->SetTexture();
 
-		//Renderer* rend = test->AddComponent<Renderer>();
-		//rend->sprite = tsprite;
+
 		
 	}
 

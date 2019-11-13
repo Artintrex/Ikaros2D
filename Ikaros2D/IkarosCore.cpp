@@ -22,9 +22,9 @@ iTime Time;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-static bool Initialize(HINSTANCE hInst);
-static void Finalize(void);
-static bool D3D_Initialize(HWND hWnd);
+static bool Initialize();
+static void Finalize();
+static bool D3D_Initialize();
 static void D3D_Finalize();
 
 #ifndef _BUILD
@@ -89,7 +89,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	ShowWindow(g_hWnd, nCmdShow);
 	UpdateWindow(g_hWnd);
-	Initialize(hInstance);
+	Initialize();
 
 	//NEED UPDATE: DEBUG CODE
 	GameObject* test = new GameObject("GameManager");
@@ -163,7 +163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-bool D3D_Initialize(HWND hWnd)
+bool D3D_Initialize()
 {
 	// Direct3D Interface
 	g_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
@@ -342,10 +342,10 @@ bool Texture::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
 }
 
 Sprite::Sprite(std::string Name) : Object(Name) {
-	VertexBuffer = nullptr;
 	renderer = nullptr;
 	texture = nullptr;
 	vertices = nullptr;
+	VertexBuffer = NULL;
 }
 
 Sprite::~Sprite() {
@@ -355,9 +355,10 @@ Sprite::~Sprite() {
 void Sprite::SetTexture(std::string Name) {
 	if (texture == nullptr) {
 		texture = texture->FindTexturebyName(Name);
+		std::cout << texture << std::endl;
 	}
 	
-	if (FAILED(pD3DDevice->CreateVertexBuffer(sizeof(VertexBufferData),
+	if (FAILED(pD3DDevice->CreateVertexBuffer(sizeof(VertexBufferData)*4,
 		D3DUSAGE_WRITEONLY,
 		(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1),
 		D3DPOOL_MANAGED,
@@ -367,7 +368,6 @@ void Sprite::SetTexture(std::string Name) {
 		std::cout << "ERROR::Failed to create vertex buffer for Texture: " << Name << std::endl;
 	}
 	else {
-		vertices = nullptr;
 		VertexBuffer->Lock(0, 0, (void**)&vertices, 0);
 
 		vertices[0].position = Vector3(-0.5f, 0.5f, 0);
@@ -385,7 +385,7 @@ void Sprite::SetTexture(std::string Name) {
 			vertices[i].position.y *= texture->Height;
 
 			vertices[i].color = D3DCOLOR_RGBA(255, 255, 255, 255);
-			vertices[i].normal = Vector3(0, 0, 0);
+			vertices[i].normal = Vector3(0, 1, 0);
 		}
 
 		VertexBuffer->Unlock();
@@ -447,14 +447,14 @@ void Transform::Scale(Vector3 scales) {
 
 Camera::Camera(std::string Name) : Behavior(Name) {
 	transform = nullptr;
-	fieldOfView = 60.0f;
-	nearClipPlane = 0.3f;
+	fieldOfView = (D3DXToRadian(60.0f));
+	nearClipPlane = 10.0f;
 	farClipPlane = 1000.0f;
 	rect.X = 0;
 	rect.Y = 0;
 	rect.W = 1;
 	rect.H = 1;
-	aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+	aspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 
 	orthographic = false;
 	orthographicSize = 10.0f;
@@ -490,10 +490,10 @@ void Camera::draw() {
 	SetD3DDevice();
 	SetCamera();
 
-	pD3DDevice->SetTransform(D3DTS_VIEW, &View);
+	//pD3DDevice->SetTransform(D3DTS_VIEW, &View);
 	pD3DDevice->SetTransform(D3DTS_PROJECTION, &Projection);
 	for (auto p : Renderer::RendererList) {
-		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
+		//pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
 
 		pD3DDevice->SetStreamSource(0, p->sprite->VertexBuffer, 0, sizeof(VertexBufferData));
 		pD3DDevice->SetTexture(0, *(p->sprite->texture->texturedata));
@@ -660,7 +660,7 @@ GameObject* GameObject::Find(std::string Name) {
 
 
 // Uninitialization
-void D3D_Finalize(void)
+void D3D_Finalize()
 {
 	//Device
 	if (pD3DDevice) {
@@ -674,12 +674,12 @@ void D3D_Finalize(void)
 	}
 }
 
-bool Initialize(HINSTANCE hInst)
+bool Initialize()
 {
 	//Initilize RNG Seed
 	srand((unsigned int)time(NULL));
 
-	if (!D3D_Initialize(g_hWnd)) {
+	if (!D3D_Initialize()) {
 		puts("Failed to initilize D3D");
 		return false;
 	}

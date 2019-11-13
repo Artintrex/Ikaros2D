@@ -176,7 +176,6 @@ class Sprite : public Object {
 public:
 	Object* renderer;
 	Texture* texture;
-	VertexBufferData* vertices;
 
 	LPDIRECT3DVERTEXBUFFER9 VertexBuffer;
 
@@ -184,6 +183,9 @@ public:
 	~Sprite();
 
 	void SetTexture(std::string Name = "");
+
+private:
+	VertexBufferData* vertices;
 };
 
 class Renderer : public Component {
