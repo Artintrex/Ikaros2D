@@ -1,4 +1,5 @@
 #include "IkarosCore.h"
+#include "GameHeader.h"
 
 //WindowProperties
 #define CLASS_NAME     "MainWindow"
@@ -90,6 +91,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	UpdateWindow(g_hWnd);
 	Initialize(hInstance);
 
+	//NEED UPDATE: DEBUG CODE
+	GameObject* test = new GameObject("GameManager");
+	MyScript* rtest = test->AddComponent<MyScript>();
+
+	//NEED UPDATE: Move this after adding scene loader and add Awake as well
 	MonoBehavior::StartMonoBehaviorArray(); //Start MonoBehavior
 
 	//Main Loop
@@ -103,7 +109,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		else {
 			Time.Start();
 			//NEED UPDATE: Want an outer loop for scene management
-
 			MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
 			
 			//Clear screen
@@ -243,20 +248,20 @@ MonoBehavior::~MonoBehavior() {
 }
 
 void MonoBehavior::AwakeMonoBehaviorArray() {
-	for (auto p : MonoBehaviorList) {
-		p->Awake();
+	for (std::vector<MonoBehavior*>::iterator it = MonoBehaviorList.begin(); it != MonoBehaviorList.end(); ++it) {
+		(*it)->Awake();
 	}
 }
 
 void MonoBehavior::StartMonoBehaviorArray() {
-	for (auto p : MonoBehaviorList) {
-		p->Start();
+	for (std::vector<MonoBehavior*>::iterator it = MonoBehaviorList.begin(); it != MonoBehaviorList.end(); ++it) {
+		(*it)->Start();
 	}
 }
 
 void MonoBehavior::UpdateMonoBehaviorArray() {
-	for (auto p : MonoBehaviorList) {
-		p->Update();
+	for (std::vector<MonoBehavior*>::iterator it = MonoBehaviorList.begin(); it != MonoBehaviorList.end(); ++it) {
+		(*it)->Update();
 	}
 }
 
@@ -348,8 +353,10 @@ Sprite::~Sprite() {
 }
 
 void Sprite::SetTexture(std::string Name) {
-	texture = texture->FindTexturebyName(Name);
-
+	if (texture == nullptr) {
+		texture = texture->FindTexturebyName(Name);
+	}
+	
 	if (FAILED(pD3DDevice->CreateVertexBuffer(sizeof(VertexBufferData),
 		D3DUSAGE_WRITEONLY,
 		(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1),
@@ -452,11 +459,11 @@ Camera::Camera(std::string Name) : Behavior(Name) {
 	orthographic = false;
 	orthographicSize = 10.0f;
 
-	SetD3DDevice();
-
 	D3DXMatrixIdentity(&mCameraWorld);
 	D3DXMatrixIdentity(&Projection);
 	D3DXMatrixIdentity(&View);
+
+	SetProjection();
 
 	CameraList.push_back(this);
 }
@@ -480,6 +487,9 @@ void Camera::Draw() {
 
 //Main draw function for a camera
 void Camera::draw() {
+	SetD3DDevice();
+	SetCamera();
+
 	pD3DDevice->SetTransform(D3DTS_VIEW, &View);
 	pD3DDevice->SetTransform(D3DTS_PROJECTION, &Projection);
 	for (auto p : Renderer::RendererList) {

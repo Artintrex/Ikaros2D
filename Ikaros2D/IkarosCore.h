@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -8,9 +9,6 @@
 #include <d3dx9.h>
 #include "Box2D\Box2D.h"
 #include <cmath>
-
-#pragma once
-#include "GameHeader.h"
 
 //NEED UPDATE: Change Resolution Settings needs to read from file!! Also set d3d parameters like fullscreen etc
 #define SCREEN_WIDTH  (1024)
@@ -54,6 +52,33 @@ struct Rect {
 	float H;
 };
 
+//Code to acquire template type info as string: Big thanks to Stefan Reinalter
+namespace internal
+{
+	static const unsigned int FRONT_SIZE = sizeof("internal::GetTypeNameHelper<") - 1u;
+	static const unsigned int BACK_SIZE = sizeof(">::GetTypeName") - 1u;
+
+	template <typename T>
+	struct GetTypeNameHelper
+	{
+		static const char* GetTypeName(void)
+		{
+			static const size_t size = sizeof(__FUNCTION__) - FRONT_SIZE - BACK_SIZE;
+			static char typeName[size] = {};
+			memcpy(typeName, __FUNCTION__ + FRONT_SIZE, size - 1u);
+
+			return typeName;
+		}
+	};
+}
+
+
+template <typename T>
+const char* GetTypeName(void)
+{
+	return internal::GetTypeNameHelper<T>::GetTypeName();
+}
+
 class iTime {
 public:
 	///Time it took to render previous frame
@@ -79,9 +104,9 @@ public:
 
 	Object(std::string Name);
 	virtual ~Object();
-	static std::vector<Object*> ObjectList;
-private:
 	
+private:
+	static std::vector<Object*> ObjectList;
 };
 
 class Component : public Object {
@@ -122,7 +147,6 @@ public:
 	static void StartMonoBehaviorArray();
 	///Do not call this function, meant for main loop
 	static void UpdateMonoBehaviorArray();
-
 private:
 	static std::vector<MonoBehavior*> MonoBehaviorList;
 };
@@ -159,7 +183,7 @@ public:
 	Sprite(std::string Name = "Sprite");
 	~Sprite();
 
-	void SetTexture(std::string Name);
+	void SetTexture(std::string Name = "");
 };
 
 class Renderer : public Component {
@@ -252,85 +276,24 @@ public:
 
 	static GameObject* Find(std::string Name);
 
-	template <typename T> T* AddComponent();
-
-	template <> Renderer* AddComponent<Renderer>() {
-		Renderer* p = new Renderer();
+	template <class T> T* AddComponent() {
+		T* p = new T();
 		p->parent = this;
+		p->transform = this->transform;
 		ComponentList.push_back((Component*)p);
 
 		return p;
 	}
 
-	template <> RigidBody* AddComponent<RigidBody>() {
-		RigidBody* p = new RigidBody();
-		p->parent = this;
-		ComponentList.push_back((Component*)p);
-
-		return p;
-	}
-
-	template <> MonoBehavior* AddComponent<MonoBehavior>() {
-		MonoBehavior* p = new MonoBehavior();
-		p->parent = this;
-		ComponentList.push_back((Component*)p);
-
-		return p;
-	}
-
-	template <> Camera* AddComponent<Camera>() {
-		Camera* p = new Camera();
-		p->parent = this;
-		ComponentList.push_back((Component*)p);
-		return p;
-	}
-
-	///Method to add custom Component
-	/*
-	template <typedef T> T* AddComponent<T>() {
-		Component* p = new T();
-		p->parent = this;
-		ComponentList.push_back(p);
-
-		return p;
-	}
-	*/
-
-	template <typename T> T* GetComponent();
-
-	template <> Renderer* GetComponent<Renderer>() {
+	template <class T> T* GetComponent() {
+		std::string Type;
+		Type += GetTypeName<T>();
 		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); ++it)
 		{
-			if ("Renderer" == (*it)->name)return static_cast<Renderer*>(*it);
+			if (Type == "class " + (*it)->name)return static_cast<T*>(*it);
 		}
 		return nullptr;
 	}
-
-	template <> RigidBody* GetComponent<RigidBody>() {
-		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); ++it)
-		{
-			if ("RigidBody" == (*it)->name)return static_cast<RigidBody*>(*it);
-		}
-			return nullptr;
-	}
-
-	template <> MonoBehavior* GetComponent<MonoBehavior>() {
-		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); ++it)
-		{
-			if ("MonoBehavior" == (*it)->name)return static_cast<MonoBehavior*>(*it);
-		}
-		return nullptr;
-	}
-
-	template <> Camera* GetComponent<Camera>() {
-		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); ++it)
-		{
-			if ("Camera" == (*it)->name)return static_cast<Camera*>(*it);
-		}
-		return nullptr;
-	}
-
-
 
 	std::vector<Component*> ComponentList;
 private:

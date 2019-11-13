@@ -13,24 +13,27 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Library">
+      <UniqueIdentifier>{b59c2470-7e88-4a3b-87a4-4fbf9166ff61}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IkarosCore.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="test.cpp">
-      <Filter>GameSource</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IkarosCore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Libs\Box2D\Box2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GameHeader.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyScript.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="IkarosCore.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Libs\Box2D\Box2D.h">
+      <Filter>Library</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
