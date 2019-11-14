@@ -518,7 +518,7 @@ void Camera::draw() {
 
 		pD3DDevice->SetTexture(0, *(p->sprite->texture->texturedata));
 	
-		if(pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 4) != D3D_OK){
+		if(pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2) != D3D_OK){
 			puts("Failed to Render");
 		}
 	}

@@ -5,18 +5,15 @@ class MyScript : public MonoBehavior {
 public:
 	GameObject* test;
 	GameObject* camObj;
-	GameObject* cam;
 
-	float rot;
 	void Awake() {
-	//DONT USE YET
+
 	}
 
 	void Start() {
-		rot = 0;
 		camObj = new GameObject("MainCamera");
 		camObj->AddComponent<Camera>();
-		camObj->transform->Translate(0, 2, -25);
+		camObj->transform->Translate(0, 2, -5000);
 
 
 		test = new GameObject("Tester");
@@ -28,7 +25,7 @@ public:
 		rend->sprite = tsprite;
 		tsprite->SetTexture();
 
-		test->transform->Scale(0.01, 0.01, 0.01);
+		test->transform->Scale(1, 1, 1);
 
 		//if (Keyboard_IsPress(DIK_A)) {
 		//	test->transform->Translate(5, 0, 0);
@@ -37,9 +34,6 @@ public:
 	}
 
 	void Update() {
-		rot += Time.DeltaTime * 10;
-		test->transform->Rotate(rot, rot, rot);
-
-
+		test->transform->Rotate(1, 0, 0);
 	}
 };

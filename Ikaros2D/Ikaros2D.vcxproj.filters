@@ -41,7 +41,10 @@
     <ClInclude Include="Input.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Kokun.hpp">
+    <ClInclude Include="HuJian.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Template.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
   </ItemGroup>

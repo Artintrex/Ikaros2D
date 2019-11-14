@@ -1,7 +1,7 @@
 #pragma once
 #include "GameHeader.h"
-
-class Kokun : public MonoBehavior {
+//Ž©•ª‚Ìhppƒtƒ@ƒCƒ‹‚ðGameHeader.h‚Ö’Ç‰Á‚µ‚Ä‚­‚¾‚³‚¢
+class Template : public MonoBehavior {
 public:
 
 	void Awake() {
