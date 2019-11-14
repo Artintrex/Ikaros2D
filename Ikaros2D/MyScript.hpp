@@ -26,8 +26,6 @@ public:
 		rend->sprite = tsprite;
 		tsprite->SetTexture();
 
-
-		
 	}
 
 	void Update() {
