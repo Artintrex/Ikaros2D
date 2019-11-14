@@ -1,14 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <string>
-#include <chrono>
-#include <windows.h>
-#include <d3d9.h>
-#include <d3dx9.h>
-#include "Box2D\Box2D.h"
-#include <cmath>
-#include <dinput.h>
+#include "Input.h"
 
 //key
 #define BUTTON_UP		0x00000001l	// 方向キー上(.IY<0)
@@ -50,12 +40,6 @@ static LPDIRECTINPUTDEVICE8	g_pGamePad[GAMEPADMAX] = { NULL, NULL, NULL, NULL };
 static DWORD				g_padState[GAMEPADMAX];	// パッド情報（複数対応）
 static DWORD				g_padTrigger[GAMEPADMAX];
 static int					g_padCount = 0;			// 検出したパッドの数
-
-
-#pragma once
-#include "GameHeader.h"
-static BYTE					g_aKeyState[256];
-
 
 
 
@@ -321,3 +305,16 @@ BOOL GamePad_IsTrigger(int padNo, DWORD button)
 {
 	return (button & g_padTrigger[padNo]);
 }
+
+/* MOUSE 
+POINT p;
+GetCursorPos(&p);
+
+if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
+
+}
+
+if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
+
+}
+*/

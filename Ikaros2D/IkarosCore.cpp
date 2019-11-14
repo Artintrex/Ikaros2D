@@ -1,5 +1,7 @@
 #include "IkarosCore.h"
 #include "GameHeader.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 //WindowProperties
 #define CLASS_NAME     "MainWindow"
@@ -196,17 +198,6 @@ bool D3D_Initialize()
 	return true;
 }
 
-void Transform::SetMatrix() {
-	D3DXMATRIX MatTemp;
-
-	D3DXMatrixScaling(&MatTemp, scale.x, scale.y, scale.z);
-	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
-	D3DXMatrixRotationYawPitchRoll(&MatTemp, rotation.y, rotation.x, rotation.z);
-	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
-	D3DXMatrixTranslation(&MatTemp, position.x, position.y, position.z);
-	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
-}
-
 //Class Method Definitions
 Object::Object(std::string Name) {
 	name = Name;
@@ -267,7 +258,6 @@ void MonoBehavior::UpdateMonoBehaviorArray() {
 
 Texture::Texture(std::string Name) : Object(Name) {
 	texturedata = nullptr;
-	graphicsFormat = D3DSURFACE_DESC();
 	Width = 0;
 	Height = 0;
 }
@@ -278,13 +268,8 @@ Texture* Texture::LoadTexture(std::string TextureName, LPCTSTR FilePath) {
 		if (CreateTexture(FilePath, tex)) {
 			Texture* texture = new Texture("TextureName");
 			texture->texturedata = tex;
-			D3DSURFACE_DESC format;
 
-			(*tex)->GetLevelDesc(0, &format);
-
-			texture->graphicsFormat;
-			texture->Width = format.Width;
-			texture->Height = format.Height;
+			stbi_info(FilePath, &(texture->Width), &(texture->Height), 0);
 
 			TextureList.push_back(texture);
 
@@ -360,7 +345,7 @@ void Sprite::SetTexture(std::string Name) {
 	
 	if (FAILED(pD3DDevice->CreateVertexBuffer(sizeof(VertexBufferData)*4,
 		D3DUSAGE_WRITEONLY,
-		(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1),
+		(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1),
 		D3DPOOL_MANAGED,
 		&VertexBuffer,
 		NULL)))
@@ -385,7 +370,6 @@ void Sprite::SetTexture(std::string Name) {
 			vertices[i].position.y *= texture->Height;
 
 			vertices[i].color = D3DCOLOR_RGBA(255, 255, 255, 255);
-			vertices[i].normal = Vector3(0, 1, 0);
 		}
 
 		VertexBuffer->Unlock();
@@ -409,12 +393,25 @@ Renderer::~Renderer() {
 	}
 }
 
+void Transform::SetMatrix() {
+	D3DXMATRIX MatTemp;
+
+	D3DXMatrixIdentity(&localToWorldMatrix);
+	D3DXMatrixScaling(&MatTemp, scale.x, scale.y, scale.z);
+	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
+	D3DXMatrixRotationYawPitchRoll(&MatTemp, rotation.y, rotation.x, rotation.z);
+	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
+	D3DXMatrixTranslation(&MatTemp, position.x, position.y, position.z);
+	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
+}
+
 Transform::Transform(Vector3 Position, Vector3 Rotation, Vector3 Scale) : Component("Transform") {
 	position = Position;
 	rotation = Rotation;
 	scale = Scale;
 
 	D3DXMatrixIdentity(&localToWorldMatrix);
+
 	SetMatrix();
 }
 
@@ -430,18 +427,18 @@ Transform::~Transform() {
 	}
 }
 
-void Transform::Translate(Vector3 translation) {
-	position = translation;
+void Transform::Translate(float x, float y, float z) {
+	position = Vector3(x, y, z);
 	SetMatrix();
 }
 
-void Transform::Rotate(Vector3 eulers) {
-	rotation = eulers;
+void Transform::Rotate(float x, float y, float z) {
+	rotation = Vector3(D3DXToRadian(x), D3DXToRadian(y), D3DXToRadian(z));
 	SetMatrix();
 }
 
-void Transform::Scale(Vector3 scales) {
-	scale = scales;
+void Transform::Scale(float x, float y, float z) {
+	scale = Vector3(x, y, z);
 	SetMatrix();
 }
 
@@ -490,18 +487,24 @@ void Camera::draw() {
 	SetD3DDevice();
 	SetCamera();
 
-	//pD3DDevice->SetTransform(D3DTS_VIEW, &View);
+	pD3DDevice->SetTransform(D3DTS_VIEW, &View);
 	pD3DDevice->SetTransform(D3DTS_PROJECTION, &Projection);
 	for (auto p : Renderer::RendererList) {
-		//pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
+		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
 
 		pD3DDevice->SetStreamSource(0, p->sprite->VertexBuffer, 0, sizeof(VertexBufferData));
+
 		pD3DDevice->SetTexture(0, *(p->sprite->texture->texturedata));
-		pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 4);
+	
+		if(pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 4) != D3D_OK){
+			puts("Failed to Render");
+		}
 	}
 }
 
 void Camera::SetD3DDevice() {
+	pD3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+
 	//Turn off lighting
 	pD3DDevice->SetRenderState(D3DRS_LIGHTING, false);
 	//	g_pD3DDevice->SetRenderState(D3DRS_ZENABLE, true);
@@ -521,21 +524,21 @@ void Camera::SetD3DDevice() {
 	For u values between 0 and 1, for example, the texture is addressed normally; between 1 and 2, the texture is flipped (mirrored);
 	between 2 and 3, the texture is normal again; and so on.
 	*/
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
 
 	/*
 	Texture coordinates outside the range [0.0, 1.0] are set to the texture color at 0.0 or 1.0, respectively.
 	*/
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
 	/*
 	Texture coordinates outside the range [0.0, 1.0] are set to the border color.
 	*/
 	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
 	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
-	pD3DDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(255, 0, 0, 255));
+	pD3DDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(0, 0, 0, 255));
 
 	/*
 	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER,

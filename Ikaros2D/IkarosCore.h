@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <cmath>
 #include <vector>
 #include <algorithm>
 #include <string>
@@ -8,7 +9,6 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include "Box2D\Box2D.h"
-#include <cmath>
 
 //NEED UPDATE: Change Resolution Settings needs to read from file!! Also set d3d parameters like fullscreen etc
 #define SCREEN_WIDTH  (1024)
@@ -40,7 +40,6 @@ extern iTime Time;
 
 struct VertexBufferData {
 	D3DXVECTOR3 position;
-	D3DXVECTOR3 normal;
 	D3DCOLOR color;
 	D3DXVECTOR2 uv;
 };
@@ -154,9 +153,8 @@ private:
 class Texture : public Object {
 public:
 	LPDIRECT3DTEXTURE9* texturedata;
-	UINT Width;
-	UINT Height;
-	D3DSURFACE_DESC graphicsFormat;
+	int Width;
+	int Height;
 
 	Texture(std::string Name);
 
@@ -222,11 +220,12 @@ public:
 	Transform(Vector3 Position = Vector3(0, 0, 0), Vector3 Rotation = Vector3(0, 0, 0), Vector3 Scale = Vector3(1, 1, 1));
 	~Transform();
 
-	void Translate(Vector3 translation);
+	//Moves the tranform 
+	void Translate(float x, float y, float z);
 
-	void Rotate(Vector3 eulers);
+	void Rotate(float x, float y, float z);
 
-	void Scale(Vector3 scales);
+	void Scale(float x, float y, float z);
 private:
 	void SetMatrix();
 };

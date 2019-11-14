@@ -21,6 +21,9 @@
     <ClCompile Include="IkarosCore.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameHeader.h">
@@ -34,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="..\Libs\Box2D\Box2D.h">
       <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
