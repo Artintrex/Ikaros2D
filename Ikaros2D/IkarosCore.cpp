@@ -1,5 +1,7 @@
 #include "IkarosCore.h"
 #include "GameHeader.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 //WindowProperties
 #define CLASS_NAME     "MainWindow"
@@ -196,17 +198,6 @@ bool D3D_Initialize()
 	return true;
 }
 
-void Transform::SetMatrix() {
-	D3DXMATRIX MatTemp;
-
-	D3DXMatrixScaling(&MatTemp, scale.x, scale.y, scale.z);
-	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
-	D3DXMatrixRotationYawPitchRoll(&MatTemp, rotation.y, rotation.x, rotation.z);
-	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
-	D3DXMatrixTranslation(&MatTemp, position.x, position.y, position.z);
-	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
-}
-
 //Class Method Definitions
 Object::Object(std::string Name) {
 	name = Name;
@@ -267,7 +258,6 @@ void MonoBehavior::UpdateMonoBehaviorArray() {
 
 Texture::Texture(std::string Name) : Object(Name) {
 	texturedata = nullptr;
-	graphicsFormat = D3DSURFACE_DESC();
 	Width = 0;
 	Height = 0;
 }
@@ -278,13 +268,8 @@ Texture* Texture::LoadTexture(std::string TextureName, LPCTSTR FilePath) {
 		if (CreateTexture(FilePath, tex)) {
 			Texture* texture = new Texture("TextureName");
 			texture->texturedata = tex;
-			D3DSURFACE_DESC format;
 
-			(*tex)->GetLevelDesc(0, &format);
-
-			texture->graphicsFormat;
-			texture->Width = format.Width;
-			texture->Height = format.Height;
+			stbi_info(FilePath, &(texture->Width), &(texture->Height), 0);
 
 			TextureList.push_back(texture);
 
@@ -409,12 +394,25 @@ Renderer::~Renderer() {
 	}
 }
 
+void Transform::SetMatrix() {
+	D3DXMATRIX MatTemp;
+
+	D3DXMatrixIdentity(&localToWorldMatrix);
+	D3DXMatrixScaling(&MatTemp, scale.x, scale.y, scale.z);
+	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
+	D3DXMatrixRotationYawPitchRoll(&MatTemp, rotation.y, rotation.x, rotation.z);
+	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
+	D3DXMatrixTranslation(&MatTemp, position.x, position.y, position.z);
+	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
+}
+
 Transform::Transform(Vector3 Position, Vector3 Rotation, Vector3 Scale) : Component("Transform") {
 	position = Position;
 	rotation = Rotation;
 	scale = Scale;
 
 	D3DXMatrixIdentity(&localToWorldMatrix);
+
 	SetMatrix();
 }
 
@@ -435,8 +433,8 @@ void Transform::Translate(Vector3 translation) {
 	SetMatrix();
 }
 
-void Transform::Rotate(Vector3 eulers) {
-	rotation = eulers;
+void Transform::Rotate(Vector3 radian) {
+	rotation = radian;
 	SetMatrix();
 }
 
@@ -490,18 +488,24 @@ void Camera::draw() {
 	SetD3DDevice();
 	SetCamera();
 
-	//pD3DDevice->SetTransform(D3DTS_VIEW, &View);
+	pD3DDevice->SetTransform(D3DTS_VIEW, &View);
 	pD3DDevice->SetTransform(D3DTS_PROJECTION, &Projection);
 	for (auto p : Renderer::RendererList) {
-		//pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
+		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
 
 		pD3DDevice->SetStreamSource(0, p->sprite->VertexBuffer, 0, sizeof(VertexBufferData));
+
 		pD3DDevice->SetTexture(0, *(p->sprite->texture->texturedata));
-		pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 4);
+	
+		if(pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 4) != D3D_OK){
+			puts("Failed to Render");
+		}
 	}
 }
 
 void Camera::SetD3DDevice() {
+	pD3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+
 	//Turn off lighting
 	pD3DDevice->SetRenderState(D3DRS_LIGHTING, false);
 	//	g_pD3DDevice->SetRenderState(D3DRS_ZENABLE, true);
