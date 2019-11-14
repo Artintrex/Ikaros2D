@@ -41,5 +41,8 @@
     <ClInclude Include="Input.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Kokun.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

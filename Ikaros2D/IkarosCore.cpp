@@ -15,6 +15,7 @@ static HWND g_hWnd; //Window Handler
 //Class static definitions
 std::vector<Object*> Object::ObjectList{};
 std::vector<Texture*> Texture::TextureList{};
+std::vector<Transform*> Transform::TransformList{};
 std::vector<GameObject*> GameObject::GameObjectList{};
 std::vector<Renderer*> Renderer::RendererList{};
 std::vector<Camera*> Camera::CameraList{};
@@ -112,6 +113,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			Time.Start();
 			//NEED UPDATE: Want an outer loop for scene management
 			MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
+			Transform::UpdateTransform();
 			
 			//Clear screen
 			pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(50, 50, 50, 255), 1.0f, 0);
@@ -239,20 +241,23 @@ MonoBehavior::~MonoBehavior() {
 }
 
 void MonoBehavior::AwakeMonoBehaviorArray() {
-	for (std::vector<MonoBehavior*>::iterator it = MonoBehaviorList.begin(); it != MonoBehaviorList.end(); ++it) {
-		(*it)->Awake();
+	std::vector<MonoBehavior*>::size_type size = MonoBehaviorList.size();
+	for (int i = 0; i < size; ++i) {
+		MonoBehaviorList[i]->Awake();
 	}
 }
 
 void MonoBehavior::StartMonoBehaviorArray() {
-	for (std::vector<MonoBehavior*>::iterator it = MonoBehaviorList.begin(); it != MonoBehaviorList.end(); ++it) {
-		(*it)->Start();
+	std::vector<MonoBehavior*>::size_type size = MonoBehaviorList.size();
+	for (int i = 0; i < size; ++i) {
+		MonoBehaviorList[i]->Start();
 	}
 }
 
 void MonoBehavior::UpdateMonoBehaviorArray() {
-	for (std::vector<MonoBehavior*>::iterator it = MonoBehaviorList.begin(); it != MonoBehaviorList.end(); ++it) {
-		(*it)->Update();
+	std::vector<MonoBehavior*>::size_type size = MonoBehaviorList.size();
+	for (int i = 0; i < size; ++i) {
+		MonoBehaviorList[i]->Update();
 	}
 }
 
@@ -403,6 +408,10 @@ void Transform::SetMatrix() {
 	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
 	D3DXMatrixTranslation(&MatTemp, position.x, position.y, position.z);
 	D3DXMatrixMultiply(&localToWorldMatrix, &localToWorldMatrix, &MatTemp);
+
+	oldposition = position;
+	oldrotation = rotation;
+	oldscale = scale;
 }
 
 Transform::Transform(Vector3 Position, Vector3 Rotation, Vector3 Scale) : Component("Transform") {
@@ -410,43 +419,56 @@ Transform::Transform(Vector3 Position, Vector3 Rotation, Vector3 Scale) : Compon
 	rotation = Rotation;
 	scale = Scale;
 
+	oldposition = position;
+	oldrotation = rotation;
+	oldscale = scale;
+
 	D3DXMatrixIdentity(&localToWorldMatrix);
 
 	SetMatrix();
+
+	TransformList.push_back(this);
 }
 
 Transform::~Transform() {
-	if (parent != nullptr) {
-		for (std::vector<Component*>::iterator it = parent->ComponentList.begin(); it != parent->ComponentList.end(); ++it)
-		{
-			if (this == (*it)) {
-				parent->ComponentList.erase(it);
-				break;
-			}
+	for (std::vector<Transform*>::iterator it = TransformList.begin(); it != TransformList.end(); ++it)
+	{
+		if (this == (*it)) {
+			TransformList.erase(it);
+			break;
 		}
 	}
 }
 
 void Transform::Translate(float x, float y, float z) {
-	position = Vector3(x, y, z);
-	SetMatrix();
+	position += Vector3(x, y, z);
 }
 
 void Transform::Rotate(float x, float y, float z) {
-	rotation = Vector3(D3DXToRadian(x), D3DXToRadian(y), D3DXToRadian(z));
-	SetMatrix();
+	rotation += Vector3(D3DXToRadian(x), D3DXToRadian(y), D3DXToRadian(z));
 }
 
 void Transform::Scale(float x, float y, float z) {
-	scale = Vector3(x, y, z);
-	SetMatrix();
+	scale.x *= x;
+	scale.y *= y;
+	scale.z *= z;
+}
+
+void Transform::UpdateTransform() {
+	for (auto p : TransformList) {
+		if (p->position != p->oldposition ||
+			p->rotation != p->oldrotation ||
+			p->scale != p->oldscale) {
+			p->SetMatrix();
+		}
+	}
 }
 
 Camera::Camera(std::string Name) : Behavior(Name) {
 	transform = nullptr;
 	fieldOfView = (D3DXToRadian(60.0f));
-	nearClipPlane = 10.0f;
-	farClipPlane = 1000.0f;
+	nearClipPlane = 0.3f;
+	farClipPlane = 10000.0f;
 	rect.X = 0;
 	rect.Y = 0;
 	rect.W = 1;
