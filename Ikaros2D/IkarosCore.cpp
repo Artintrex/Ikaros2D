@@ -345,7 +345,7 @@ void Sprite::SetTexture(std::string Name) {
 	
 	if (FAILED(pD3DDevice->CreateVertexBuffer(sizeof(VertexBufferData)*4,
 		D3DUSAGE_WRITEONLY,
-		(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1),
+		(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1),
 		D3DPOOL_MANAGED,
 		&VertexBuffer,
 		NULL)))
@@ -370,7 +370,6 @@ void Sprite::SetTexture(std::string Name) {
 			vertices[i].position.y *= texture->Height;
 
 			vertices[i].color = D3DCOLOR_RGBA(255, 255, 255, 255);
-			vertices[i].normal = Vector3(0, 1, 0);
 		}
 
 		VertexBuffer->Unlock();
@@ -428,18 +427,18 @@ Transform::~Transform() {
 	}
 }
 
-void Transform::Translate(Vector3 translation) {
-	position = translation;
+void Transform::Translate(float x, float y, float z) {
+	position = Vector3(x, y, z);
 	SetMatrix();
 }
 
-void Transform::Rotate(Vector3 radian) {
-	rotation = radian;
+void Transform::Rotate(float x, float y, float z) {
+	rotation = Vector3(D3DXToRadian(x), D3DXToRadian(y), D3DXToRadian(z));
 	SetMatrix();
 }
 
-void Transform::Scale(Vector3 scales) {
-	scale = scales;
+void Transform::Scale(float x, float y, float z) {
+	scale = Vector3(x, y, z);
 	SetMatrix();
 }
 
@@ -504,7 +503,7 @@ void Camera::draw() {
 }
 
 void Camera::SetD3DDevice() {
-	pD3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+	pD3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
 	//Turn off lighting
 	pD3DDevice->SetRenderState(D3DRS_LIGHTING, false);
@@ -525,21 +524,21 @@ void Camera::SetD3DDevice() {
 	For u values between 0 and 1, for example, the texture is addressed normally; between 1 and 2, the texture is flipped (mirrored);
 	between 2 and 3, the texture is normal again; and so on.
 	*/
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
 
 	/*
 	Texture coordinates outside the range [0.0, 1.0] are set to the texture color at 0.0 or 1.0, respectively.
 	*/
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
 	/*
 	Texture coordinates outside the range [0.0, 1.0] are set to the border color.
 	*/
 	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
 	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
-	pD3DDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(255, 0, 0, 255));
+	pD3DDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(0, 0, 0, 255));
 
 	/*
 	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER,

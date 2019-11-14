@@ -40,7 +40,6 @@ extern iTime Time;
 
 struct VertexBufferData {
 	D3DXVECTOR3 position;
-	D3DXVECTOR3 normal;
 	D3DCOLOR color;
 	D3DXVECTOR2 uv;
 };
@@ -221,11 +220,12 @@ public:
 	Transform(Vector3 Position = Vector3(0, 0, 0), Vector3 Rotation = Vector3(0, 0, 0), Vector3 Scale = Vector3(1, 1, 1));
 	~Transform();
 
-	void Translate(Vector3 translation);
+	//Moves the tranform 
+	void Translate(float x, float y, float z);
 
-	void Rotate(Vector3 radian);
+	void Rotate(float x, float y, float z);
 
-	void Scale(Vector3 scales);
+	void Scale(float x, float y, float z);
 private:
 	void SetMatrix();
 };
