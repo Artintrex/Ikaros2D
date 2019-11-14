@@ -226,7 +226,16 @@ public:
 	void Rotate(float x, float y, float z);
 
 	void Scale(float x, float y, float z);
+
+	static void UpdateTransform();
+
 private:
+	Vector3 oldposition;
+	Vector3 oldrotation;
+	Vector3 oldscale;
+
+	static std::vector<Transform*> TransformList;
+
 	void SetMatrix();
 };
 
@@ -245,6 +254,9 @@ public:
 	Camera(std::string Name = "Camera");
 	~Camera();
 
+	///Calculates projection matrix
+	void SetProjection();
+
 	///Do not call this method. It's meant for main loop
 	static void Draw();
 
@@ -260,9 +272,6 @@ private:
 	
 	///Sets D3DDevice RenderStates
 	void SetD3DDevice();
-
-	///Calculates projection matrix
-	void SetProjection();
 
 	//Calculates view matrix
 	void SetCamera();

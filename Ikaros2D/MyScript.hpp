@@ -1,5 +1,5 @@
 #pragma once
-#include "IkarosCore.h"
+#include "GameHeader.h"
 
 class MyScript : public MonoBehavior {
 public:
