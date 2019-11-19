@@ -5,6 +5,11 @@ class MyScript : public MonoBehavior {
 public:
 	GameObject* test;
 	GameObject* camObj;
+	GameObject* camObj2;
+	GameObject* camObj3;
+	GameObject* camObj4;
+
+	Camera* cam;
 
 	void Awake() {
 
@@ -12,8 +17,36 @@ public:
 
 	void Start() {
 		camObj = new GameObject("MainCamera");
-		camObj->AddComponent<Camera>();
+		cam = camObj->AddComponent<Camera>();
 		camObj->transform->Translate(0, 2, -5000);
+		cam->rect.W = 0.5;
+		cam->rect.H = 0.5;
+		cam->SetProjection();
+
+		camObj2 = new GameObject("Camera2");
+		cam = camObj2->AddComponent<Camera>();
+		camObj2->transform->Translate(0, 2, -5000);
+		cam->rect.X = 0.5;
+		cam->rect.W = 0.5;
+		cam->rect.H = 0.5;
+		cam->SetProjection();
+
+		camObj3 = new GameObject("Camera3");
+		cam = camObj3->AddComponent<Camera>();
+		camObj3->transform->Translate(0, 2, -5000);
+		cam->rect.Y = 0.5;
+		cam->rect.W = 0.5;
+		cam->rect.H = 0.5;
+		cam->SetProjection();
+
+		camObj4 = new GameObject("Camera4");
+		cam = camObj4->AddComponent<Camera>();
+		camObj4->transform->Translate(0, 2, -5000);
+		cam->rect.X = 0.5;
+		cam->rect.Y = 0.5;
+		cam->rect.W = 0.5;
+		cam->rect.H = 0.5;
+		cam->SetProjection();
 
 
 		test = new GameObject("Tester");
@@ -23,7 +56,7 @@ public:
 		tsprite->texture = tex;
 		Renderer* rend = test->AddComponent<Renderer>();
 		rend->sprite = tsprite;
-		tsprite->SetTexture();
+		tsprite->GenereteSprite();
 
 		test->transform->Scale(1, 1, 1);
 
@@ -34,6 +67,6 @@ public:
 	}
 
 	void Update() {
-		test->transform->Rotate(1, 0, 0);
+		test->transform->Rotate(1, 0.5, 0.5);
 	}
 };

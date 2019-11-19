@@ -115,9 +115,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
 			Transform::UpdateTransform();
 			
-			//Clear screen
-			pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(50, 50, 50, 255), 1.0f, 0);
-
 			//Begin drawing
 			pD3DDevice->BeginScene();
 
@@ -335,14 +332,17 @@ Sprite::Sprite(std::string Name) : Object(Name) {
 	renderer = nullptr;
 	texture = nullptr;
 	vertices = nullptr;
+	indices = nullptr;
 	VertexBuffer = NULL;
+	IndexBuffer = NULL;
 }
 
 Sprite::~Sprite() {
 	VertexBuffer->Release();
+	IndexBuffer->Release();
 }
 
-void Sprite::SetTexture(std::string Name) {
+void Sprite::GenereteSprite(std::string Name) {
 	if (texture == nullptr) {
 		texture = texture->FindTexturebyName(Name);
 		std::cout << texture << std::endl;
@@ -370,6 +370,7 @@ void Sprite::SetTexture(std::string Name) {
 		vertices[2].uv = Vector2(0, 1);
 		vertices[3].uv = Vector2(1, 1);
 
+
 		for (int i = 0; i < 4; i++) {
 			vertices[i].position.x *= texture->Width;
 			vertices[i].position.y *= texture->Height;
@@ -378,6 +379,36 @@ void Sprite::SetTexture(std::string Name) {
 		}
 
 		VertexBuffer->Unlock();
+	}
+
+	if (FAILED(pD3DDevice->CreateIndexBuffer(sizeof(WORD) * 12,
+		D3DUSAGE_WRITEONLY,
+		D3DFMT_INDEX16,
+		D3DPOOL_MANAGED,
+		&IndexBuffer,
+		NULL)))
+	{
+		std::cout << "ERROR::Failed to create index buffer for Texture: " << Name << std::endl;
+	}
+	else {
+		IndexBuffer->Lock(0, 0, (void**)&indices, 0);
+		indices[0] = 0;
+		indices[1] = 1;
+		indices[2] = 2;
+
+		indices[3] = 2;
+		indices[4] = 3;
+		indices[5] = 1;
+
+		indices[6] = 3;
+		indices[7] = 2;
+		indices[8] = 1;
+
+		indices[9] = 1;
+		indices[10] = 0;
+		indices[11] = 2;
+
+		IndexBuffer->Unlock();
 	}
 }
 
@@ -471,12 +502,12 @@ Camera::Camera(std::string Name) : Behavior(Name) {
 	farClipPlane = 10000.0f;
 	rect.X = 0;
 	rect.Y = 0;
-	rect.W = 1;
-	rect.H = 1;
+	rect.W = 0;
+	rect.H = 0;
 	aspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 
 	orthographic = false;
-	orthographicSize = 10.0f;
+	orthographicSize = 5.0f;
 
 	D3DXMatrixIdentity(&mCameraWorld);
 	D3DXMatrixIdentity(&Projection);
@@ -511,20 +542,34 @@ void Camera::draw() {
 
 	pD3DDevice->SetTransform(D3DTS_VIEW, &View);
 	pD3DDevice->SetTransform(D3DTS_PROJECTION, &Projection);
+
+	pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(50, 50, 50, 255), 1.0f, 0);
 	for (auto p : Renderer::RendererList) {
 		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
 
 		pD3DDevice->SetStreamSource(0, p->sprite->VertexBuffer, 0, sizeof(VertexBufferData));
+		pD3DDevice->SetIndices(p->sprite->IndexBuffer);
 
 		pD3DDevice->SetTexture(0, *(p->sprite->texture->texturedata));
 	
-		if(pD3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2) != D3D_OK){
+		if(pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, 0, 4) != D3D_OK){
 			puts("Failed to Render");
 		}
 	}
 }
 
+void Camera::SetViewport() {
+	viewport.X = rect.X * SCREEN_WIDTH;
+	viewport.Width = rect.W * SCREEN_WIDTH;
+	viewport.Y = rect.Y * SCREEN_HEIGHT;
+	viewport.Height = rect.H * SCREEN_HEIGHT;
+	viewport.MinZ = nearClipPlane;
+	viewport.MaxZ = farClipPlane;
+}
+
 void Camera::SetD3DDevice() {
+	pD3DDevice->SetViewport(&viewport);
+
 	pD3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 
 	//Turn off lighting
@@ -609,11 +654,15 @@ void Camera::SetD3DDevice() {
 	pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	pD3DDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 
+
 	// D3DTEXTUREOP Texture blending settings
 	//	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+
 }
 
 void Camera::SetProjection() {
+	SetViewport();
+
 	D3DXMatrixPerspectiveFovLH(&Projection,
 		fieldOfView,
 		aspect,

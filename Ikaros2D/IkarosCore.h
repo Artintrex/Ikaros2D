@@ -130,15 +130,9 @@ public:
 	~MonoBehavior();
 
 
-	virtual void Awake() {
-		//Only once for this script instance
-	}
-	virtual void Start() {
-		//Run only once for each object instance
-	}
-	virtual void Update() {
-		//Run every frame
-	}
+	virtual void Awake() = 0;
+	virtual void Start() = 0;
+	virtual void Update() = 0;
 
 	///Do not call this function, meant for main loop
 	static void AwakeMonoBehaviorArray();
@@ -176,14 +170,16 @@ public:
 	Texture* texture;
 
 	LPDIRECT3DVERTEXBUFFER9 VertexBuffer;
+	LPDIRECT3DINDEXBUFFER9 IndexBuffer;
 
 	Sprite(std::string Name = "Sprite");
 	~Sprite();
 
-	void SetTexture(std::string Name = "");
+	void GenereteSprite(std::string Name = "");
 
 private:
 	VertexBufferData* vertices;
+	WORD* indices;
 };
 
 class Renderer : public Component {
@@ -263,12 +259,17 @@ public:
 private:
 	static std::vector<Camera*> CameraList;
 
+	D3DVIEWPORT9 viewport;
+
 	D3DXMATRIX mCameraRot;
 	D3DXMATRIX mCameraWorld;
 	D3DXMATRIX View;
 	D3DXMATRIX Projection;
 
 	void draw();
+
+	//Calculates viewport based on rect and screen resolution
+	void SetViewport();
 	
 	///Sets D3DDevice RenderStates
 	void SetD3DDevice();
