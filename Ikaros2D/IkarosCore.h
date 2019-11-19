@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cmath>
+#include <map>
 #include <vector>
 #include <algorithm>
 #include <string>
@@ -71,6 +72,29 @@ namespace internal
 	};
 }
 
+class ComponentFactory {
+public:
+	virtual Component* AddComponent(GameObject* parent, std::string type) = 0;
+};
+
+
+#define REGISTER_COMPONENT(component) \
+    class component##Factory : public ComponentFactory { \
+    public: \
+        component##Factory() \
+        { \
+            Component::registerType(#component, this); \
+        } \
+        virtual Component* AddComponent(GameObject* parent, std::string type) { \
+			Component* p = new component();\
+			p->parent = parent;\
+			p->transform = parent->transform;\
+			parent->ComponentList.push_back((Component*)p);\
+            return p; \
+        } \
+    }; \
+    static component##Factory global_##component##Factory;
+
 
 template <typename T>
 const char* GetTypeName(void)
@@ -104,6 +128,8 @@ public:
 	Object(std::string Name);
 	virtual ~Object();
 	
+
+	//NEED UPDATE: Need release objects for program exit and scene unload
 private:
 	static std::vector<Object*> ObjectList;
 };
@@ -115,6 +141,14 @@ public:
 
 	Component(std::string Name = "EmptyComponent");
 	~Component();
+
+	static void registerType(const std::string& name, ComponentFactory* factory) {
+		factories[name] = factory;
+	}
+
+	static std::map<std::string, ComponentFactory*> factories;
+private:
+	
 };
 
 class Behavior : public Component {
@@ -140,6 +174,7 @@ public:
 	static void StartMonoBehaviorArray();
 	///Do not call this function, meant for main loop
 	static void UpdateMonoBehaviorArray();
+
 private:
 	static std::vector<MonoBehavior*> MonoBehaviorList;
 };

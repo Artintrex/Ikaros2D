@@ -217,6 +217,7 @@
     <ClInclude Include="HuJian.hpp" />
     <ClInclude Include="IkarosCore.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Register.cpp" />
     <ClInclude Include="Template.hpp" />
     <ClInclude Include="MyScript.hpp" />
   </ItemGroup>

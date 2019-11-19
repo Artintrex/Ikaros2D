@@ -20,6 +20,7 @@ std::vector<GameObject*> GameObject::GameObjectList{};
 std::vector<Renderer*> Renderer::RendererList{};
 std::vector<Camera*> Camera::CameraList{};
 std::vector<MonoBehavior*> MonoBehavior::MonoBehaviorList{};
+std::map<std::string, ComponentFactory*> Component::factories{};
 
 iTime Time;
 

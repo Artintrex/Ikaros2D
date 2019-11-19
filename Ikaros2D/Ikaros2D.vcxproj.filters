@@ -29,9 +29,6 @@
     <ClInclude Include="GameHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MyScript.hpp">
-      <Filter>GameSource</Filter>
-    </ClInclude>
     <ClInclude Include="IkarosCore.h">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -46,6 +43,12 @@
     </ClInclude>
     <ClInclude Include="Template.hpp">
       <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="MyScript.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Register.cpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

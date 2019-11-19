@@ -16,6 +16,13 @@ public:
 	}
 
 	void Start() {
+		std::cout << Component::factories["MyScript"] << std::endl;
+
+		for (auto it = Component::factories.cbegin(); it != Component::factories.cend(); ++it)
+		{
+			std::cout << it->first << "\n";
+		}
+
 		camObj = new GameObject("MainCamera");
 		cam = camObj->AddComponent<Camera>();
 		camObj->transform->Translate(0, 2, -5000);
