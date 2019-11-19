@@ -9,19 +9,19 @@ public:
 	GameObject* camObj3;
 	GameObject* camObj4;
 
-	Camera* cam;
-
 	void Awake() {
 
 	}
 
 	void Start() {
-		std::cout << Component::factories["MyScript"] << std::endl;
 
+		std::cout << "Factory Register" << "\n";
 		for (auto it = Component::factories.cbegin(); it != Component::factories.cend(); ++it)
 		{
-			std::cout << it->first << "\n";
+			std::cout << it->first << " " << it->second << "\n";
 		}
+
+		Camera* cam;
 
 		camObj = new GameObject("MainCamera");
 		cam = camObj->AddComponent<Camera>();

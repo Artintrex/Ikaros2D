@@ -19,8 +19,6 @@ typedef D3DXVECTOR2 Vector2;
 typedef D3DXVECTOR3 Vector3;
 
 //NEED UPDATE:
-//class SceneLoader
-//class Input
 //class Collider(Types)
 class iTime;
 class Object;
@@ -52,7 +50,7 @@ struct Rect {
 	float H;
 };
 
-//Code to acquire template type info as string: Big thanks to Stefan Reinalter
+//RTTI type info from template instances by Stefan Reinalter. Only works on MSVS "class #classname"
 namespace internal
 {
 	static const unsigned int FRONT_SIZE = sizeof("internal::GetTypeNameHelper<") - 1u;
@@ -77,7 +75,7 @@ public:
 	virtual Component* AddComponent(GameObject* parent, std::string type) = 0;
 };
 
-
+//Creates factory function for custom component and maps pointer with its string name
 #define REGISTER_COMPONENT(component) \
     class component##Factory : public ComponentFactory { \
     public: \
@@ -128,10 +126,12 @@ public:
 	Object(std::string Name);
 	virtual ~Object();
 	
-
-	//NEED UPDATE: Need release objects for program exit and scene unload
 private:
 	static std::vector<Object*> ObjectList;
+
+	static void ReleaseObjects();
+
+	friend class SceneManager;
 };
 
 class Component : public Object {
@@ -140,7 +140,7 @@ public:
 	Transform* transform;
 
 	Component(std::string Name = "EmptyComponent");
-	~Component();
+	virtual ~Component();
 
 	static void registerType(const std::string& name, ComponentFactory* factory) {
 		factories[name] = factory;
@@ -153,15 +153,16 @@ private:
 
 class Behavior : public Component {
 public:
+	bool enabled;
 	Behavior(std::string Name) : Component(Name) {
-		//NEED UPDATE : what should be inside B constructor ???
+		enabled = true;
 	}
 };
 
 class MonoBehavior : public Behavior {
 public:
 	MonoBehavior(std::string Name = "MonoBehavior");
-	~MonoBehavior();
+	virtual ~MonoBehavior();
 
 
 	virtual void Awake() = 0;
@@ -186,11 +187,10 @@ public:
 	int Height;
 
 	Texture(std::string Name);
+	~Texture();
 
 	///File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
 	static Texture* LoadTexture(std::string TextureName, LPCTSTR FilePath);
-
-	static void ReleaseTextures();
 
 	static Texture* FindTexturebyName(std::string Name);
 

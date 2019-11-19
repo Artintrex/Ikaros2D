@@ -1,5 +1,7 @@
 #include "IkarosCore.h"
+#include "SceneManager.h"
 #include "GameHeader.h"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -208,6 +210,17 @@ Object::~Object() {
 	ObjectList.erase(std::remove(ObjectList.begin(), ObjectList.end(), this), ObjectList.end());
 }
 
+void Object::ReleaseObjects() {
+
+	while (ObjectList.size() > 0) {
+		std::cout << ObjectList[0]->name << std::endl;
+		std::cout << ObjectList.size() << std::endl;
+		delete ObjectList.at(0);
+	}
+
+	ObjectList.clear();
+}
+
 Component::Component(std::string Name) : Object(Name) {
 	parent = nullptr;
 	transform = nullptr;
@@ -265,6 +278,17 @@ Texture::Texture(std::string Name) : Object(Name) {
 	Height = 0;
 }
 
+Texture::~Texture() {
+	for (std::vector<Texture*>::iterator it = TextureList.begin(); it != TextureList.end(); ++it)
+	{
+		if (this == (*it)) {
+			(*texturedata)->Release();
+			TextureList.erase(it);
+			break;
+		}
+	}
+}
+
 //File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
 Texture* Texture::LoadTexture(std::string TextureName, LPCTSTR FilePath) {
 		LPDIRECT3DTEXTURE9* tex = new LPDIRECT3DTEXTURE9;
@@ -279,14 +303,6 @@ Texture* Texture::LoadTexture(std::string TextureName, LPCTSTR FilePath) {
 			return texture;
 		}
 		else delete tex;
-}
-
-void Texture::ReleaseTextures() {
-	for (auto p : TextureList) {
-		(*(p->texturedata))->Release();
-		delete p;
-	}
-	TextureList.clear();
 }
 
 Texture* Texture::FindTexturebyName(std::string Name) {
@@ -773,7 +789,8 @@ bool Initialize()
 
 void Finalize(void)
 {
-	Texture::ReleaseTextures();
+	SceneManager::UnloadScene();
+
 
 	// DirectInput‚ÌI—¹ˆ—
 	//GamePad_Finalize();
