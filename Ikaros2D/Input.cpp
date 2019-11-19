@@ -1,5 +1,5 @@
 #include "Input.h"
-
+#include "GameHeader.h"
 
 
 #define DIRECTINPUT_VERSION (0x0800)
@@ -303,14 +303,18 @@ if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
 
 }
 */
+
 void Key_IsInt(void)
 {
-	if (Keyboard_IsPress(DIK_A))
+	//è„É{É^ÉìÇ™âüÇ≥ÇÍÇΩÇÁ
+	if (Keyboard_IsPress(DIK_UP))
 	{
-		
-
-
+	
 	}
 
+	if (Keyboard_IsTrigger(DIK_UP))
+	{
+		
+	}
 
 }
