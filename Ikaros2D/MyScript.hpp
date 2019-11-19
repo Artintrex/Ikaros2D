@@ -26,7 +26,7 @@ public:
 		tsprite->SetTexture();
 
 		test->transform->Scale(1, 1, 1);
-
+		
 		//if (Keyboard_IsPress(DIK_A)) {
 		//	test->transform->Translate(5, 0, 0);
 		//	test->transform->Rotate(45, 0, 0);
@@ -35,5 +35,6 @@ public:
 
 	void Update() {
 		test->transform->Rotate(1, 0, 0);
+
 	}
 };
