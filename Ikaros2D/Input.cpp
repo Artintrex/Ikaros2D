@@ -3,10 +3,11 @@
 
 
 #define DIRECTINPUT_VERSION (0x0800)
-// game pad用設定値
-#define DEADZONE		2500			// 各軸の25%を無効ゾーンとする
-#define RANGE_MAX		10000			// 有効範囲の最大値
-#define RANGE_MIN		-10000			// 有効範囲の最小値
+
+//Gamepad parameters
+#define DEADZONE		2500
+#define RANGE_MAX		10000
+#define RANGE_MIN		-10000
 
 
 static bool initialize(HINSTANCE hInstance);
@@ -14,17 +15,17 @@ static void finalize(void);
 
 LPDIRECTINPUT8			g_pInput = NULL;
 
-//キーボード
+//Keyboard globals
 static LPDIRECTINPUTDEVICE8	g_pDevKeyboard = NULL;
 static BYTE					g_aKeyState[NUM_KEY_MAX];
 static BYTE					g_aKeyStateTrigger[NUM_KEY_MAX];
 static BYTE					g_aKeyStateRelease[NUM_KEY_MAX];
 
-//ゲームパッド
-static LPDIRECTINPUTDEVICE8	g_pGamePad[GAMEPADMAX] = { NULL, NULL, NULL, NULL };// パッドデバイス
-static DWORD				g_padState[GAMEPADMAX];	// パッド情報（複数対応）
-static DWORD				g_padTrigger[GAMEPADMAX];
-static int					g_padCount = 0;			// 検出したパッドの数
+//Gamepad globals
+static LPDIRECTINPUTDEVICE8	g_pGamePad[GAMEPADMAX] = { NULL, NULL, NULL, NULL };// Gamepad device
+static DWORD				g_padState[GAMEPADMAX];	// State information for multiple gamepad
+static DWORD				g_padTrigger[GAMEPADMAX]; 
+static int					g_padCount = 0;
 
 
 
@@ -113,17 +114,17 @@ void Keyboard_Update(void)
 	}
 }
 
-bool Keyboard_IsPress(int nKey)
+bool GetKeyDown(int nKey)
 {
 	return (g_aKeyState[nKey] & 0x80) ? true : false;
 }
 
-bool Keyboard_IsTrigger(int nKey)
+bool GetKey(int nKey)
 {
 	return (g_aKeyStateTrigger[nKey] & 0x80) ? true : false;
 }
 
-bool Keyboard_IsRelease(int nKey)
+bool GetKeyUp(int nKey)
 {
 	return (g_aKeyStateRelease[nKey] & 0x80) ? true : false;
 }
@@ -252,31 +253,20 @@ void GamePad_Update(void)
 		//* x-axis (left)
 		if (dijs.lX < 0)					g_padState[i] |= BUTTON_LEFT;
 		//* x-axis (right)
-		if (dijs.lX > 0)					g_padState[i] |= BUTTON_RIGHT;
-		//* Ａボタン
+		if (dijs.lX > 0)				g_padState[i] |= BUTTON_RIGHT;
+
 		if (dijs.rgbButtons[0] & 0x80)	g_padState[i] |= BUTTON_A;
-		//* Ｂボタン
 		if (dijs.rgbButtons[1] & 0x80)	g_padState[i] |= BUTTON_B;
-		//* Ｃボタン
 		if (dijs.rgbButtons[2] & 0x80)	g_padState[i] |= BUTTON_C;
-		//* Ｘボタン
 		if (dijs.rgbButtons[3] & 0x80)	g_padState[i] |= BUTTON_X;
-		//* Ｙボタン
 		if (dijs.rgbButtons[4] & 0x80)	g_padState[i] |= BUTTON_Y;
-		//* Ｚボタン
 		if (dijs.rgbButtons[5] & 0x80)	g_padState[i] |= BUTTON_Z;
-		//* Ｌボタン
 		if (dijs.rgbButtons[6] & 0x80)	g_padState[i] |= BUTTON_L;
-		//* Ｒボタン
 		if (dijs.rgbButtons[7] & 0x80)	g_padState[i] |= BUTTON_R;
-		//* ＳＴＡＲＴボタン
 		if (dijs.rgbButtons[8] & 0x80)	g_padState[i] |= BUTTON_START;
-		//* Ｍボタン
 		if (dijs.rgbButtons[9] & 0x80)	g_padState[i] |= BUTTON_M;
 
-		// Trigger設定
-		g_padTrigger[i] = ((lastPadState ^ g_padState[i])	// 前回と違っていて
-			& g_padState[i]);					// しかも今ONのやつ
+		g_padTrigger[i] = ((lastPadState ^ g_padState[i]) & g_padState[i]);
 
 	}
 }
@@ -292,9 +282,6 @@ BOOL GamePad_IsTrigger(int padNo, DWORD button)
 }
 
 /* MOUSE    //必要がない
-POINT p;
-GetCursorPos(&p);
-
 if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
 
 }
@@ -304,17 +291,59 @@ if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
 }
 */
 
-void Key_IsInt(void)
-{
-	//上ボタンが押されたら
-	if (Keyboard_IsPress(DIK_UP))
-	{
-	
-	}
+POINT p;
+SHORT m_stateOLD[6], m_stateNEW[6];
+MSG* msg;
 
-	if (Keyboard_IsTrigger(DIK_UP))
-	{
-		
-	}
+void MouseInit() {
+	p.x = 0;
+	p.y = 0;
 
+	for (int i = 0; i < 6; i++) {
+		m_stateOLD[i] = 0;
+		m_stateNEW[i] = 0;
+	}
+}
+
+void MouseUpdate() {
+
+	GetCursorPos(&p);
+}
+
+//NEED UPDATE mouse wheel need windows messages
+
+//Using virtual key codes 
+bool GetMouseButton(int nButton) {
+	if (GetAsyncKeyState(nButton) & 0x8000)return true;
+	else return false;
+}
+//Using virtual key codes 
+//bool GetMouseButtonDown(int nButton) {
+//
+//}
+//Using virtual key codes 
+//bool GetMouseButtonUp(int nButton) {
+
+//}
+
+bool InputInitialize(HINSTANCE hInstance, HWND hWnd, MSG* messages) {
+	initialize(hInstance);
+	Keyboard_Initialize(hInstance, hWnd);
+	GamePad_Initialize(hInstance, hWnd);
+	MouseInit();
+	msg = messages;
+
+	return true;
+}
+
+void InputUpdate() {
+	Keyboard_Update();
+	MouseUpdate();
+	GamePad_Update();
+}
+
+void InputRelease() {
+	Keyboard_Finalize();
+	GamePad_Finalize();
+	finalize();
 }

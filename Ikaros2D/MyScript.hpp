@@ -46,6 +46,7 @@ public:
 		cam->rect.H = 0.5;
 		cam->SetProjection();
 
+		
 		camObj4 = new GameObject("Camera4");
 		cam = camObj4->AddComponent<Camera>();
 		camObj4->transform->Translate(0, 2, -5000);

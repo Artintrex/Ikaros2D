@@ -20,18 +20,23 @@
 #define	NUM_KEY_MAX			(256)
 
 
-bool Keyboard_Initialize(HINSTANCE hInstance, HWND hWnd);
-void Keyboard_Finalize(void);
-void Keyboard_Update(void);
+bool InputInitialize(HINSTANCE hInstance, HWND hWnd, MSG* messages);
+void InputUpdate();
+void InputRelease();
 
-bool Keyboard_IsPress(int nKey);
-bool Keyboard_IsTrigger(int nKey);
-bool Keyboard_IsRelease(int nKey);
+bool GetKey(int nKey);
+bool GetKeyDown(int nKey);
+bool GetKeyUp(int nKey);
 
-//---------------------------- game pad
-bool GamePad_Initialize(HINSTANCE hInstance, HWND hWnd);
-void GamePad_Finalize(void);
-void GamePad_Update(void);
+bool GetButton(int padNo, DWORD button);
+bool GetButtonDown(int padNo, DWORD button);
+bool GetButtonUp(int padNo, DWORD button);
 
-BOOL GamePad_IsPress(int padNo, DWORD button);
-BOOL GamePad_IsTrigger(int padNo, DWORD button);
+float GetAxis(int padNo, DWORD axis);
+
+bool GetMouseButton(int nButton);
+bool GetMouseButtonDown(int nButton);
+bool GetMouseButtonUp(int nButton);
+
+extern Vector2 mousePosition;
+extern int mouseScrollDelta;
