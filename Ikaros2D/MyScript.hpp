@@ -14,7 +14,6 @@ public:
 	}
 
 	void Start() {
-
 		std::cout << "Factory Register" << "\n";
 		for (auto it = Component::factories.cbegin(); it != Component::factories.cend(); ++it)
 		{
@@ -26,8 +25,8 @@ public:
 		camObj = new GameObject("MainCamera");
 		cam = camObj->AddComponent<Camera>();
 		camObj->transform->Translate(0, 2, -5000);
-		cam->rect.W = 0.5;
-		cam->rect.H = 0.5;
+		cam->rect.W = 1;
+		cam->rect.H = 1;
 		cam->SetProjection();
 
 		camObj2 = new GameObject("Camera2");
@@ -74,7 +73,15 @@ public:
 		//}
 	}
 
+	SHORT oldsate;
+	SHORT state;
 	void Update() {
 		test->transform->Rotate(1, 0.5, 0.5);
+		oldsate = state;
+		state = GetAsyncKeyState(VK_LBUTTON);
+		if ((oldsate ^ state) & state & 0x8000) {
+			std::cout << "OOOOO" << std::endl;
+		}
+		
 	}
 };

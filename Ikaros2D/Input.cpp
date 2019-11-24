@@ -9,6 +9,8 @@
 #define RANGE_MAX		10000
 #define RANGE_MIN		-10000
 
+int mouseScrollDelta;
+POINT mousePosition;
 
 static bool initialize(HINSTANCE hInstance);
 static void finalize(void);
@@ -291,30 +293,31 @@ if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
 }
 */
 
-POINT p;
-SHORT m_stateOLD[6], m_stateNEW[6];
-MSG* msg;
+SHORT m_stateOLD[5], m_stateNEW[6];
 
 void MouseInit() {
-	p.x = 0;
-	p.y = 0;
+	mousePosition.x = 0;
+	mousePosition.y = 0;
 
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < 5; i++) {
 		m_stateOLD[i] = 0;
 		m_stateNEW[i] = 0;
 	}
 }
 
 void MouseUpdate() {
-
-	GetCursorPos(&p);
+	GetCursorPos(&mousePosition);
+	for (int i = 0; i < 5; i++)m_stateOLD[i] = m_stateNEW[i];
+	m_stateNEW[0] = GetAsyncKeyState(VK_LBUTTON);
+	m_stateNEW[1] = GetAsyncKeyState(VK_RBUTTON);
+	m_stateNEW[2] = GetAsyncKeyState(VK_MBUTTON);
+	m_stateNEW[3] = GetAsyncKeyState(VK_XBUTTON1);
+	m_stateNEW[4] = GetAsyncKeyState(VK_XBUTTON2);
 }
-
-//NEED UPDATE mouse wheel need windows messages
 
 //Using virtual key codes 
 bool GetMouseButton(int nButton) {
-	if (GetAsyncKeyState(nButton) & 0x8000)return true;
+	if (m_stateNEW[nButton] & 0x8000)return true;
 	else return false;
 }
 //Using virtual key codes 
@@ -326,13 +329,11 @@ bool GetMouseButton(int nButton) {
 
 //}
 
-bool InputInitialize(HINSTANCE hInstance, HWND hWnd, MSG* messages) {
+bool InputInitialize(HINSTANCE hInstance, HWND hWnd) {
 	initialize(hInstance);
 	Keyboard_Initialize(hInstance, hWnd);
 	GamePad_Initialize(hInstance, hWnd);
 	MouseInit();
-	msg = messages;
-
 	return true;
 }
 

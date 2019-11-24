@@ -1,7 +1,6 @@
 #pragma once
-#include "IkarosCore.h"
 #include <dinput.h>
-//key
+
 #define BUTTON_UP		0x00000001l	// 方向キー上(.IY<0)
 #define BUTTON_DOWN		0x00000002l	// 方向キー下(.IY>0)
 #define BUTTON_LEFT		0x00000004l	// 方向キー左(.IX<0)
@@ -38,5 +37,5 @@ bool GetMouseButton(int nButton);
 bool GetMouseButtonDown(int nButton);
 bool GetMouseButtonUp(int nButton);
 
-extern Vector2 mousePosition;
+extern POINT mousePosition;
 extern int mouseScrollDelta;

@@ -11,6 +11,7 @@
 
 static LPDIRECT3D9 g_pD3D = NULL;             //Direct3D interface
 static LPDIRECT3DDEVICE9 pD3DDevice = NULL;  //Direct3D device
+static D3DVIEWPORT9 MainViewport;
 
 static HWND g_hWnd; //Window Handler
 
@@ -60,6 +61,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	RECT window_rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 	AdjustWindowRect(&window_rect, window_style, FALSE);
+	MainViewport = {0, 0, SCREEN_WIDTH , SCREEN_HEIGHT , 0, 1};
 
 	// Calculate window rect dimensions
 	int window_width = window_rect.right - window_rect.left;
@@ -162,6 +164,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
+
+		//catch mousewheel event
+	case WM_MOUSEWHEEL:
+		mouseScrollDelta += (short)HIWORD(wParam) / 120;
 	};
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -547,6 +553,8 @@ Camera::~Camera() {
 
 //Draw all cameras
 void Camera::Draw() {
+	pD3DDevice->SetViewport(&MainViewport);
+	pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(50, 50, 50, 255), 1.0f, 0);
 	for (auto p : CameraList) {
 		p->draw();
 	}
@@ -560,7 +568,7 @@ void Camera::draw() {
 	pD3DDevice->SetTransform(D3DTS_VIEW, &View);
 	pD3DDevice->SetTransform(D3DTS_PROJECTION, &Projection);
 
-	pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(50, 50, 50, 255), 1.0f, 0);
+	
 	for (auto p : Renderer::RendererList) {
 		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
 
