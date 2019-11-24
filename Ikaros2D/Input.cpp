@@ -12,9 +12,6 @@
 int mouseScrollDelta;
 POINT mousePosition;
 
-static bool initialize(HINSTANCE hInstance);
-static void finalize(void);
-
 LPDIRECTINPUT8			g_pInput = NULL;
 
 //Keyboard globals
@@ -26,16 +23,20 @@ static BYTE					g_aKeyStateRelease[NUM_KEY_MAX];
 //Gamepad globals
 static LPDIRECTINPUTDEVICE8	g_pGamePad[GAMEPADMAX] = { NULL, NULL, NULL, NULL };// Gamepad device
 static DWORD				g_padState[GAMEPADMAX];	// State information for multiple gamepad
-static DWORD				g_padTrigger[GAMEPADMAX]; 
+static DWORD				g_padTrigger[GAMEPADMAX];
+static DWORD				g_padRelease[GAMEPADMAX];
+static DWORD				g_padAxis[GAMEPADMAX];
 static int					g_padCount = 0;
 
 
+HWND MainWindowHandle;
+HINSTANCE InstanceHandle;
 
-bool initialize(HINSTANCE hInstance)
+bool InitDirectInput()
 {
 	if (g_pInput == NULL) {
 
-		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&g_pInput, NULL))) {
+		if (FAILED(DirectInput8Create(InstanceHandle, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&g_pInput, NULL))) {
 
 			return false;
 		}
@@ -44,7 +45,7 @@ bool initialize(HINSTANCE hInstance)
 	return true;
 }
 
-void finalize(void)
+void ReleaseDirectInput(void)
 {
 	if (g_pInput != NULL) {
 		g_pInput->Release();
@@ -52,29 +53,23 @@ void finalize(void)
 	}
 }
 
-bool Keyboard_Initialize(HINSTANCE hInstance, HWND g_hWnd)
+bool Keyboard_Initialize()
 {
-	if (!initialize(hInstance)) {
-
-		MessageBox(g_hWnd, "DirectInputオブジェクトが作れねぇ！", "警告！", MB_ICONWARNING);
-		return false;
-	}
-
 	if (FAILED(g_pInput->CreateDevice(GUID_SysKeyboard, &g_pDevKeyboard, NULL)))
 	{
-		MessageBox(g_hWnd, "キーボードがねぇ！", "警告！", MB_ICONWARNING);
+		puts("Failed to create keyboard device");
 		return false;
 	}
 
 	if (FAILED(g_pDevKeyboard->SetDataFormat(&c_dfDIKeyboard)))
 	{
-		MessageBox(g_hWnd, "キーボードのデータフォーマットを設定できませんでした。", "警告！", MB_ICONWARNING);
+		puts("Failed to set keyboard data format");
 		return false;
 	}
 	//													 DISCL_BACKGROUND | DISCL_EXCLUSIVE	
-	if (FAILED(g_pDevKeyboard->SetCooperativeLevel(g_hWnd, (DISCL_FOREGROUND | DISCL_NONEXCLUSIVE))))
+	if (FAILED(g_pDevKeyboard->SetCooperativeLevel(MainWindowHandle, (DISCL_FOREGROUND | DISCL_NONEXCLUSIVE))))
 	{
-		MessageBox(g_hWnd, "キーボードの協調モードを設定できませんでした。", "警告！", MB_ICONWARNING);
+		puts("Failed to set keyboard cooperative level");
 		return false;
 	}
 
@@ -92,8 +87,6 @@ void Keyboard_Finalize(void)
 		g_pDevKeyboard->Release();
 		g_pDevKeyboard = NULL;
 	}
-
-	finalize();
 }
 
 void Keyboard_Update(void)
@@ -131,6 +124,9 @@ bool GetKeyUp(int nKey)
 	return (g_aKeyStateRelease[nKey] & 0x80) ? true : false;
 }
 
+
+//		GAMEPAD
+
 //---------------------------------------- コールバック関数
 BOOL CALLBACK SearchGamePadCallback(LPDIDEVICEINSTANCE lpddi, LPVOID)
 {
@@ -140,13 +136,8 @@ BOOL CALLBACK SearchGamePadCallback(LPDIDEVICEINSTANCE lpddi, LPVOID)
 	return DIENUM_CONTINUE;	// 次のデバイスを列挙
 }
 
-bool GamePad_Initialize(HINSTANCE hInstance, HWND hWnd)
+bool GamePad_Initialize()
 {
-	if (!initialize(hInstance)) {
-
-		MessageBox(hWnd, "DirectInputオブジェクトが作れねぇ！", "警告！", MB_ICONWARNING);
-		return false;
-	}
 
 	HRESULT		result;
 	int			i;
@@ -217,14 +208,12 @@ void GamePad_Finalize(void)
 			g_pGamePad[i]->Release();
 		}
 	}
-
-	finalize();
 }
 
+DIJOYSTATE2		dijs[GAMEPADMAX];
 void GamePad_Update(void)
 {
 	HRESULT			result;
-	DIJOYSTATE2		dijs;
 	int				i;
 
 	for (i = 0; i < g_padCount; i++)
@@ -240,61 +229,56 @@ void GamePad_Update(void)
 				result = g_pGamePad[i]->Acquire();
 		}
 
-		result = g_pGamePad[i]->GetDeviceState(sizeof(DIJOYSTATE), &dijs);	// デバイス状態を読み取る
+		result = g_pGamePad[i]->GetDeviceState(sizeof(DIJOYSTATE), &dijs[i]);	// デバイス状態を読み取る
 		if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) {
 			result = g_pGamePad[i]->Acquire();
 			while (result == DIERR_INPUTLOST)
 				result = g_pGamePad[i]->Acquire();
 		}
 
-		// ３２の各ビットに意味を持たせ、ボタン押下に応じてビットをオンにする
-		//* y-axis (forward)
-		if (dijs.lY < 0)					g_padState[i] |= BUTTON_UP;
-		//* y-axis (backward)
-		if (dijs.lY > 0)					g_padState[i] |= BUTTON_DOWN;
-		//* x-axis (left)
-		if (dijs.lX < 0)					g_padState[i] |= BUTTON_LEFT;
-		//* x-axis (right)
-		if (dijs.lX > 0)				g_padState[i] |= BUTTON_RIGHT;
-
-		if (dijs.rgbButtons[0] & 0x80)	g_padState[i] |= BUTTON_A;
-		if (dijs.rgbButtons[1] & 0x80)	g_padState[i] |= BUTTON_B;
-		if (dijs.rgbButtons[2] & 0x80)	g_padState[i] |= BUTTON_C;
-		if (dijs.rgbButtons[3] & 0x80)	g_padState[i] |= BUTTON_X;
-		if (dijs.rgbButtons[4] & 0x80)	g_padState[i] |= BUTTON_Y;
-		if (dijs.rgbButtons[5] & 0x80)	g_padState[i] |= BUTTON_Z;
-		if (dijs.rgbButtons[6] & 0x80)	g_padState[i] |= BUTTON_L;
-		if (dijs.rgbButtons[7] & 0x80)	g_padState[i] |= BUTTON_R;
-		if (dijs.rgbButtons[8] & 0x80)	g_padState[i] |= BUTTON_START;
-		if (dijs.rgbButtons[9] & 0x80)	g_padState[i] |= BUTTON_M;
+		if (dijs[i].rgbButtons[0] & 0x80)	g_padState[i] |= BUTTON_A;
+		if (dijs[i].rgbButtons[1] & 0x80)	g_padState[i] |= BUTTON_B;
+		if (dijs[i].rgbButtons[2] & 0x80)	g_padState[i] |= BUTTON_C;
+		if (dijs[i].rgbButtons[3] & 0x80)	g_padState[i] |= BUTTON_X;
+		if (dijs[i].rgbButtons[4] & 0x80)	g_padState[i] |= BUTTON_Y;
+		if (dijs[i].rgbButtons[5] & 0x80)	g_padState[i] |= BUTTON_Z;
+		if (dijs[i].rgbButtons[6] & 0x80)	g_padState[i] |= BUTTON_L;
+		if (dijs[i].rgbButtons[7] & 0x80)	g_padState[i] |= BUTTON_R;
+		if (dijs[i].rgbButtons[8] & 0x80)	g_padState[i] |= BUTTON_START;
+		if (dijs[i].rgbButtons[9] & 0x80)	g_padState[i] |= BUTTON_M;
 
 		g_padTrigger[i] = ((lastPadState ^ g_padState[i]) & g_padState[i]);
+		g_padRelease[i] = ((lastPadState ^ g_padState[i]) & lastPadState);
 
 	}
 }
 
-BOOL GamePad_IsPress(int padNo, DWORD button)
-{
+bool GetButton(int padNo, DWORD button) {
 	return (button & g_padState[padNo]);
 }
-
-BOOL GamePad_IsTrigger(int padNo, DWORD button)
-{
+bool GetButtonDown(int padNo, DWORD button) {
 	return (button & g_padTrigger[padNo]);
 }
-
-/* MOUSE    //必要がない
-if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) {
-
+bool GetButtonUp(int padNo, DWORD button) {
+	return (button & g_padRelease[padNo]);
 }
 
-if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
-
+float GetAxis(int padNo, Axis axis) {
+	switch (axis) {
+	case LeftHorizontal:
+		return (float)dijs[padNo].lX / RANGE_MAX;
+	case LeftVertical:
+		return (float)dijs[padNo].lY / RANGE_MAX;
+	case RightHorizontal:
+		return (float)((dijs[padNo].lZ / 3.27675) - RANGE_MAX) / RANGE_MAX;
+	case RightVertical:
+		return (float)-((dijs[padNo].lRz / 3.27675) - RANGE_MAX) / RANGE_MAX;
+	}
 }
-*/
+
+//		MOUSE
 
 SHORT m_stateOLD[5], m_stateNEW[6];
-
 void MouseInit() {
 	mousePosition.x = 0;
 	mousePosition.y = 0;
@@ -315,24 +299,29 @@ void MouseUpdate() {
 	m_stateNEW[4] = GetAsyncKeyState(VK_XBUTTON2);
 }
 
-//Using virtual key codes 
+//Return continuous true as long as key is pushed
 bool GetMouseButton(int nButton) {
-	if (m_stateNEW[nButton] & 0x8000)return true;
-	else return false;
+	return (m_stateNEW[nButton] & 0x8000) ? true : false;
 }
-//Using virtual key codes 
-//bool GetMouseButtonDown(int nButton) {
-//
-//}
-//Using virtual key codes 
-//bool GetMouseButtonUp(int nButton) {
 
-//}
+//Returns true only once the button is pushed
+bool GetMouseButtonDown(int nButton) {
+	return ((m_stateOLD[nButton] ^ m_stateNEW[nButton]) & m_stateNEW[nButton] & 0x8000) ? true : false;
+}
+
+//Returns true only once the button is released
+bool GetMouseButtonUp(int nButton) {
+	return ((m_stateOLD[nButton] ^ m_stateNEW[nButton]) & m_stateOLD[nButton] & 0x8000) ? true : false;
+}
+
+//System functions
 
 bool InputInitialize(HINSTANCE hInstance, HWND hWnd) {
-	initialize(hInstance);
-	Keyboard_Initialize(hInstance, hWnd);
-	GamePad_Initialize(hInstance, hWnd);
+	MainWindowHandle = hWnd;
+	InstanceHandle = hInstance;
+	InitDirectInput();
+	Keyboard_Initialize();
+	GamePad_Initialize();
 	MouseInit();
 	return true;
 }
@@ -346,5 +335,5 @@ void InputUpdate() {
 void InputRelease() {
 	Keyboard_Finalize();
 	GamePad_Finalize();
-	finalize();
+	ReleaseDirectInput();
 }

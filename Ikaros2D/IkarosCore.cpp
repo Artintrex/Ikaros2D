@@ -29,10 +29,12 @@ iTime Time;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-static bool Initialize();
+static bool Initialize(HINSTANCE hInstance);
 static void Finalize();
 static bool D3D_Initialize();
 static void D3D_Finalize();
+
+static void GameLoop();
 
 #ifndef _BUILD
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -97,7 +99,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	ShowWindow(g_hWnd, nCmdShow);
 	UpdateWindow(g_hWnd);
-	Initialize();
+	Initialize(hInstance);
 
 	//NEED UPDATE: DEBUG CODE
 	GameObject* test = new GameObject("GameManager");
@@ -115,23 +117,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			DispatchMessage(&msg);
 		}
 		else {
-			Time.Start();
-			//NEED UPDATE: Want an outer loop for scene management
-			MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
-			Transform::UpdateTransform();
-			
-			//Begin drawing
-			pD3DDevice->BeginScene();
-
-			Camera::Draw();
-
-			//End drawing
-			pD3DDevice->EndScene();
-
-			// Back buffer flip（Timing depends on D3DPRESENT_PARAMETERS）
-			pD3DDevice->Present(NULL, NULL, NULL, NULL);
-
-			Time.End();
+			GameLoop();
 		}
 	}
 	Finalize();
@@ -773,7 +759,7 @@ void D3D_Finalize()
 	}
 }
 
-bool Initialize()
+bool Initialize(HINSTANCE hInstance)
 {
 	//Initilize RNG Seed
 	srand((unsigned int)time(NULL));
@@ -783,15 +769,7 @@ bool Initialize()
 		return false;
 	}
 
-	// DirectInputの初期化（キーボード）
-	//if (!Keyboard_Initialize(hInst, g_hWnd)) {
-	//	return false;
-	//}
-	// DirectInputの初期化（ゲームパッド）
-	//if (!GamePad_Initialize(hInst, g_hWnd)) {
-	//	return false;
-	//}
-
+	InputInitialize(hInstance, g_hWnd);
 	return true;
 }
 
@@ -799,13 +777,30 @@ void Finalize(void)
 {
 	SceneManager::UnloadScene();
 
-
-	// DirectInputの終了処理
-	//GamePad_Finalize();
-
-	// DirectInputの終了処理
-	//Keyboard_Finalize();
+	InputRelease();
 
 	// Kill D3D
 	D3D_Finalize();
+}
+
+void GameLoop() {
+	Time.Start();
+	//NEED UPDATE: Want an outer loop for scene management
+
+	InputUpdate();
+	MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
+	Transform::UpdateTransform(); //Update matrices if transforms are changed
+
+	//Begin drawing
+	pD3DDevice->BeginScene();
+
+	Camera::Draw();
+
+	//End drawing
+	pD3DDevice->EndScene();
+
+	// Back buffer flip（Timing depends on D3DPRESENT_PARAMETERS）
+	pD3DDevice->Present(NULL, NULL, NULL, NULL);
+
+	Time.End();
 }

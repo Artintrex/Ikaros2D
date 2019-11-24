@@ -1,10 +1,21 @@
 #pragma once
 #include <dinput.h>
 
+//Unused for now
 #define BUTTON_UP		0x00000001l	// 方向キー上(.IY<0)
 #define BUTTON_DOWN		0x00000002l	// 方向キー下(.IY>0)
 #define BUTTON_LEFT		0x00000004l	// 方向キー左(.IX<0)
 #define BUTTON_RIGHT	0x00000008l	// 方向キー右(.IX>0)
+
+
+enum Axis {
+	LeftHorizontal,
+	LeftVertical,
+	RightHorizontal,
+	RightVertical
+};
+
+
 #define BUTTON_A		0x00000010l	// Ａボタン(.rgbButtons[0]&0x80)
 #define BUTTON_B		0x00000020l	// Ｂボタン(.rgbButtons[1]&0x80)
 #define BUTTON_C		0x00000040l	// Ｃボタン(.rgbButtons[2]&0x80)
@@ -19,7 +30,7 @@
 #define	NUM_KEY_MAX			(256)
 
 
-bool InputInitialize(HINSTANCE hInstance, HWND hWnd, MSG* messages);
+bool InputInitialize(HINSTANCE hInstance, HWND hWnd);
 void InputUpdate();
 void InputRelease();
 
@@ -31,7 +42,7 @@ bool GetButton(int padNo, DWORD button);
 bool GetButtonDown(int padNo, DWORD button);
 bool GetButtonUp(int padNo, DWORD button);
 
-float GetAxis(int padNo, DWORD axis);
+float GetAxis(int padNo, Axis axis);
 
 bool GetMouseButton(int nButton);
 bool GetMouseButtonDown(int nButton);

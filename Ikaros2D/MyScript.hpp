@@ -73,15 +73,8 @@ public:
 		//}
 	}
 
-	SHORT oldsate;
-	SHORT state;
 	void Update() {
 		test->transform->Rotate(1, 0.5, 0.5);
-		oldsate = state;
-		state = GetAsyncKeyState(VK_LBUTTON);
-		if ((oldsate ^ state) & state & 0x8000) {
-			std::cout << "OOOOO" << std::endl;
-		}
 		
 	}
 };
