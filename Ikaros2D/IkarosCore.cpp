@@ -294,15 +294,15 @@ Texture* Texture::LoadTexture(std::string TextureName, LPCTSTR FilePath) {
 
 			return texture;
 		}
-		else delete tex;
+		else delete tex; return nullptr;
 }
 
 Texture* Texture::FindTexturebyName(std::string Name) {
 	for (std::vector<Texture*>::iterator it = TextureList.begin(); it != TextureList.end(); ++it)
 	{
 		if (Name == (*it)->name)return *it;
-		else return nullptr;
 	}
+	return nullptr;
 }
 
 bool Texture::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)

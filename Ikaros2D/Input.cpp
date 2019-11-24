@@ -270,7 +270,7 @@ float GetAxis(int padNo, Axis axis) {
 	case LeftVertical:
 		return (float)dijs[padNo].lY / RANGE_MAX;
 	case RightHorizontal:
-		return (float)((dijs[padNo].lZ / 3.27675) - RANGE_MAX) / RANGE_MAX;
+		return (float)((dijs[padNo].lZ / 3.27675) - RANGE_MAX) / RANGE_MAX; //minus mod deadzone for stabilization
 	case RightVertical:
 		return (float)-((dijs[padNo].lRz / 3.27675) - RANGE_MAX) / RANGE_MAX;
 	}
