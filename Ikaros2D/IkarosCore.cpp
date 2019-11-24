@@ -36,6 +36,9 @@ static void D3D_Finalize();
 
 static void GameLoop();
 
+b2Vec2 gravity(0.0f, -10.0f);
+b2World world(gravity);
+
 #ifndef _BUILD
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {

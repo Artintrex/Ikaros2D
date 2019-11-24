@@ -75,6 +75,5 @@ public:
 
 	void Update() {
 		test->transform->Rotate(1, 0.5, 0.5);
-		
 	}
 };
