@@ -384,8 +384,8 @@ void Sprite::GenereteSprite(std::string Name) {
 
 
 		for (int i = 0; i < 4; i++) {
-			vertices[i].position.x *= texture->Width;
-			vertices[i].position.y *= texture->Height;
+			vertices[i].position.x *= texture->Width / 100;
+			vertices[i].position.y *= texture->Height / 100;
 
 			vertices[i].color = D3DCOLOR_RGBA(255, 255, 255, 255);
 		}
@@ -712,6 +712,15 @@ void Camera::SetCamera() {
 
 	D3DXMatrixLookAtLH(&View, &(transform->position), &LookAt, &vWorldUp);
 	D3DXMatrixInverse(&mCameraWorld, NULL, &View);
+}
+
+RigidBody::RigidBody(std::string Name) : Component(Name) {
+	bodydefinition.position.Set(0, 0);
+	rigidbody = world.CreateBody(&bodydefinition);
+}
+
+RigidBody::~RigidBody() {
+	world.DestroyBody(rigidbody);
 }
 
 GameObject::GameObject(std::string Name) : Object(Name) {

@@ -233,13 +233,13 @@ public:
 
 class RigidBody : public Component {
 public:
-	RigidBody(std::string Name = "RigidBody") : Component(Name) {
-		//NEED UPDATE: actually add physics instad of husk
-	}
+	b2Body* rigidbody;
+	RigidBody(std::string Name = "RigidBody");
 
-	~RigidBody() {
-		//NEED UPDATE: Release fixtures etc
-	}
+	~RigidBody();
+
+private:
+	b2BodyDef bodydefinition;
 };
 
 class Transform : public Component {
