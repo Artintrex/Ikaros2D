@@ -1,9 +1,14 @@
 #pragma once
 #include "IkarosCore.h"
 
-class HuJian : public MonoBehavior {
+class Player1 : public MonoBehavior {
 public:
+	GameObject* player1;
+	Texture* PlayerTex[10];
+	Sprite* PlayerSpr[10];
+	Renderer* p1rend;
 
+	GameObject* floor;
 
 	void Awake() {
 
@@ -13,35 +18,8 @@ public:
 
 	void Start() {
 
-		std::cout << "Factory Register" << "\n";
-		for (auto it = Component::factories.cbegin(); it != Component::factories.cend(); ++it)
-		{
-			std::cout << it->first << " " << it->second << "\n";
-		}
-
-		Camera* cam;
-
-		camObj = new GameObject("MainCamera");
-		cam = camObj->AddComponent<Camera>();
-		camObj->transform->Translate(0, 0, -900);
-		cam->rect.W = 1.0;
-		cam->rect.H = 1.0;
-		cam->SetProjection();
-
-
-		test = new GameObject("Tester");
-		Texture* tex = Texture::LoadTexture("TestImage", "Assets/Textures/title.jpg");
-		Sprite* tsprite = new Sprite();
-
-		tsprite->texture = tex;
-		Renderer* rend = test->AddComponent<Renderer>();
-		rend->sprite = tsprite;
-		tsprite->GenereteSprite();
-
-		test->transform->Scale(1, 1, 1);
-
-
 		player1 = new GameObject("Player1");
+
 		PlayerTex[0] = Texture::LoadTexture("player1", "Assets/Textures/player1t.png");
 		PlayerTex[1] = Texture::LoadTexture("player2", "Assets/Textures/player2t.png");
 		PlayerTex[2] = Texture::LoadTexture("player3", "Assets/Textures/player3t.png");
@@ -51,7 +29,11 @@ public:
 		PlayerTex[6] = Texture::LoadTexture("player7", "Assets/Textures/player7t.png");
 		PlayerTex[7] = Texture::LoadTexture("player8", "Assets/Textures/player8t.png");
 		PlayerTex[8] = Texture::LoadTexture("player9", "Assets/Textures/player9t.png");
+
+
 		p1rend = player1->AddComponent<Renderer>();
+
+
 		for (int player_shin = 0; player_shin < 9; player_shin++)
 		{
 

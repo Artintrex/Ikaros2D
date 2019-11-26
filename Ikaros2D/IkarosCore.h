@@ -148,8 +148,6 @@ public:
 	}
 
 	static std::map<std::string, ComponentFactory*> factories;
-private:
-	
 };
 
 class Behavior : public Component {
@@ -208,7 +206,7 @@ public:
 	LPDIRECT3DVERTEXBUFFER9 VertexBuffer;
 	LPDIRECT3DINDEXBUFFER9 IndexBuffer;
 
-	Sprite(std::string Name = "Sprite");
+	Sprite(Texture* pTexture = nullptr, std::string Name = "Sprite");
 	~Sprite();
 
 	void GenereteSprite(std::string Name = "");
@@ -225,16 +223,18 @@ public:
 	Vector2 size;
 	int sortingOrder;
 
-	Renderer(std::string Name = "Renderer");
+	Renderer(GameObject* Parent, std::string Name = "Renderer");
 	~Renderer();
 
 	static std::vector<Renderer*> RendererList;
 };
 
+//class 
+
 class RigidBody : public Component {
 public:
 	b2Body* rigidbody;
-	RigidBody(std::string Name = "RigidBody");
+	RigidBody(GameObject* Parent, std::string Name = "RigidBody");
 
 	~RigidBody();
 };
@@ -281,7 +281,7 @@ public:
 	
 	//NEED UPDATE: Add Layer systems to filter objects for cameras and clear camera list
 
-	Camera(std::string Name = "Camera");
+	Camera(GameObject* Parent, std::string Name = "Camera");
 	~Camera();
 
 	///Calculates projection matrix
@@ -323,9 +323,27 @@ public:
 	template <class T> T* AddComponent() {
 		T* p = new T();
 		p->parent = this;
-		p->transform = this->transform;
+		p->transform = transform;
 		ComponentList.push_back((Component*)p);
 
+		return p;
+	}
+
+	template <> Camera* AddComponent<Camera>() {
+		Camera* p = new Camera(this);
+		ComponentList.push_back((Component*)p);
+		return p;
+	}
+
+	template <> RigidBody* AddComponent<RigidBody>() {
+		RigidBody* p = new RigidBody(this);
+		ComponentList.push_back((Component*)p);
+		return p;
+	}
+
+	template <> Renderer* AddComponent<Renderer>() {
+		Renderer* p = new Renderer(this);
+		ComponentList.push_back((Component*)p);
 		return p;
 	}
 

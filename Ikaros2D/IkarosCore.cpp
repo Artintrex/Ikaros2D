@@ -340,13 +340,17 @@ bool Texture::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
 	}
 }
 
-Sprite::Sprite(std::string Name) : Object(Name) {
+Sprite::Sprite(Texture* pTexture, std::string Name) : Object(Name) {
 	renderer = nullptr;
-	texture = nullptr;
+	texture = pTexture;
 	vertices = nullptr;
 	indices = nullptr;
 	VertexBuffer = NULL;
 	IndexBuffer = NULL;
+
+	if (texture != nullptr) {
+		GenereteSprite();
+	}
 }
 
 Sprite::~Sprite() {
@@ -424,7 +428,9 @@ void Sprite::GenereteSprite(std::string Name) {
 	}
 }
 
-Renderer::Renderer(std::string Name) : Component(Name) {
+Renderer::Renderer(GameObject* Parent, std::string Name) : Component(Name) {
+	parent = Parent;
+	transform = Parent->transform;
 	sprite = nullptr;
 	sortingOrder = 0;
 
@@ -507,15 +513,17 @@ void Transform::UpdateTransform() {
 	}
 }
 
-Camera::Camera(std::string Name) : Behavior(Name) {
-	transform = nullptr;
+Camera::Camera(GameObject* Parent, std::string Name) : Behavior(Name) {
+	parent = Parent;
+	transform = Parent->transform;
+
 	fieldOfView = (D3DXToRadian(60.0f));
 	nearClipPlane = 0.3f;
 	farClipPlane = 10000.0f;
 	rect.X = 0;
 	rect.Y = 0;
-	rect.W = 0;
-	rect.H = 0;
+	rect.W = 1;
+	rect.H = 1;
 	aspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 
 	orthographic = false;
@@ -559,6 +567,8 @@ void Camera::draw() {
 
 	
 	for (auto p : Renderer::RendererList) {
+		if (p->sprite == nullptr)continue;
+
 		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
 
 		pD3DDevice->SetStreamSource(0, p->sprite->VertexBuffer, 0, sizeof(VertexBufferData));
@@ -714,7 +724,10 @@ void Camera::SetCamera() {
 	D3DXMatrixInverse(&mCameraWorld, NULL, &View);
 }
 
-RigidBody::RigidBody(std::string Name) : Component(Name) {
+RigidBody::RigidBody(GameObject* Parent, std::string Name) : Component(Name) {
+	parent = Parent;
+	transform = Parent->transform;
+
 	b2BodyDef bodydefinition;
 	bodydefinition.position.Set(0, 0);
 	rigidbody = world.CreateBody(&bodydefinition);

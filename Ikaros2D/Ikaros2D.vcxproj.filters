@@ -41,14 +41,14 @@
     <ClInclude Include="Input.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="HuJian.hpp">
-      <Filter>GameSource</Filter>
-    </ClInclude>
     <ClInclude Include="MyScript.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Player1.hpp">
+      <Filter>GameSource</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

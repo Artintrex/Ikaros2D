@@ -7,7 +7,7 @@
 //
 //Add your classes here so scene loader can recognize them
 REGISTER_COMPONENT(MyScript)
-REGISTER_COMPONENT(HuJian)
+REGISTER_COMPONENT(Player1)
 
 //
 //

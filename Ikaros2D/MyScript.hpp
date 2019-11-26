@@ -7,9 +7,6 @@ public:
 	GameObject* testGround;
 
 	GameObject* camObj;
-	GameObject* camObj2;
-	GameObject* camObj3;
-	GameObject* camObj4;
 
 	void Awake() {
 
@@ -27,9 +24,8 @@ public:
 		camObj = new GameObject("MainCamera");
 		cam = camObj->AddComponent<Camera>();
 		camObj->transform->Translate(0, 2, -50);
-		cam->rect.W = 1;
-		cam->rect.H = 1;
-		cam->SetProjection();
+
+
 		/*
 		camObj2 = new GameObject("Camera2");
 		cam = camObj2->AddComponent<Camera>();
@@ -38,38 +34,16 @@ public:
 		cam->rect.W = 0.5;
 		cam->rect.H = 0.5;
 		cam->SetProjection();
-
-		camObj3 = new GameObject("Camera3");
-		cam = camObj3->AddComponent<Camera>();
-		camObj3->transform->Translate(0, 2, -5000);
-		cam->rect.Y = 0.5;
-		cam->rect.W = 0.5;
-		cam->rect.H = 0.5;
-		cam->SetProjection();
-
-		
-		camObj4 = new GameObject("Camera4");
-		cam = camObj4->AddComponent<Camera>();
-		camObj4->transform->Translate(0, 2, -5000);
-		cam->rect.X = 0.5;
-		cam->rect.Y = 0.5;
-		cam->rect.W = 0.5;
-		cam->rect.H = 0.5;
-		cam->SetProjection();
 		*/
 
 		test = new GameObject("Tester");
 		test->transform->position = Vector3(0, 20, 0);
+
 		Texture* tex = Texture::LoadTexture("TestImage", "Assets/Textures/test.jpg");
-		Sprite* tsprite = new Sprite();
-		tsprite->texture = tex;
-		tsprite->GenereteSprite();
+		Sprite* tsprite = new Sprite(tex);
 
 		Renderer* rend = test->AddComponent<Renderer>();
 		rend->sprite = tsprite;
-
-
-
 
 
 		RigidBody* testBody = test->AddComponent<RigidBody>();
@@ -106,7 +80,7 @@ public:
 		test->transform->rotation.z = test->GetComponent<RigidBody>()->rigidbody->GetAngle();
 
 
-		std::cout << test->transform->position.x << ", " << test->transform->position.y << std::endl;
+		//std::cout << test->transform->position.x << ", " << test->transform->position.y << std::endl;
 
 		if (GetKeyDown(DIK_SPACE)) {
 			test->GetComponent<RigidBody>()->rigidbody->ApplyLinearImpulse(b2Vec2(0, 50),
