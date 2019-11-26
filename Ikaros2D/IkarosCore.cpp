@@ -619,7 +619,7 @@ void Camera::SetD3DDevice() {
 	*/
 	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
 	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
-	pD3DDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(0, 0, 0, 255));
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(0, 0, 0, 255));
 
 	/*
 	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER,
@@ -715,6 +715,7 @@ void Camera::SetCamera() {
 }
 
 RigidBody::RigidBody(std::string Name) : Component(Name) {
+	b2BodyDef bodydefinition;
 	bodydefinition.position.Set(0, 0);
 	rigidbody = world.CreateBody(&bodydefinition);
 }
@@ -798,6 +799,8 @@ void Finalize(void)
 void GameLoop() {
 	Time.Start();
 	//NEED UPDATE: Want an outer loop for scene management
+
+	world.Step(Time.DeltaTime, 6, 2);
 
 	InputUpdate();
 	MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior

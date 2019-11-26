@@ -237,9 +237,6 @@ public:
 	RigidBody(std::string Name = "RigidBody");
 
 	~RigidBody();
-
-private:
-	b2BodyDef bodydefinition;
 };
 
 class Transform : public Component {

@@ -109,12 +109,12 @@ void Keyboard_Update(void)
 	}
 }
 
-bool GetKeyDown(int nKey)
+bool GetKey(int nKey)
 {
 	return (g_aKeyState[nKey] & 0x80) ? true : false;
 }
 
-bool GetKey(int nKey)
+bool GetKeyDown(int nKey)
 {
 	return (g_aKeyStateTrigger[nKey] & 0x80) ? true : false;
 }
