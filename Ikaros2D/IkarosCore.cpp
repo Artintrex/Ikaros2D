@@ -11,6 +11,7 @@
 
 static LPDIRECT3D9 g_pD3D = NULL;             //Direct3D interface
 static LPDIRECT3DDEVICE9 pD3DDevice = NULL;  //Direct3D device
+static D3DVIEWPORT9 MainViewport;
 
 static HWND g_hWnd; //Window Handler
 
@@ -28,10 +29,15 @@ iTime Time;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-static bool Initialize();
+static bool Initialize(HINSTANCE hInstance);
 static void Finalize();
 static bool D3D_Initialize();
 static void D3D_Finalize();
+
+static void GameLoop();
+
+b2Vec2 gravity(0.0f, -10.0f);
+b2World world(gravity);
 
 #ifndef _BUILD
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -60,6 +66,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	RECT window_rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 	AdjustWindowRect(&window_rect, window_style, FALSE);
+	MainViewport = {0, 0, SCREEN_WIDTH , SCREEN_HEIGHT , 0, 1};
 
 	// Calculate window rect dimensions
 	int window_width = window_rect.right - window_rect.left;
@@ -95,7 +102,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	ShowWindow(g_hWnd, nCmdShow);
 	UpdateWindow(g_hWnd);
-	Initialize();
+	Initialize(hInstance);
 
 	//NEED UPDATE: DEBUG CODE
 	GameObject* test = new GameObject("GameManager");
@@ -113,23 +120,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			DispatchMessage(&msg);
 		}
 		else {
-			Time.Start();
-			//NEED UPDATE: Want an outer loop for scene management
-			MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
-			Transform::UpdateTransform();
-			
-			//Begin drawing
-			pD3DDevice->BeginScene();
-
-			Camera::Draw();
-
-			//End drawing
-			pD3DDevice->EndScene();
-
-			// Back buffer flip（Timing depends on D3DPRESENT_PARAMETERS）
-			pD3DDevice->Present(NULL, NULL, NULL, NULL);
-
-			Time.End();
+			GameLoop();
 		}
 	}
 	Finalize();
@@ -162,6 +153,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
+
+		//catch mousewheel event
+	case WM_MOUSEWHEEL:
+		mouseScrollDelta += (short)HIWORD(wParam) / 120;
 	};
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -302,15 +297,15 @@ Texture* Texture::LoadTexture(std::string TextureName, LPCTSTR FilePath) {
 
 			return texture;
 		}
-		else delete tex;
+		else delete tex; return nullptr;
 }
 
 Texture* Texture::FindTexturebyName(std::string Name) {
 	for (std::vector<Texture*>::iterator it = TextureList.begin(); it != TextureList.end(); ++it)
 	{
 		if (Name == (*it)->name)return *it;
-		else return nullptr;
 	}
+	return nullptr;
 }
 
 bool Texture::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
@@ -389,8 +384,8 @@ void Sprite::GenereteSprite(std::string Name) {
 
 
 		for (int i = 0; i < 4; i++) {
-			vertices[i].position.x *= texture->Width;
-			vertices[i].position.y *= texture->Height;
+			vertices[i].position.x *= texture->Width / 100;
+			vertices[i].position.y *= texture->Height / 100;
 
 			vertices[i].color = D3DCOLOR_RGBA(255, 255, 255, 255);
 		}
@@ -547,6 +542,8 @@ Camera::~Camera() {
 
 //Draw all cameras
 void Camera::Draw() {
+	pD3DDevice->SetViewport(&MainViewport);
+	pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(50, 50, 50, 255), 1.0f, 0);
 	for (auto p : CameraList) {
 		p->draw();
 	}
@@ -560,7 +557,7 @@ void Camera::draw() {
 	pD3DDevice->SetTransform(D3DTS_VIEW, &View);
 	pD3DDevice->SetTransform(D3DTS_PROJECTION, &Projection);
 
-	pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_RGBA(50, 50, 50, 255), 1.0f, 0);
+	
 	for (auto p : Renderer::RendererList) {
 		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
 
@@ -622,7 +619,7 @@ void Camera::SetD3DDevice() {
 	*/
 	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
 	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
-	pD3DDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(0, 0, 0, 255));
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(0, 0, 0, 255));
 
 	/*
 	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER,
@@ -717,6 +714,16 @@ void Camera::SetCamera() {
 	D3DXMatrixInverse(&mCameraWorld, NULL, &View);
 }
 
+RigidBody::RigidBody(std::string Name) : Component(Name) {
+	b2BodyDef bodydefinition;
+	bodydefinition.position.Set(0, 0);
+	rigidbody = world.CreateBody(&bodydefinition);
+}
+
+RigidBody::~RigidBody() {
+	world.DestroyBody(rigidbody);
+}
+
 GameObject::GameObject(std::string Name) : Object(Name) {
 	transform = new Transform();
 	transform->parent = this;
@@ -765,7 +772,7 @@ void D3D_Finalize()
 	}
 }
 
-bool Initialize()
+bool Initialize(HINSTANCE hInstance)
 {
 	//Initilize RNG Seed
 	srand((unsigned int)time(NULL));
@@ -775,15 +782,7 @@ bool Initialize()
 		return false;
 	}
 
-	// DirectInputの初期化（キーボード）
-	//if (!Keyboard_Initialize(hInst, g_hWnd)) {
-	//	return false;
-	//}
-	// DirectInputの初期化（ゲームパッド）
-	//if (!GamePad_Initialize(hInst, g_hWnd)) {
-	//	return false;
-	//}
-
+	InputInitialize(hInstance, g_hWnd);
 	return true;
 }
 
@@ -791,13 +790,32 @@ void Finalize(void)
 {
 	SceneManager::UnloadScene();
 
-
-	// DirectInputの終了処理
-	//GamePad_Finalize();
-
-	// DirectInputの終了処理
-	//Keyboard_Finalize();
+	InputRelease();
 
 	// Kill D3D
 	D3D_Finalize();
+}
+
+void GameLoop() {
+	Time.Start();
+	//NEED UPDATE: Want an outer loop for scene management
+
+	world.Step(Time.DeltaTime, 6, 2);
+
+	InputUpdate();
+	MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
+	Transform::UpdateTransform(); //Update matrices if transforms are changed
+
+	//Begin drawing
+	pD3DDevice->BeginScene();
+
+	Camera::Draw();
+
+	//End drawing
+	pD3DDevice->EndScene();
+
+	// Back buffer flip（Timing depends on D3DPRESENT_PARAMETERS）
+	pD3DDevice->Present(NULL, NULL, NULL, NULL);
+
+	Time.End();
 }

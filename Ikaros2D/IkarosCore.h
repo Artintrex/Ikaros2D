@@ -10,6 +10,7 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include "Box2D\Box2D.h"
+#include "input.h"
 
 //NEED UPDATE: Change Resolution Settings needs to read from file!! Also set d3d parameters like fullscreen etc
 #define SCREEN_WIDTH  (1024)
@@ -232,13 +233,10 @@ public:
 
 class RigidBody : public Component {
 public:
-	RigidBody(std::string Name = "RigidBody") : Component(Name) {
-		//NEED UPDATE: actually add physics instad of husk
-	}
+	b2Body* rigidbody;
+	RigidBody(std::string Name = "RigidBody");
 
-	~RigidBody() {
-		//NEED UPDATE: Release fixtures etc
-	}
+	~RigidBody();
 };
 
 class Transform : public Component {
@@ -280,6 +278,7 @@ public:
 	bool orthographic;
 	float orthographicSize;
 	Rect rect;
+	
 	//NEED UPDATE: Add Layer systems to filter objects for cameras and clear camera list
 
 	Camera(std::string Name = "Camera");
@@ -290,7 +289,6 @@ public:
 
 	///Do not call this method. It's meant for main loop
 	static void Draw();
-
 private:
 	static std::vector<Camera*> CameraList;
 
