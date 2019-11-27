@@ -19,8 +19,6 @@
 typedef D3DXVECTOR2 Vector2;
 typedef D3DXVECTOR3 Vector3;
 
-//NEED UPDATE:
-//class Collider(Types)
 class iTime;
 class Object;
 class GameObject;
@@ -49,6 +47,12 @@ struct Rect {
 	float Y;
 	float W;
 	float H;
+};
+
+enum ForceMode {
+	Force,
+	Impulse,
+	VelocityChange
 };
 
 //RTTI type info from template instances by Stefan Reinalter. Only works on MSVS "class #classname"
@@ -106,6 +110,10 @@ public:
 	///Time it took to render previous frame
 	float DeltaTime;
 
+	iTime() {
+		DeltaTime = 1;
+	}
+
 	void Start() {
 		t1 = std::chrono::high_resolution_clock::now();
 	}
@@ -133,6 +141,7 @@ private:
 	static void ReleaseObjects();
 
 	friend class SceneManager;
+	friend class Debug;
 };
 
 class Component : public Object {
@@ -202,6 +211,7 @@ class Sprite : public Object {
 public:
 	Object* renderer;
 	Texture* texture;
+	Vector2 size;
 
 	LPDIRECT3DVERTEXBUFFER9 VertexBuffer;
 	LPDIRECT3DINDEXBUFFER9 IndexBuffer;
@@ -209,11 +219,13 @@ public:
 	Sprite(Texture* pTexture = nullptr, std::string Name = "Sprite");
 	~Sprite();
 
+	void SetColor(D3DCOLOR rgba);
 	void GenereteSprite(std::string Name = "");
 
 private:
 	VertexBufferData* vertices;
 	WORD* indices;
+	D3DCOLOR color;
 };
 
 class Renderer : public Component {
@@ -229,31 +241,30 @@ public:
 	static std::vector<Renderer*> RendererList;
 };
 
-//class 
-
-class RigidBody : public Component {
-public:
-	b2Body* rigidbody;
-	RigidBody(GameObject* Parent, std::string Name = "RigidBody");
-
-	~RigidBody();
-};
-
+//Holds transform data and matrice calculations. 
+//THIS COMPONENT IS HANDLED BY THE ENGINE. DO NOT ADD THIS !!
 class Transform : public Component {
 public:
+	//If there is a rigidbody attached these will be overwritten. Use RigidBody component for transformation instead.
 	Vector3 position;
+	//If there is a rigidbody attached these will be overwritten. Use RigidBody component for transformation instead.
 	Vector3 rotation;
+	//If there is a rigidbody attached these will be overwritten. Use RigidBody component for transformation instead.
 	Vector3 scale;
 	D3DXMATRIX localToWorldMatrix;
 
 	Transform(Vector3 Position = Vector3(0, 0, 0), Vector3 Rotation = Vector3(0, 0, 0), Vector3 Scale = Vector3(1, 1, 1));
 	~Transform();
 
-	//Moves the tranform 
+	//Moves the tranform by entered values Additive.
+	//If there is a rigidbody attached these will be overwritten. Use RigidBody component for transformation instead.
 	void Translate(float x, float y, float z);
 
+	//Additive rotation.
+	//If there is a rigidbody attached these will be overwritten. Use RigidBody component for transformation instead.
 	void Rotate(float x, float y, float z);
 
+	//Multiplies scale value
 	void Scale(float x, float y, float z);
 
 	static void UpdateTransform();
@@ -266,6 +277,47 @@ private:
 	static std::vector<Transform*> TransformList;
 
 	void SetMatrix();
+};
+
+//Adds physics to a GameObject
+class RigidBody : public Component {
+public:
+	b2Body* rigidbody;
+	Vector2 velocity;
+
+	RigidBody(GameObject* Parent, std::string Name = "RigidBody");
+
+	~RigidBody();
+
+	static void UpdateRigidBody();
+
+	void SetType(b2BodyType type) {
+		rigidbody->SetType(type);
+	}
+
+	void SetContinuousDynamic(bool flag) {
+		rigidbody->SetBullet(flag);
+	}
+
+	void AddForce(Vector2 force, ForceMode mode);
+	void AddTorque(float torque, ForceMode mode);
+
+	void Translate(Vector3 position) {
+		rigidbody->SetTransform(b2Vec2(position.x, position.y), transform->rotation.z);
+		transform->position.z = position.z;
+	}
+	void Rotate(Vector3 rotation) {
+		rigidbody->SetTransform(b2Vec2(transform->position.x, transform->position.y), rotation.z);
+		transform->rotation.x = rotation.x;
+		transform->rotation.y = rotation.y;
+	}
+
+	void AddCircleCollider(float radius = 1, Vector2 center = Vector2(0, 0), float density = 1.0f, float friction = 0.2f, float bounciness = 0, uint16 maskBits = 0x0001, bool isTrigger = false);
+	void AddBoxCollider(Vector2 size = Vector2(1, 1), Vector2 center = Vector2(0, 0), float angle = 0, float density = 1.0f, float friction = 0.2f, float bounciness = 0, uint16 maskBits = 0x0001, bool isTrigger = false);
+
+	std::vector<b2Fixture*> ColliderList;
+private:
+	static std::vector<RigidBody*> RigidBodyList;
 };
 
 class Camera : public Behavior {
@@ -287,7 +339,7 @@ public:
 	///Calculates projection matrix
 	void SetProjection();
 
-	///Do not call this method. It's meant for main loop
+	///Do NOT CALL THIS METHOD. It's meant for main loop
 	static void Draw();
 private:
 	static std::vector<Camera*> CameraList;

@@ -41,13 +41,25 @@
     <ClInclude Include="Input.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="MyScript.hpp">
-      <Filter>GameSource</Filter>
-    </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Player1.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Title.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneAlpha.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Template.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
   </ItemGroup>

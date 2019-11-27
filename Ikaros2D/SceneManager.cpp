@@ -6,8 +6,10 @@
 //
 //
 //Add your classes here so scene loader can recognize them
-REGISTER_COMPONENT(MyScript)
+REGISTER_COMPONENT(Debug)
 REGISTER_COMPONENT(Player1)
+REGISTER_COMPONENT(GameManager)
+REGISTER_COMPONENT(SceneAlpha)
 
 //
 //

@@ -229,11 +229,15 @@
   <ItemGroup>
     <ClInclude Include="..\Libs\Box2D\Box2D.h" />
     <ClInclude Include="GameHeader.h" />
+    <ClInclude Include="GameManager.hpp" />
     <ClInclude Include="Player1.hpp" />
     <ClInclude Include="IkarosCore.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="SceneAlpha.hpp" />
     <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="MyScript.hpp" />
+    <ClInclude Include="Debug.hpp" />
+    <ClInclude Include="Template.hpp" />
+    <ClInclude Include="Title.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,11 +4,10 @@
 class Player1 : public MonoBehavior {
 public:
 	GameObject* player1;
-	Texture* PlayerTex[10];
-	Sprite* PlayerSpr[10];
+	RigidBody* rb_player1;
+	Texture* PlayerTex[9];
+	Sprite* PlayerSpr[9];
 	Renderer* p1rend;
-
-	GameObject* floor;
 
 	void Awake() {
 
@@ -45,19 +44,14 @@ public:
 			PlayerSpr[player_shin]->GenereteSprite();
 		}
 
-		player1->transform->Scale(0.3, 0.3, 0.3);
+		player1->transform->Scale(0.6, 0.6, 0.6);
 		p1rend->sprite = PlayerSpr[0];
-		floor = new GameObject("floor");
-		Texture* floorT = Texture::LoadTexture("TestImage", "Assets/Textures/floor.png");
-		Sprite* flsprite = new Sprite();
 
-		flsprite->texture = floorT;
-		Renderer* flrend = floor->AddComponent<Renderer>();
-		flrend->sprite = flsprite;
-		flsprite->GenereteSprite();
+		rb_player1 = player1->AddComponent<RigidBody>();
+		rb_player1->SetType(b2_dynamicBody);
+		rb_player1->rigidbody->SetFixedRotation(true);
+		rb_player1->AddBoxCollider(PlayerSpr[0]->size * 0.6f);
 
-		floor->transform->Scale(1, 1, 1);
-		floor->transform->position = Vector3(-500, 59, 0);
 	}
 	int cnt = 0;
 	float Timer = 0.5;
@@ -65,11 +59,22 @@ public:
 		p1rend->sprite = PlayerSpr[cnt];
 		if (Timer < 0) {
 			cnt++;
-			Timer = 0.18;
+			Timer = 0.5;
 		}
-		Timer -= Time.DeltaTime;
+		Timer -= Time.DeltaTime * abs(rb_player1->velocity.x);
 		if (cnt > 8) cnt = 0;
 
+		if (GetKey(DIK_A)) {
+			rb_player1->AddForce(Vector2(-200,0), Force);
+			player1->transform->scale = Vector3(-0.6, 0.6, 0.6);
+		}
+		if (GetKey(DIK_D)) {
+			rb_player1->AddForce(Vector2(200, 0), Force);
+			player1->transform->scale = Vector3(0.6, 0.6, 0.6);
+		}
+		if (GetKeyDown(DIK_SPACE)) {
+			rb_player1->AddForce(Vector2(0, 300), Impulse);
+		}
 	}
 
 };

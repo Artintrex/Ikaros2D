@@ -23,6 +23,7 @@ std::vector<GameObject*> GameObject::GameObjectList{};
 std::vector<Renderer*> Renderer::RendererList{};
 std::vector<Camera*> Camera::CameraList{};
 std::vector<MonoBehavior*> MonoBehavior::MonoBehaviorList{};
+std::vector<RigidBody*> RigidBody::RigidBodyList{};
 std::map<std::string, ComponentFactory*> Component::factories{};
 
 iTime Time;
@@ -106,7 +107,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	//NEED UPDATE: DEBUG CODE
 	GameObject* test = new GameObject("GameManager");
-	MyScript* rtest = test->AddComponent<MyScript>();
+	test->AddComponent<GameManager>();
 
 	//NEED UPDATE: Move this after adding scene loader and add Awake as well
 	MonoBehavior::StartMonoBehaviorArray(); //Start MonoBehavior
@@ -250,6 +251,7 @@ void MonoBehavior::AwakeMonoBehaviorArray() {
 	std::vector<MonoBehavior*>::size_type size = MonoBehaviorList.size();
 	for (int i = 0; i < size; ++i) {
 		MonoBehaviorList[i]->Awake();
+		size = MonoBehaviorList.size();
 	}
 }
 
@@ -257,6 +259,7 @@ void MonoBehavior::StartMonoBehaviorArray() {
 	std::vector<MonoBehavior*>::size_type size = MonoBehaviorList.size();
 	for (int i = 0; i < size; ++i) {
 		MonoBehaviorList[i]->Start();
+		size = MonoBehaviorList.size();
 	}
 }
 
@@ -264,6 +267,7 @@ void MonoBehavior::UpdateMonoBehaviorArray() {
 	std::vector<MonoBehavior*>::size_type size = MonoBehaviorList.size();
 	for (int i = 0; i < size; ++i) {
 		MonoBehaviorList[i]->Update();
+		size = MonoBehaviorList.size();
 	}
 }
 
@@ -288,7 +292,7 @@ Texture::~Texture() {
 Texture* Texture::LoadTexture(std::string TextureName, LPCTSTR FilePath) {
 		LPDIRECT3DTEXTURE9* tex = new LPDIRECT3DTEXTURE9;
 		if (CreateTexture(FilePath, tex)) {
-			Texture* texture = new Texture("TextureName");
+			Texture* texture = new Texture(TextureName);
 			texture->texturedata = tex;
 
 			stbi_info(FilePath, &(texture->Width), &(texture->Height), 0);
@@ -348,6 +352,8 @@ Sprite::Sprite(Texture* pTexture, std::string Name) : Object(Name) {
 	VertexBuffer = NULL;
 	IndexBuffer = NULL;
 
+	color = D3DCOLOR_RGBA(255, 255, 255, 255);
+
 	if (texture != nullptr) {
 		GenereteSprite();
 	}
@@ -386,12 +392,13 @@ void Sprite::GenereteSprite(std::string Name) {
 		vertices[2].uv = Vector2(0, 1);
 		vertices[3].uv = Vector2(1, 1);
 
+		size = Vector2((float)texture->Width / 100, (float)texture->Height / 100);
 
 		for (int i = 0; i < 4; i++) {
-			vertices[i].position.x *= texture->Width / 100;
-			vertices[i].position.y *= texture->Height / 100;
+			vertices[i].position.x *= size.x;
+			vertices[i].position.y *= size.y;
 
-			vertices[i].color = D3DCOLOR_RGBA(255, 255, 255, 255);
+			vertices[i].color = color;
 		}
 
 		VertexBuffer->Unlock();
@@ -426,6 +433,11 @@ void Sprite::GenereteSprite(std::string Name) {
 
 		IndexBuffer->Unlock();
 	}
+}
+
+void Sprite::SetColor(D3DCOLOR rbga) {
+	color = rbga;
+	GenereteSprite();
 }
 
 Renderer::Renderer(GameObject* Parent, std::string Name) : Component(Name) {
@@ -729,12 +741,97 @@ RigidBody::RigidBody(GameObject* Parent, std::string Name) : Component(Name) {
 	transform = Parent->transform;
 
 	b2BodyDef bodydefinition;
-	bodydefinition.position.Set(0, 0);
+	bodydefinition.position.Set(transform->position.x, transform->position.y);
 	rigidbody = world.CreateBody(&bodydefinition);
+
+	RigidBodyList.push_back(this);
 }
 
 RigidBody::~RigidBody() {
 	world.DestroyBody(rigidbody);
+
+	for (std::vector<RigidBody*>::iterator it = RigidBodyList.begin(); it != RigidBodyList.end(); ++it)
+	{
+		if (this == (*it)) {
+			RigidBodyList.erase(it);
+			break;
+		}
+	}
+}
+
+void RigidBody::UpdateRigidBody() {
+	for (auto p : RigidBodyList) {
+		p->transform->position.x = p->rigidbody->GetPosition().x;
+		p->transform->position.y = p->rigidbody->GetPosition().y;
+		p->transform->rotation.z = p->rigidbody->GetAngle();
+
+		p->velocity.x = p->rigidbody->GetLinearVelocity().x;
+		p->velocity.y = p->rigidbody->GetLinearVelocity().y;
+	}
+}
+
+void RigidBody::AddForce(Vector2 force, ForceMode mode) {
+	switch (mode) {
+	case Force:
+		rigidbody->ApplyForceToCenter(b2Vec2(force.x, force.y), true);
+		break;
+	case Impulse:
+		rigidbody->ApplyLinearImpulseToCenter(b2Vec2(force.x, force.y), true);
+		break;
+	case VelocityChange:
+		rigidbody->SetLinearVelocity(b2Vec2(force.x, force.y));
+		break;
+	}
+}
+
+void RigidBody::AddTorque(float torque, ForceMode mode) {
+	switch (mode) {
+	case Force:
+		rigidbody->ApplyTorque(torque, true);
+		break;
+	case Impulse:
+		rigidbody->ApplyAngularImpulse(torque, true);
+		break;
+	case VelocityChange:
+		rigidbody->SetAngularVelocity(torque);
+		break;
+	}
+}
+
+void RigidBody::AddCircleCollider(float radius, Vector2 center, float density, float friction, float bounciness, uint16 maskBits, bool isTrigger) {
+	b2CircleShape circle;
+	circle.m_p.Set(center.x, center.y);
+	circle.m_radius = radius;
+
+	b2FixtureDef fixtureDef;
+
+	fixtureDef.shape = &circle;
+	fixtureDef.density = density;
+	fixtureDef.friction = friction;
+	fixtureDef.restitution = bounciness;
+	fixtureDef.filter.maskBits = maskBits;
+	fixtureDef.isSensor = isTrigger;
+
+	b2Fixture* collider = rigidbody->CreateFixture(&fixtureDef);
+
+	ColliderList.push_back(collider);
+}
+
+void RigidBody::AddBoxCollider(Vector2 size, Vector2 center, float angle, float density, float friction, float bounciness, uint16 maskBits, bool isTrigger) {
+	b2PolygonShape box;
+	box.SetAsBox(size.x / 2, size.y / 2, b2Vec2(center.x, center.y), angle);
+	b2FixtureDef fixtureDef;
+
+	fixtureDef.shape = &box;
+	fixtureDef.density = density;
+	fixtureDef.friction = friction;
+	fixtureDef.restitution = bounciness;
+	fixtureDef.filter.maskBits = maskBits;
+	fixtureDef.isSensor = isTrigger;
+
+	b2Fixture* collider = rigidbody->CreateFixture(&fixtureDef);
+
+	ColliderList.push_back(collider);
 }
 
 GameObject::GameObject(std::string Name) : Object(Name) {
@@ -813,13 +910,22 @@ void GameLoop() {
 	Time.Start();
 	//NEED UPDATE: Want an outer loop for scene management
 
-	world.Step(Time.DeltaTime, 6, 2);
+	world.Step(Time.DeltaTime, 6, 2); //Physics engine iteration
+	RigidBody::UpdateRigidBody(); //Update transforms to physics engine output
 
-	InputUpdate();
+
+	InputUpdate(); //Update keyboard, mouse and gamepad inputs
+
 	MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
+
 	Transform::UpdateTransform(); //Update matrices if transforms are changed
 
+
+	//
 	//Begin drawing
+	//
+
+
 	pD3DDevice->BeginScene();
 
 	Camera::Draw();

@@ -1,5 +1,8 @@
 #pragma once
-#include "IkarosCore.h"
 
-#include "MyScript.hpp"
+#include "Debug.hpp"
 #include "Player1.hpp"
+
+
+#include "SceneAlpha.hpp"
+#include "GameManager.hpp"
