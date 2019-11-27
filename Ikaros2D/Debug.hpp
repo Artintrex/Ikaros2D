@@ -43,7 +43,7 @@ public:
 		std::cout << "\n" << "--------Object List--------" << "\n" << "\n" << "\n";
 		for (auto p : Object::ObjectList)
 		{
-			std::cout << p->name << "\n";
+			std::cout << p->name << " " << p <<"\n";
 		}
 		std::cout << "\n" << "Number of Objects:  " << Object::ObjectList.size() << "\n";
 	}
