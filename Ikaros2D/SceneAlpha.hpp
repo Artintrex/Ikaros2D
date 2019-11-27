@@ -107,7 +107,7 @@ public:
 
 	int numberofFloor = 0;
 	void CreateFloor(float x, float y) {
-		GameObject* floorblock = new GameObject("floor" + numberofFloor);
+		GameObject* floorblock = new GameObject((std::string)"floor" + std::to_string(numberofFloor));
 		floorblock->AddComponent<Renderer>()->sprite = sprFloor;
 		floorblock->transform->position = Vector3(x, y, 0);
 
@@ -116,7 +116,7 @@ public:
 
 	int numberofBoxes = 0;
 	void CreateBox(float x, float y, float size = 1) {
-		GameObject* box = new GameObject("box" + numberofBoxes);
+		GameObject* box = new GameObject("box" + std::to_string(numberofBoxes));
 		box->AddComponent<Renderer>()->sprite = sprBox;
 		box->transform->position = Vector3(x, y, 0);
 		box->transform->scale *= size;
