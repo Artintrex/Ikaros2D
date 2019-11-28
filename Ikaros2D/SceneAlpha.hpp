@@ -31,7 +31,7 @@ public:
 		PlayerController1 = new GameObject("PlayerController1");
 		PlayerController2 = new GameObject("PlayerController2");
 		player1 = PlayerController1->AddComponent<Player1>();
-		PlayerController2->AddComponent<player2>();
+		PlayerController2->AddComponent<Player2>();
 
 		GroundCollider = new GameObject("GroundCollider");
 		GroundCollider->transform->position = Vector3(0, -21, 0);

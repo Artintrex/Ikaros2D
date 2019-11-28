@@ -27,7 +27,7 @@ public:
 
 	}
 
-	float Timer = 25;
+	float Timer = 3;
 	void Update() {
 		Timer -= Time.DeltaTime;
 

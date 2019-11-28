@@ -1,5 +1,6 @@
 #pragma once
 #include "IkarosCore.h"
+#include "Title.hpp"
 
 class GameManager : public MonoBehavior {
 public:
@@ -11,6 +12,7 @@ public:
 	bool SceneisLoaded;
 
 	GameObject* Alpha;
+	GameObject* objTitle;
 	Title* mTitle;
 
 	void Awake() {
@@ -18,14 +20,13 @@ public:
 	}
 
 	void Start() {
-		this->parent->AddComponent<Debug>();
+		puts("Hello");
+		//this->parent->AddComponent<Debug>();
 
 		LoadAlpha();
-		mTitle = this->parent->AddComponent<Title>();
 	}
-
 	void Update() {
-		
+
 	}
 
 	void ChangeScene(Scene scene) {

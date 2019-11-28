@@ -43,6 +43,18 @@ public:
 	Sprite* ExitSpr = new Sprite();
 	Sprite* EditorSpr = new Sprite();
 	Sprite* ButtonBackdropSpr = new Sprite();
+	TitleBackSpr->texture = TitleBackTex;
+	OptionSpr->texture = OptionTex;
+	ExitSpr->texture = ExitTex;
+	EditorSpr->texture = EditorTex;
+	ButtonBackdropSpr->texture = ButtonBackdropTex;
+
+	TitleBackSpr->GenereteSprite();
+	OptionSpr->GenereteSprite();
+	ExitSpr->GenereteSprite();
+	EditorSpr->GenereteSprite();
+	ButtonBackdropSpr->GenereteSprite();
+
 	TitleBack->AddComponent<Renderer>()->sprite = TitleBackSpr;
 	TitleBack->transform->position = Vector3(0, 0, 0.0010);
 	TitleBack->transform->Scale(100, 100, 1);
@@ -81,6 +93,9 @@ public:
 			BACKDROPPOS = BUTTON * 100;
 		}
 		ButtonBackdrop->transform->position = Vector3(-700, -BACKDROPPOS, 0.0011);
+
+		if (GetKeyDown(DIK_RETURN) && BUTTON == 0) {
+		}
 
 
 	}

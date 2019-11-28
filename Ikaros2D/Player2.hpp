@@ -1,13 +1,17 @@
 #pragma once
 #include "IkarosCore.h"
+#include "Javelin.hpp"
 
-class player2 : public MonoBehavior {
+class Player2 : public MonoBehavior {
 public:
 	GameObject* player2;
 	RigidBody* rb_player2;
 	Texture* PlayerTex[9];
 	Sprite* PlayerSpr[9];
 	Renderer* p2rend;
+
+	Texture* texSpear;
+	Sprite* sprSpear;
 
 	void Awake() {
 
@@ -32,6 +36,10 @@ public:
 
 		p2rend = player2->AddComponent<Renderer>();
 
+		texSpear = Texture::LoadTexture("SpearTexture", "Assets/Textures/javelin.png");
+		sprSpear = new Sprite();
+		sprSpear->texture = texSpear;
+		sprSpear->GenereteSprite();
 
 		for (int player_shin = 0; player_shin < 9; player_shin++)
 		{
@@ -55,6 +63,7 @@ public:
 	}
 	int cnt = 0;
 	float Timer = 0.5;
+	int direction = 1;
 	void Update() {
 		p2rend->sprite = PlayerSpr[cnt];
 		if (Timer < 0) {
@@ -67,18 +76,20 @@ public:
 		if (GetKey(DIK_LEFT)) {
 			rb_player2->AddForce(Vector2(-200, 0), Force);
 			player2->transform->scale = Vector3(-0.6, 0.6, 0.6);
+			direction = -1;
 		}
 
 		if (GetKey(DIK_RIGHT)) {
 			rb_player2->AddForce(Vector2(200, 0), Force);
 			player2->transform->scale = Vector3(0.6, 0.6, 0.6);
+			direction = 1;
 		}
 		if (GetKeyDown(DIK_UP)) {
 			rb_player2->AddForce(Vector2(0, 300), Impulse);
 		}
 
-		if (GetKeyDown(DIK_L)) {
-			new Javelin(Vector2();
+		if (GetKeyDown(DIK_RSHIFT)) {
+			new Javelin(Vector2(player2->transform->position.x, player2->transform->position.y), direction, sprSpear);
 		}
 	}
 
