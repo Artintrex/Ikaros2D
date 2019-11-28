@@ -8,9 +8,10 @@ public:
 		sAlpha
 	};
 	int ActiveScene;
+	bool SceneisLoaded;
 
 	GameObject* Alpha;
-	GameObject* mTitle;
+	Title* mTitle;
 
 	void Awake() {
 
@@ -20,8 +21,7 @@ public:
 		this->parent->AddComponent<Debug>();
 
 		//LoadAlpha();
-		GameObject* test = new GameObject();
-		//test->AddComponent<Title>();
+		mTitle = this->parent->AddComponent<Title>();
 	}
 
 	void Update() {
@@ -41,7 +41,7 @@ private:
 		ActiveScene = sAlpha;
 
 		Alpha = new GameObject();
-		Alpha->AddComponent<SceneAlpha>();
+		Alpha->AddComponent<SceneAlpha>(); //run start here for now
 	}
 
 	void LoadTitle() {
