@@ -13,8 +13,8 @@
 #include "input.h"
 
 //NEED UPDATE: Change Resolution Settings needs to read from file!! Also set d3d parameters like fullscreen etc
-#define SCREEN_WIDTH  (1024)
-#define SCREEN_HEIGHT  (768)
+#define SCREEN_WIDTH  (1920)
+#define SCREEN_HEIGHT  (1080)
 
 typedef D3DXVECTOR2 Vector2;
 typedef D3DXVECTOR3 Vector3;
