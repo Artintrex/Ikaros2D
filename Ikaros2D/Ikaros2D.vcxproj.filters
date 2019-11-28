@@ -27,6 +27,12 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Player2.hpp">
+      <Filter>GameSource</Filter>
+    </ClCompile>
+    <ClCompile Include="sound.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameHeader.h">
@@ -61,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="Debug.hpp">
       <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="sound.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
