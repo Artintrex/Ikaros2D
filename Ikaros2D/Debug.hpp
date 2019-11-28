@@ -15,6 +15,7 @@ public:
 			std::cout << it->first << " " << it->second << "\n";
 		}
 
+		Texture::LoadTexture("null", "Assets/Textures/null.png");
 
 		/*
 		camObj2 = new GameObject("Camera2");

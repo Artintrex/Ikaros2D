@@ -367,72 +367,75 @@ Sprite::~Sprite() {
 void Sprite::GenereteSprite(std::string Name) {
 	if (texture == nullptr) {
 		texture = texture->FindTexturebyName(Name);
-		std::cout << texture << std::endl;
 	}
 	
-	if (FAILED(pD3DDevice->CreateVertexBuffer(sizeof(VertexBufferData)*4,
-		D3DUSAGE_WRITEONLY,
-		(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1),
-		D3DPOOL_MANAGED,
-		&VertexBuffer,
-		NULL)))
-	{
-		std::cout << "ERROR::Failed to create vertex buffer for Texture: " << Name << std::endl;
-	}
-	else {
-		VertexBuffer->Lock(0, 0, (void**)&vertices, 0);
+	if (texture != nullptr) {
 
-		vertices[0].position = Vector3(-0.5f, 0.5f, 0);
-		vertices[1].position = Vector3(0.5f, 0.5f, 0);
-		vertices[2].position = Vector3(-0.5f, -0.5f, 0);
-		vertices[3].position = Vector3(0.5f, -0.5f, 0);
+		if (FAILED(pD3DDevice->CreateVertexBuffer(sizeof(VertexBufferData) * 4,
+			D3DUSAGE_WRITEONLY,
+			(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1),
+			D3DPOOL_MANAGED,
+			&VertexBuffer,
+			NULL)))
+		{
+			std::cout << "ERROR::Failed to create vertex buffer for Texture: " << Name << std::endl;
+		}
+		else {
+			VertexBuffer->Lock(0, 0, (void**)&vertices, 0);
 
-		vertices[0].uv = Vector2(0, 0);
-		vertices[1].uv = Vector2(1, 0);
-		vertices[2].uv = Vector2(0, 1);
-		vertices[3].uv = Vector2(1, 1);
+			vertices[0].position = Vector3(-0.5f, 0.5f, 0);
+			vertices[1].position = Vector3(0.5f, 0.5f, 0);
+			vertices[2].position = Vector3(-0.5f, -0.5f, 0);
+			vertices[3].position = Vector3(0.5f, -0.5f, 0);
 
-		size = Vector2((float)texture->Width / 100, (float)texture->Height / 100);
+			vertices[0].uv = Vector2(0, 0);
+			vertices[1].uv = Vector2(1, 0);
+			vertices[2].uv = Vector2(0, 1);
+			vertices[3].uv = Vector2(1, 1);
 
-		for (int i = 0; i < 4; i++) {
-			vertices[i].position.x *= size.x;
-			vertices[i].position.y *= size.y;
+			size = Vector2((float)texture->Width / 100, (float)texture->Height / 100);
 
-			vertices[i].color = color;
+			for (int i = 0; i < 4; i++) {
+				vertices[i].position.x *= size.x;
+				vertices[i].position.y *= size.y;
+
+				vertices[i].color = color;
+			}
+
+			VertexBuffer->Unlock();
 		}
 
-		VertexBuffer->Unlock();
+		if (FAILED(pD3DDevice->CreateIndexBuffer(sizeof(WORD) * 12,
+			D3DUSAGE_WRITEONLY,
+			D3DFMT_INDEX16,
+			D3DPOOL_MANAGED,
+			&IndexBuffer,
+			NULL)))
+		{
+			std::cout << "ERROR::Failed to create index buffer for Texture: " << Name << std::endl;
+		}
+		else {
+			IndexBuffer->Lock(0, 0, (void**)&indices, 0);
+			indices[0] = 0;
+			indices[1] = 1;
+			indices[2] = 2;
+
+			indices[3] = 2;
+			indices[4] = 3;
+			indices[5] = 1;
+
+			indices[6] = 3;
+			indices[7] = 2;
+			indices[8] = 1;
+
+			indices[9] = 1;
+			indices[10] = 0;
+			indices[11] = 2;
+
+			IndexBuffer->Unlock();
+		}
 	}
-
-	if (FAILED(pD3DDevice->CreateIndexBuffer(sizeof(WORD) * 12,
-		D3DUSAGE_WRITEONLY,
-		D3DFMT_INDEX16,
-		D3DPOOL_MANAGED,
-		&IndexBuffer,
-		NULL)))
-	{
-		std::cout << "ERROR::Failed to create index buffer for Texture: " << Name << std::endl;
-	}
-	else {
-		IndexBuffer->Lock(0, 0, (void**)&indices, 0);
-		indices[0] = 0;
-		indices[1] = 1;
-		indices[2] = 2;
-
-		indices[3] = 2;
-		indices[4] = 3;
-		indices[5] = 1;
-
-		indices[6] = 3;
-		indices[7] = 2;
-		indices[8] = 1;
-
-		indices[9] = 1;
-		indices[10] = 0;
-		indices[11] = 2;
-
-		IndexBuffer->Unlock();
-	}
+	else std::cout << this->name << "can`t find texture" << std::endl;
 }
 
 void Sprite::SetColor(D3DCOLOR rbga) {
@@ -579,8 +582,10 @@ void Camera::draw() {
 
 	
 	for (auto p : Renderer::RendererList) {
-		if (p->sprite == nullptr)continue;
-
+		if (p->sprite == nullptr) {
+			std::cout << p->parent->name << "has renderer with no sprite set" << std::endl;
+			continue;
+		}
 		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
 
 		pD3DDevice->SetStreamSource(0, p->sprite->VertexBuffer, 0, sizeof(VertexBufferData));

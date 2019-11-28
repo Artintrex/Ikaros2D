@@ -220,7 +220,7 @@ public:
 	~Sprite();
 
 	void SetColor(D3DCOLOR rgba);
-	void GenereteSprite(std::string Name = "");
+	void GenereteSprite(std::string Name = "null");
 
 private:
 	VertexBufferData* vertices;
@@ -230,7 +230,6 @@ private:
 
 class Renderer : public Component {
 public:
-	Vector3 color;
 	Sprite* sprite;
 	Vector2 size;
 	int sortingOrder;
@@ -302,14 +301,14 @@ public:
 	void AddForce(Vector2 force, ForceMode mode);
 	void AddTorque(float torque, ForceMode mode);
 
-	void Translate(Vector3 position) {
-		rigidbody->SetTransform(b2Vec2(position.x, position.y), transform->rotation.z);
-		transform->position.z = position.z;
+	void Translate(float x, float y, float z) {
+		rigidbody->SetTransform(b2Vec2(x, y), transform->rotation.z);
+		transform->position.z = z;
 	}
-	void Rotate(Vector3 rotation) {
-		rigidbody->SetTransform(b2Vec2(transform->position.x, transform->position.y), D3DXToRadian(rotation.z));
-		transform->rotation.x = rotation.x;
-		transform->rotation.y = rotation.y;
+	void Rotate(float Ex, float Ey, float Ez) {
+		rigidbody->SetTransform(b2Vec2(transform->position.x, transform->position.y), D3DXToRadian(Ez));
+		transform->rotation.x = Ex;
+		transform->rotation.y = Ey;
 	}
 
 	void AddCircleCollider(float radius = 1, Vector2 center = Vector2(0, 0), float density = 1.0f, float friction = 0.2f, float bounciness = 0, uint16 maskBits = 0x0001, bool isTrigger = false);

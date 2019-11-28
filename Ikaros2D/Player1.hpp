@@ -74,7 +74,6 @@ public:
 		if (cnt > 8) cnt = 0;
 
 		if (GetKey(DIK_A)) {
-		//	PlaySound(SOUND_LABEL_BGM000);
 			rb_player1->AddForce(Vector2(-200,0), Force);
 			player1->transform->scale = Vector3(-0.6, 0.6, 0.6);
 			direction = -1;

@@ -20,8 +20,7 @@ public:
 	}
 
 	void Start() {
-		puts("Hello");
-		//this->parent->AddComponent<Debug>();
+		this->parent->AddComponent<Debug>();
 
 		LoadAlpha();
 	}

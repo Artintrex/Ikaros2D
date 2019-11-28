@@ -1,12 +1,11 @@
 #pragma once
 #include "IkarosCore.h"
-#include "Javelin.hpp"
 
 class Player2 : public MonoBehavior {
 public:
 	GameObject* player2;
 	RigidBody* rb_player2;
-	Texture* PlayerTex[9];
+	//Texture* PlayerTex[9];
 	Sprite* PlayerSpr[9];
 	Renderer* p2rend;
 
@@ -23,17 +22,17 @@ public:
 
 		player2 = new GameObject("Player2");
 
-		PlayerTex[0] = Texture::LoadTexture("player1", "Assets/Textures/player2t.png");
-		PlayerTex[1] = Texture::LoadTexture("player2", "Assets/Textures/player2t.png");
-		PlayerTex[2] = Texture::LoadTexture("player3", "Assets/Textures/player3t.png");
-		PlayerTex[3] = Texture::LoadTexture("player4", "Assets/Textures/player4t.png");
-		PlayerTex[4] = Texture::LoadTexture("player5", "Assets/Textures/player5t.png");
-		PlayerTex[5] = Texture::LoadTexture("player6", "Assets/Textures/player6t.png");
-		PlayerTex[6] = Texture::LoadTexture("player7", "Assets/Textures/player7t.png");
-		PlayerTex[7] = Texture::LoadTexture("player8", "Assets/Textures/player8t.png");
-		PlayerTex[8] = Texture::LoadTexture("player9", "Assets/Textures/player9t.png");
+		//PlayerTex[0] = Texture::LoadTexture("player1", "Assets/Textures/player2t.png");
+		//PlayerTex[1] = Texture::LoadTexture("player2", "Assets/Textures/player2t.png");
+		//PlayerTex[2] = Texture::LoadTexture("player3", "Assets/Textures/player3t.png");
+		//PlayerTex[3] = Texture::LoadTexture("player4", "Assets/Textures/player4t.png");
+		//PlayerTex[4] = Texture::LoadTexture("player5", "Assets/Textures/player5t.png");
+		//PlayerTex[5] = Texture::LoadTexture("player6", "Assets/Textures/player6t.png");
+		//PlayerTex[6] = Texture::LoadTexture("player7", "Assets/Textures/player7t.png");
+		//PlayerTex[7] = Texture::LoadTexture("player8", "Assets/Textures/player8t.png");
+		//PlayerTex[8] = Texture::LoadTexture("player9", "Assets/Textures/player9t.png");
 
-
+		//エゲメン：player1でロードしたのでもう一回いらない
 		p2rend = player2->AddComponent<Renderer>();
 
 		texSpear = Texture::LoadTexture("SpearTexture", "Assets/Textures/javelin.png");
@@ -46,10 +45,10 @@ public:
 
 			PlayerSpr[player_shin] = new Sprite();
 
-			PlayerSpr[player_shin]->texture = PlayerTex[player_shin];
+			//PlayerSpr[player_shin]->texture = PlayerTex[player_shin];　＜-　これじゃなくて
 
 
-			PlayerSpr[player_shin]->GenereteSprite();
+			PlayerSpr[player_shin]->GenereteSprite("player" + std::to_string(player_shin + 1)); // テクスチャーの名前入れたらロードしたの中で調べる
 		}
 
 		player2->transform->Scale(0.6, 0.6, 0.6);
@@ -58,8 +57,9 @@ public:
 		rb_player2 = player2->AddComponent<RigidBody>();
 		rb_player2->SetType(b2_dynamicBody);
 		rb_player2->rigidbody->SetFixedRotation(true);
-		rb_player2->AddBoxCollider(PlayerSpr[0]->size * 0.6f);
-		rb_player2->transform->Translate(1.0f, 1.0f, 1.0f);
+		rb_player2->AddBoxCollider(Vector2(PlayerSpr[0]->size.x - 2, PlayerSpr[0]->size.y - 0.4) * 0.6f);
+		//player2->transform-> 書き換えらる
+		rb_player2->Translate(20, 0, 0);//rigidbody 追加したオブジェクトのtransformはrigidbodyコンポネントでできる
 	}
 	int cnt = 0;
 	float Timer = 0.5;

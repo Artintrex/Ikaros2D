@@ -16,7 +16,7 @@ public:
 		RigidBody* rb_spear = spear->AddComponent<RigidBody>();
 		rb_spear->SetType(b2_dynamicBody);
 		rb_spear->AddBoxCollider(sprSpear->size * 3.0f);
-		rb_spear->Rotate(Vector3(0, 0, -90 * direction));
+		rb_spear->Rotate(0, 0, -90 * direction);
 		rb_spear->AddForce(Vector2(50 * direction, 0), VelocityChange);
 	}
 	void Awake() {
