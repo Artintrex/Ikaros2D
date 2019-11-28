@@ -62,5 +62,8 @@
     <ClInclude Include="Debug.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
+    <ClInclude Include="Javelin.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -9,6 +9,9 @@ public:
 	Sprite* PlayerSpr[9];
 	Renderer* p1rend;
 
+	Texture* texSpear;
+	Sprite* sprSpear;
+
 	void Awake() {
 
 		
@@ -29,6 +32,10 @@ public:
 		PlayerTex[7] = Texture::LoadTexture("player8", "Assets/Textures/player8t.png");
 		PlayerTex[8] = Texture::LoadTexture("player9", "Assets/Textures/player9t.png");
 
+		texSpear = Texture::LoadTexture("SpearTexture", "Assets/Textures/javelin.png");
+		sprSpear = new Sprite();
+		sprSpear->texture = texSpear;
+		sprSpear->GenereteSprite();
 
 		p1rend = player1->AddComponent<Renderer>();
 
@@ -55,6 +62,7 @@ public:
 	}
 	int cnt = 0;
 	float Timer = 0.5;
+	int direction = 1;
 	void Update() {
 		p1rend->sprite = PlayerSpr[cnt];
 		if (Timer < 0) {
@@ -67,14 +75,18 @@ public:
 		if (GetKey(DIK_A)) {
 			rb_player1->AddForce(Vector2(-200,0), Force);
 			player1->transform->scale = Vector3(-0.6, 0.6, 0.6);
+			direction = -1;
 		}
 		if (GetKey(DIK_D)) {
 			rb_player1->AddForce(Vector2(200, 0), Force);
 			player1->transform->scale = Vector3(0.6, 0.6, 0.6);
+			direction = 1;
 		}
 		if (GetKeyDown(DIK_SPACE)) {
 			rb_player1->AddForce(Vector2(0, 300), Impulse);
 		}
+		if (GetKeyDown(DIK_B)) {
+			new Javelin(Vector2(player1->transform->position.x, player1->transform->position.y), direction, sprSpear);
+		}
 	}
-
 };
