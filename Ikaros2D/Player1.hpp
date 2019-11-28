@@ -52,7 +52,7 @@ public:
 		rb_player1 = player1->AddComponent<RigidBody>();
 		rb_player1->SetType(b2_dynamicBody);
 		rb_player1->rigidbody->SetFixedRotation(true);
-		rb_player1->AddBoxCollider(PlayerSpr[0]->size * 0.6f);
+		rb_player1->AddBoxCollider(Vector2(PlayerSpr[0]->size.x - 2, PlayerSpr[0]->size.y - 0.4) * 0.6f);
 
 	}
 	int cnt = 0;

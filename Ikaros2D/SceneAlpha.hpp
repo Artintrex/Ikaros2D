@@ -36,7 +36,7 @@ public:
 		GroundCollider = new GameObject("GroundCollider");
 		GroundCollider->transform->position = Vector3(0, -21, 0);
 		RigidBody* ground = GroundCollider->AddComponent<RigidBody>();
-		ground->AddBoxCollider(Vector2(500, 1));
+		ground->AddBoxCollider(Vector2(150, 1));
 
 
 		texBG[0] = Texture::LoadTexture("clouds1", "Assets/Textures/BG/clouds_1.png");
@@ -107,6 +107,10 @@ public:
 
 	void Update() {
 		MainCamera->transform->position.x = player1->player1->transform->position.x;
+
+		if (GetKeyDown(DIK_F)) {
+			CreateBox(0, 0, 0.5);
+		}
 	}
 
 	int numberofFloor = 0;
