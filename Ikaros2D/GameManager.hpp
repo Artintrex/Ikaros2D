@@ -10,7 +10,7 @@ public:
 	int ActiveScene;
 
 	GameObject* Alpha;
-	GameObject* Title;
+	GameObject* mTitle;
 
 	void Awake() {
 
