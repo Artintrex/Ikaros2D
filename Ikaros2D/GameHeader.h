@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Debug.hpp"
+#include "Javelin.hpp"
 #include "Player1.hpp"
 #include "Title.hpp"
 
