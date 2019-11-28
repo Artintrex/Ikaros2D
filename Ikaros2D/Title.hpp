@@ -1,5 +1,6 @@
 #pragma once
 #include "IkarosCore.h"
+
 class Title : public MonoBehavior {
 public:
 	GameObject* TitleBack;
@@ -50,7 +51,7 @@ public:
 	Editor->transform->Scale(0.5, 0.5, 0.5);
 	ButtonBackdrop->transform->Scale(0.5, 0.5, 0.5);
 
-}
+	}
 
 	void Update() {
 

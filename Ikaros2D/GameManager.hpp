@@ -11,7 +11,7 @@ public:
 	bool SceneisLoaded;
 
 	GameObject* Alpha;
-	GameObject* Title;
+	Title* mTitle;
 
 	void Awake() {
 
@@ -21,8 +21,7 @@ public:
 		this->parent->AddComponent<Debug>();
 
 		//LoadAlpha();
-		GameObject* test = new GameObject();
-		//test->AddComponent<Title>();
+		mTitle = this->parent->AddComponent<Title>();
 	}
 
 	void Update() {
