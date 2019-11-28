@@ -73,8 +73,12 @@ public:
 			rb_player2->AddForce(Vector2(200, 0), Force);
 			player2->transform->scale = Vector3(0.6, 0.6, 0.6);
 		}
-		if (GetKey(DIK_UP)) {
-			rb_player2->AddForce(Vector2(0, -300), Impulse);
+		if (GetKeyDown(DIK_UP)) {
+			rb_player2->AddForce(Vector2(0, 300), Impulse);
+		}
+
+		if (GetKeyDown(DIK_L)) {
+			new Javelin(Vector2();
 		}
 	}
 

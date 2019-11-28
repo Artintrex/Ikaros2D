@@ -1,6 +1,5 @@
 #pragma once
 #include "IkarosCore.h"
-#include "sound.h"
 class Player1 : public MonoBehavior {
 public:
 	GameObject* player1;
