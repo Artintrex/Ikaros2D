@@ -20,7 +20,9 @@ public:
 	void Start() {
 		this->parent->AddComponent<Debug>();
 
-		LoadAlpha();
+		//LoadAlpha();
+		GameObject* test = new GameObject();
+		//test->AddComponent<Title>();
 	}
 
 	void Update() {
