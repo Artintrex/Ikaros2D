@@ -4,6 +4,7 @@
 class SceneAlpha : public MonoBehavior {
 public:
 	GameObject* PlayerController1;
+	GameObject* PlayerController2;
 	GameObject* GroundCollider;
 	GameObject* MainCamera;
 
@@ -17,6 +18,7 @@ public:
 	Sprite* sprBox;
 
 	Player1* player1;
+
 	void Awake() {
 
 	}
@@ -27,7 +29,9 @@ public:
 		MainCamera->transform->Translate(0, 0, -40);
 
 		PlayerController1 = new GameObject("PlayerController1");
+		PlayerController2 = new GameObject("PlayerController2");
 		player1 = PlayerController1->AddComponent<Player1>();
+		PlayerController2->AddComponent<player2>();
 
 		GroundCollider = new GameObject("GroundCollider");
 		GroundCollider->transform->position = Vector3(0, -21, 0);

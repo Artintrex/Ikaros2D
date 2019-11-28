@@ -1,6 +1,6 @@
 #pragma once
 #include "IkarosCore.h"
-
+#include "sound.h"
 class Player1 : public MonoBehavior {
 public:
 	GameObject* player1;
@@ -20,6 +20,7 @@ public:
 
 	void Start() {
 
+
 		player1 = new GameObject("Player1");
 
 		PlayerTex[0] = Texture::LoadTexture("player1", "Assets/Textures/player1t.png");
@@ -38,6 +39,7 @@ public:
 		sprSpear->GenereteSprite();
 
 		p1rend = player1->AddComponent<Renderer>();
+
 
 
 		for (int player_shin = 0; player_shin < 9; player_shin++)
@@ -73,6 +75,7 @@ public:
 		if (cnt > 8) cnt = 0;
 
 		if (GetKey(DIK_A)) {
+		//	PlaySound(SOUND_LABEL_BGM000);
 			rb_player1->AddForce(Vector2(-200,0), Force);
 			player1->transform->scale = Vector3(-0.6, 0.6, 0.6);
 			direction = -1;

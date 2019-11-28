@@ -224,7 +224,9 @@
   <ItemGroup>
     <ClCompile Include="IkarosCore.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Player2.hpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="sound.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Libs\Box2D\Box2D.h" />
@@ -237,6 +239,7 @@
     <ClInclude Include="SceneAlpha.hpp" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Debug.hpp" />
+    <ClInclude Include="sound.h" />
     <ClInclude Include="Template.hpp" />
     <ClInclude Include="Title.hpp" />
   </ItemGroup>
