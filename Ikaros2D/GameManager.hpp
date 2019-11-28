@@ -8,6 +8,7 @@ public:
 		sAlpha
 	};
 	int ActiveScene;
+	bool SceneisLoaded;
 
 	GameObject* Alpha;
 	GameObject* Title;
@@ -39,7 +40,7 @@ private:
 		ActiveScene = sAlpha;
 
 		Alpha = new GameObject();
-		Alpha->AddComponent<SceneAlpha>();
+		Alpha->AddComponent<SceneAlpha>(); //run start here for now
 	}
 
 	void LoadTitle() {
