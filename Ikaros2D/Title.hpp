@@ -22,7 +22,7 @@ public:
 
 
 	Texture* TitleBackTex = Texture::LoadTexture("TitleBackTex", "assets/Textures/title.jpg");
-	Texture* OptionTex = Texture::LoadTexture("OptionTex", "assets/Textures/optilen.png");
+	Texture* OptionTex = Texture::LoadTexture("OptionTex", "assets/Textures/option.png");
 	Texture* ExitTex = Texture::LoadTexture("ExitTex", "assets/Textures/exit.png");
 	Texture* EditorTex = Texture::LoadTexture("EditorTex", "assets/Textures/editor.png");
 	Texture* ButtonBackdropTex = Texture::LoadTexture("ButtonBackdropTex", "assets/Textures/ButtonBackdrop.png");

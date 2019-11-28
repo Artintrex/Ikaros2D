@@ -20,7 +20,7 @@ public:
 	void Start() {
 		this->parent->AddComponent<Debug>();
 
-		//LoadAlpha();
+		LoadAlpha();
 		mTitle = this->parent->AddComponent<Title>();
 	}
 

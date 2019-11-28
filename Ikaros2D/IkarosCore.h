@@ -307,7 +307,7 @@ public:
 		transform->position.z = position.z;
 	}
 	void Rotate(Vector3 rotation) {
-		rigidbody->SetTransform(b2Vec2(transform->position.x, transform->position.y), rotation.z);
+		rigidbody->SetTransform(b2Vec2(transform->position.x, transform->position.y), D3DXToRadian(rotation.z));
 		transform->rotation.x = rotation.x;
 		transform->rotation.y = rotation.y;
 	}
