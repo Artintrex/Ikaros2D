@@ -16,6 +16,9 @@
     <Filter Include="Library">
       <UniqueIdentifier>{b59c2470-7e88-4a3b-87a4-4fbf9166ff61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Library\imgui">
+      <UniqueIdentifier>{e11fe35c-e8e0-4106-a1cb-39cba74a00db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IkarosCore.cpp">
@@ -26,6 +29,24 @@
     </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Libs\imgui\imgui.cpp">
+      <Filter>Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Libs\imgui\imgui_demo.cpp">
+      <Filter>Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Libs\imgui\imgui_draw.cpp">
+      <Filter>Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Libs\imgui\imgui_impl_dx9.cpp">
+      <Filter>Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Libs\imgui\imgui_impl_win32.cpp">
+      <Filter>Library\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Libs\imgui\imgui_widgets.cpp">
+      <Filter>Library\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,5 +89,25 @@
     <ClInclude Include="Javelin.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
+    <ClInclude Include="..\Libs\imgui\imconfig.h">
+      <Filter>Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Libs\imgui\imgui.h">
+      <Filter>Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Libs\imgui\imgui_impl_dx9.h">
+      <Filter>Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Libs\imgui\imgui_impl_win32.h">
+      <Filter>Library\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Libs\imgui\imgui_internal.h">
+      <Filter>Library\imgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\Libs\imgui\misc\natvis\imgui.natvis">
+      <Filter>Library\imgui</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

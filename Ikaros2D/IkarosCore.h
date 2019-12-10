@@ -11,6 +11,11 @@
 #include <d3dx9.h>
 #include "Box2D\Box2D.h"
 #include "input.h"
+#include "imgui\imgui.h"
+#include "imgui\imgui_impl_dx9.h"
+#include "imgui\imgui_impl_win32.h"
+#include <tchar.h>
+#include "SceneManager.h"
 
 //NEED UPDATE: Change Resolution Settings needs to read from file!! Also set d3d parameters like fullscreen etc
 #define SCREEN_WIDTH  (1920)
@@ -77,7 +82,7 @@ namespace internal
 
 class ComponentFactory {
 public:
-	virtual Component* AddComponent(GameObject* parent, std::string type) = 0;
+	virtual Component* AddComponent(GameObject* parent) = 0;
 };
 
 //Creates factory function for custom component and maps pointer with its string name
@@ -88,7 +93,7 @@ public:
         { \
             Component::registerType(#component, this); \
         } \
-        virtual Component* AddComponent(GameObject* parent, std::string type) { \
+        virtual Component* AddComponent(GameObject* parent) { \
 			Component* p = new component();\
 			p->parent = parent;\
 			p->transform = parent->transform;\
@@ -169,6 +174,7 @@ public:
 
 class MonoBehavior : public Behavior {
 public:
+	std::string type;
 	MonoBehavior(std::string Name = "MonoBehavior");
 	virtual ~MonoBehavior();
 
@@ -178,12 +184,12 @@ public:
 	virtual void Update() = 0;
 
 	///Do not call this function, meant for main loop
-	static void AwakeMonoBehaviorArray();
-	///Do not call this function, meant for main loop
 	static void StartMonoBehaviorArray();
 	///Do not call this function, meant for main loop
 	static void UpdateMonoBehaviorArray();
 
+protected:
+	static std::map<std::string, bool> isAwake;
 private:
 	static std::vector<MonoBehavior*> MonoBehaviorList;
 };

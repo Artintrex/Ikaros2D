@@ -25,6 +25,7 @@ std::vector<Camera*> Camera::CameraList{};
 std::vector<MonoBehavior*> MonoBehavior::MonoBehaviorList{};
 std::vector<RigidBody*> RigidBody::RigidBodyList{};
 std::map<std::string, ComponentFactory*> Component::factories{};
+std::map<std::string, bool> MonoBehavior::isAwake{};
 
 iTime Time;
 
@@ -106,11 +107,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	Initialize(hInstance);
 
 	//NEED UPDATE: DEBUG CODE
-	GameObject* test = new GameObject("GameManager");
-	test->AddComponent<GameManager>();
+	//GameObject* test = new GameObject("GameManager");
+	//test->AddComponent<GameManager>();
+
+	SceneManager::LoadScene(0);
 
 	//NEED UPDATE: Move this after adding scene loader and add Awake as well
-	MonoBehavior::StartMonoBehaviorArray(); //Start MonoBehavior
+	//MonoBehavior::StartMonoBehaviorArray(); //Start MonoBehavior
 
 	//Main Loop
 	MSG msg = {};
@@ -136,8 +139,12 @@ int main() {
 #endif
 
 //Callback function
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+		return true;
+
 	switch (uMsg) {
 	case WM_KEYDOWN:
 		if (wParam == VK_ESCAPE) {
@@ -244,14 +251,6 @@ MonoBehavior::~MonoBehavior() {
 			MonoBehaviorList.erase(it);
 			break;
 		}
-	}
-}
-
-void MonoBehavior::AwakeMonoBehaviorArray() {
-	std::vector<MonoBehavior*>::size_type size = MonoBehaviorList.size();
-	for (int i = 0; i < size; ++i) {
-		MonoBehaviorList[i]->Awake();
-		size = MonoBehaviorList.size();
 	}
 }
 
@@ -695,7 +694,6 @@ void Camera::SetD3DDevice() {
 	pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	pD3DDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 
-
 	// D3DTEXTUREOP Texture blending settings
 	//	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 
@@ -898,6 +896,21 @@ bool Initialize(HINSTANCE hInstance)
 	}
 
 	InputInitialize(hInstance, g_hWnd);
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//io.Fonts->AddFontDefault();
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
+	ImGui_ImplWin32_Init(g_hWnd);
+	ImGui_ImplDX9_Init(pD3DDevice);
 	return true;
 }
 
@@ -907,10 +920,14 @@ void Finalize(void)
 
 	InputRelease();
 
+	ImGui_ImplDX9_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+
 	// Kill D3D
 	D3D_Finalize();
 }
-
+bool show_demo_window = true;
 void GameLoop() {
 	Time.Start();
 	//NEED UPDATE: Want an outer loop for scene management
@@ -921,8 +938,12 @@ void GameLoop() {
 
 	InputUpdate(); //Update keyboard, mouse and gamepad inputs
 
-	MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
+	ImGui_ImplDX9_NewFrame();
+	ImGui_ImplWin32_NewFrame();
 
+	ImGui::NewFrame();
+	MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
+	ImGui::EndFrame();
 	Transform::UpdateTransform(); //Update matrices if transforms are changed
 
 
@@ -930,10 +951,12 @@ void GameLoop() {
 	//Begin drawing
 	//
 
-
 	pD3DDevice->BeginScene();
 
 	Camera::Draw();
+
+	ImGui::Render();
+	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 
 	//End drawing
 	pD3DDevice->EndScene();

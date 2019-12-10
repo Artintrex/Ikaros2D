@@ -1,5 +1,6 @@
 #pragma once
 #include "IkarosCore.h"
+#include "SceneManager.h"
 
 class Debug : public MonoBehavior {
 public:
@@ -14,6 +15,8 @@ public:
 		{
 			std::cout << it->first << " " << it->second << "\n";
 		}
+
+		std::cout << SceneManager::GetActiveScene().path << "\n";
 
 		Texture::LoadTexture("null", "Assets/Textures/null.png");
 

@@ -17,6 +17,8 @@ public:
 	}
 
 	void Start() {
+		//this->parent->AddComponent<Debug>();
+
 		MainCamera = new GameObject("MainCamera");
 		Camera* cam = MainCamera->AddComponent<Camera>();
 		MainCamera->transform->Translate(0, 0, -40);
@@ -95,6 +97,7 @@ public:
 		ButtonBackdrop->transform->position = Vector3(-700, -BACKDROPPOS, 0.0011);
 
 		if (GetKeyDown(DIK_RETURN) && BUTTON == 0) {
+			SceneManager::LoadScene(1);
 		}
 
 

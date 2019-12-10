@@ -222,12 +222,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Libs\imgui\imgui.cpp" />
+    <ClCompile Include="..\Libs\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\Libs\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\Libs\imgui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="..\Libs\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\Libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="IkarosCore.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Libs\Box2D\Box2D.h" />
+    <ClInclude Include="..\Libs\imgui\imconfig.h" />
+    <ClInclude Include="..\Libs\imgui\imgui.h" />
+    <ClInclude Include="..\Libs\imgui\imgui_impl_dx9.h" />
+    <ClInclude Include="..\Libs\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="..\Libs\imgui\imgui_internal.h" />
     <ClInclude Include="GameHeader.h" />
     <ClInclude Include="GameManager.hpp" />
     <ClInclude Include="Javelin.hpp" />
@@ -240,6 +251,9 @@
     <ClInclude Include="Debug.hpp" />
     <ClInclude Include="Template.hpp" />
     <ClInclude Include="Title.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\Libs\imgui\misc\natvis\imgui.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
