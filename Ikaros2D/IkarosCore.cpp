@@ -927,7 +927,7 @@ void Finalize(void)
 	// Kill D3D
 	D3D_Finalize();
 }
-bool show_demo_window = true;
+
 void GameLoop() {
 	Time.Start();
 	//NEED UPDATE: Want an outer loop for scene management
