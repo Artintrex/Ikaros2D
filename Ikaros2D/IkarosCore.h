@@ -150,6 +150,12 @@ private:
 	friend class Debug;
 };
 
+struct Collision {
+	GameObject* parent;
+	RigidBody* rigidbody;
+	b2Fixture* b2fixture;
+};
+
 class Component : public Object {
 public:
 	GameObject* parent;
@@ -157,6 +163,14 @@ public:
 
 	Component(std::string Name = "EmptyComponent");
 	virtual ~Component();
+
+	virtual void OnCollisionEnter(Collision collider) {
+
+	}
+
+	virtual void OnCollisionExit(Collision collider) {
+
+	}
 
 	static void registerType(const std::string& name, ComponentFactory* factory) {
 		factories[name] = factory;
@@ -286,17 +300,9 @@ private:
 };
 
 class CollisionCallback : public b2ContactListener {
-	void BeginContact(b2Contact* contact) {
-		b2Fixture* FixtureA = contact->GetFixtureA();
-		b2Fixture* FixtureB = contact->GetFixtureB();
-	}
+	void BeginContact(b2Contact* contact);
 
-	void EndContact(b2Contact* contact) {
-		b2Fixture* FixtureA = contact->GetFixtureA();
-		b2Fixture* FixtureB = contact->GetFixtureB();
-	}
-	
-	//map for calling monobehaviors next iteration for enter, stay, exit
+	void EndContact(b2Contact* contact);
 };
 
 //Adds physics to a GameObject

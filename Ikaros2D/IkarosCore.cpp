@@ -736,6 +736,60 @@ void Camera::SetCamera() {
 	D3DXMatrixInverse(&mCameraWorld, NULL, &View);
 }
 
+void CollisionCallback::BeginContact(b2Contact* contact) {
+	Collision A, B;
+
+	b2Fixture* FixtureA = contact->GetFixtureA();
+	b2Fixture* FixtureB = contact->GetFixtureB();
+
+	b2Body* BodyA = FixtureA->GetBody();
+	b2Body* BodyB = FixtureB->GetBody();
+
+	A.b2fixture = FixtureA;
+	B.b2fixture = FixtureB;
+
+	A.rigidbody = mRigidBody[BodyA];
+	B.rigidbody = mRigidBody[BodyB];
+
+	A.parent = A.rigidbody->parent;
+	B.parent = B.rigidbody->parent;
+
+	for (int i = 0; i < A.parent->ComponentList.size(); ++i) {
+		A.parent->ComponentList[i]->OnCollisionEnter(B);
+	}
+
+	for (int i = 0; i < B.parent->ComponentList.size(); ++i) {
+		B.parent->ComponentList[i]->OnCollisionEnter(A);
+	}
+}
+
+void CollisionCallback::EndContact(b2Contact* contact) {
+	Collision A, B;
+
+	b2Fixture* FixtureA = contact->GetFixtureA();
+	b2Fixture* FixtureB = contact->GetFixtureB();
+
+	b2Body* BodyA = FixtureA->GetBody();
+	b2Body* BodyB = FixtureB->GetBody();
+
+	A.b2fixture = FixtureA;
+	B.b2fixture = FixtureB;
+
+	A.rigidbody = mRigidBody[BodyA];
+	B.rigidbody = mRigidBody[BodyB];
+
+	A.parent = A.rigidbody->parent;
+	B.parent = B.rigidbody->parent;
+
+	for (int i = 0; i < A.parent->ComponentList.size(); ++i) {
+		A.parent->ComponentList[i]->OnCollisionExit(B);
+	}
+
+	for (int i = 0; i < B.parent->ComponentList.size(); ++i) {
+		B.parent->ComponentList[i]->OnCollisionExit(A);
+	}
+}
+
 RigidBody::RigidBody(GameObject* Parent, std::string Name) : Component(Name) {
 	parent = Parent;
 	transform = Parent->transform;
