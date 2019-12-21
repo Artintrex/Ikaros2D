@@ -4,6 +4,9 @@
 
 class Debug : public MonoBehavior {
 public:
+	Debug() {
+		type = typeid(*this).name(); if (isAwake[type] == false)Awake(); isAwake[type] = true; if (SceneManager::isLoaded == true)Start();
+	}
 
 	void Awake() {
 
@@ -38,7 +41,7 @@ public:
 
 		if (Timer < 0) {
 			ListObject();
-			Timer = 20;
+			Timer = 120;
 		}
 	}
 

@@ -4,6 +4,9 @@
 
 class GameManager : public MonoBehavior {
 public:
+	GameManager() {
+		type = typeid(*this).name(); if (isAwake[type] == false)Awake(); isAwake[type] = true; if (SceneManager::isLoaded == true)Start();
+	}
 	enum Scene {
 		sTitle,
 		sAlpha

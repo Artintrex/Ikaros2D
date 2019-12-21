@@ -2,6 +2,9 @@
 #include "IkarosCore.h"
 class Player1 : public MonoBehavior {
 public:
+	Player1() {
+		type = typeid(*this).name(); if (isAwake[type] == false)Awake(); isAwake[type] = true; if (SceneManager::isLoaded == true)Start();
+	}
 	GameObject* player1;
 	RigidBody* rb_player1;
 	Texture* PlayerTex[9];

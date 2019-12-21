@@ -3,6 +3,9 @@
 
 class SceneAlpha : public MonoBehavior {
 public:
+	SceneAlpha() {
+		type = typeid(*this).name(); if (isAwake[type] == false)Awake(); isAwake[type] = true; if (SceneManager::isLoaded == true)Start();
+	}
 	GameObject* PlayerController1;
 	GameObject* PlayerController2;
 	GameObject* GroundCollider;

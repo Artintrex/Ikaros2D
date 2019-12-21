@@ -24,10 +24,14 @@ std::vector<Renderer*> Renderer::RendererList{};
 std::vector<Camera*> Camera::CameraList{};
 std::vector<MonoBehavior*> MonoBehavior::MonoBehaviorList{};
 std::vector<RigidBody*> RigidBody::RigidBodyList{};
-std::map<std::string, ComponentFactory*> Component::factories{};
-std::map<std::string, bool> MonoBehavior::isAwake{};
+std::unordered_map<std::string, ComponentFactory*> Component::factories{};
+std::unordered_map<std::string, bool> MonoBehavior::isAwake{};
+
+std::unordered_map<b2Body*, RigidBody*> mRigidBody;
 
 iTime Time;
+
+CollisionCallback ContactListener;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -106,14 +110,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	UpdateWindow(g_hWnd);
 	Initialize(hInstance);
 
-	//NEED UPDATE: DEBUG CODE
-	//GameObject* test = new GameObject("GameManager");
-	//test->AddComponent<GameManager>();
-
 	SceneManager::LoadScene(0);
-
-	//NEED UPDATE: Move this after adding scene loader and add Awake as well
-	//MonoBehavior::StartMonoBehaviorArray(); //Start MonoBehavior
 
 	//Main Loop
 	MSG msg = {};
@@ -747,6 +744,7 @@ RigidBody::RigidBody(GameObject* Parent, std::string Name) : Component(Name) {
 	bodydefinition.position.Set(transform->position.x, transform->position.y);
 	rigidbody = world.CreateBody(&bodydefinition);
 
+	mRigidBody[rigidbody] = this;
 	RigidBodyList.push_back(this);
 }
 
@@ -902,8 +900,8 @@ bool Initialize(HINSTANCE hInstance)
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	//io.Fonts->AddFontDefault();
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -911,6 +909,8 @@ bool Initialize(HINSTANCE hInstance)
 
 	ImGui_ImplWin32_Init(g_hWnd);
 	ImGui_ImplDX9_Init(pD3DDevice);
+
+	world.SetContactListener(&ContactListener);
 	return true;
 }
 

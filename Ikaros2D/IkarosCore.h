@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include <algorithm>
 #include <string>
@@ -161,7 +162,7 @@ public:
 		factories[name] = factory;
 	}
 
-	static std::map<std::string, ComponentFactory*> factories;
+	static std::unordered_map<std::string, ComponentFactory*> factories;
 };
 
 class Behavior : public Component {
@@ -189,7 +190,7 @@ public:
 	static void UpdateMonoBehaviorArray();
 
 protected:
-	static std::map<std::string, bool> isAwake;
+	static std::unordered_map<std::string, bool> isAwake;
 private:
 	static std::vector<MonoBehavior*> MonoBehaviorList;
 };
@@ -246,7 +247,7 @@ public:
 	static std::vector<Renderer*> RendererList;
 };
 
-//Holds transform data and matrice calculations. 
+//Holds transform data and matrix calculations. 
 //THIS COMPONENT IS HANDLED BY THE ENGINE. DO NOT ADD THIS !!
 class Transform : public Component {
 public:
@@ -282,6 +283,20 @@ private:
 	static std::vector<Transform*> TransformList;
 
 	void SetMatrix();
+};
+
+class CollisionCallback : public b2ContactListener {
+	void BeginContact(b2Contact* contact) {
+		b2Fixture* FixtureA = contact->GetFixtureA();
+		b2Fixture* FixtureB = contact->GetFixtureB();
+	}
+
+	void EndContact(b2Contact* contact) {
+		b2Fixture* FixtureA = contact->GetFixtureA();
+		b2Fixture* FixtureB = contact->GetFixtureB();
+	}
+	
+	//map for calling monobehaviors next iteration for enter, stay, exit
 };
 
 //Adds physics to a GameObject
