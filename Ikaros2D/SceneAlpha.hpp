@@ -11,6 +11,8 @@ public:
 	GameObject* GroundCollider;
 	GameObject* MainCamera;
 
+	Camera* MainCameraComp;
+
 	Texture* texBG[7];
 	Sprite* sprBG[7];
 
@@ -28,7 +30,7 @@ public:
 
 	void Start() {
 		MainCamera = new GameObject("MainCamera");
-		MainCamera->AddComponent<Camera>();
+		MainCameraComp = MainCamera->AddComponent<Camera>();
 		MainCamera->transform->Translate(0, 0, -40);
 
 		PlayerController1 = new GameObject("PlayerController1");
@@ -109,7 +111,7 @@ public:
 	}
 
 	void Update() {
-		MainCamera->transform->position.x = player1->player1->transform->position.x;
+		MainCamera->transform->position.x = PlayerController1->transform->position.x;
 
 		if (GetKeyDown(DIK_F)) {
 			CreateBox(0, 0, 0.5);

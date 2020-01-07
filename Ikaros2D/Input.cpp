@@ -126,14 +126,12 @@ bool GetKeyUp(int nKey)
 
 
 //		GAMEPAD
-
-//---------------------------------------- コールバック関数
 BOOL CALLBACK SearchGamePadCallback(LPDIDEVICEINSTANCE lpddi, LPVOID)
 {
 	HRESULT result;
 
 	result = g_pInput->CreateDevice(lpddi->guidInstance, &g_pGamePad[g_padCount++], NULL);
-	return DIENUM_CONTINUE;	// 次のデバイスを列挙
+	return DIENUM_CONTINUE;	// enumerate next device
 }
 
 bool GamePad_Initialize()
@@ -143,26 +141,23 @@ bool GamePad_Initialize()
 	int			i;
 
 	g_padCount = 0;
-	// ジョイパッドを探す
+	// Look for game controllers
 	g_pInput->EnumDevices(DI8DEVCLASS_GAMECTRL, (LPDIENUMDEVICESCALLBACK)SearchGamePadCallback, NULL, DIEDFL_ATTACHEDONLY);
-	// セットしたコールバック関数が、パッドを発見した数だけ呼ばれる。
+	// Callback each time a device is found
 
 	for (i = 0; i < g_padCount; i++)
 	{
-		// ジョイスティック用のデータ・フォーマットを設定
+		// Set data format
 		result = g_pGamePad[i]->SetDataFormat(&c_dfDIJoystick);
 		if (FAILED(result))
-			return false; // データフォーマットの設定に失敗
+			return false;
 
-		// モードを設定（フォアグラウンド＆非排他モード）
+		// Set mode (foreground & non-exclusive mode)
 		//		result = pGamePad[i]->SetCooperativeLevel(hWindow, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
 		//		if ( FAILED(result) )
-		//			return false; // モードの設定に失敗
+		//			return false;
 
-		// 軸の値の範囲を設定
-		// X軸、Y軸のそれぞれについて、オブジェクトが報告可能な値の範囲をセットする。
-		// (max-min)は、最大10,000(?)。(max-min)/2が中央値になる。
-		// 差を大きくすれば、アナログ値の細かな動きを捕らえられる。(パッドの性能による)
+		// (max-min) 10,000(?)。(max-min)/2 becomes the center
 		DIPROPRANGE				diprg;
 		ZeroMemory(&diprg, sizeof(diprg));
 		diprg.diph.dwSize = sizeof(diprg);
@@ -170,29 +165,21 @@ bool GamePad_Initialize()
 		diprg.diph.dwHow = DIPH_BYOFFSET;
 		diprg.lMin = RANGE_MIN;
 		diprg.lMax = RANGE_MAX;
-		// X軸の範囲を設定
 		diprg.diph.dwObj = DIJOFS_X;
 		g_pGamePad[i]->SetProperty(DIPROP_RANGE, &diprg.diph);
-		// Y軸の範囲を設定
 		diprg.diph.dwObj = DIJOFS_Y;
 		g_pGamePad[i]->SetProperty(DIPROP_RANGE, &diprg.diph);
 
-		// 各軸ごとに、無効のゾーン値を設定する。
-		// 無効ゾーンとは、中央からの微少なジョイスティックの動きを無視する範囲のこと。
-		// 指定する値は、10000に対する相対値(2000なら20パーセント)。
 		DIPROPDWORD				dipdw;
 		dipdw.diph.dwSize = sizeof(DIPROPDWORD);
 		dipdw.diph.dwHeaderSize = sizeof(dipdw.diph);
 		dipdw.diph.dwHow = DIPH_BYOFFSET;
 		dipdw.dwData = DEADZONE;
-		//X軸の無効ゾーンを設定
 		dipdw.diph.dwObj = DIJOFS_X;
 		g_pGamePad[i]->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
-		//Y軸の無効ゾーンを設定
 		dipdw.diph.dwObj = DIJOFS_Y;
 		g_pGamePad[i]->SetProperty(DIPROP_DEADZONE, &dipdw.diph);
 
-		//ジョイスティック入力制御開始
 		g_pGamePad[i]->Acquire();
 	}
 
@@ -220,16 +207,16 @@ void GamePad_Update(void)
 	{
 		DWORD lastPadState;
 		lastPadState = g_padState[i];
-		g_padState[i] = 0x00000000l;	// 初期化
+		g_padState[i] = 0x00000000l;	// initialize
 
-		result = g_pGamePad[i]->Poll();	// ジョイスティックにポールをかける
+		result = g_pGamePad[i]->Poll();
 		if (FAILED(result)) {
 			result = g_pGamePad[i]->Acquire();
 			while (result == DIERR_INPUTLOST)
 				result = g_pGamePad[i]->Acquire();
 		}
 
-		result = g_pGamePad[i]->GetDeviceState(sizeof(DIJOYSTATE), &dijs[i]);	// デバイス状態を読み取る
+		result = g_pGamePad[i]->GetDeviceState(sizeof(DIJOYSTATE), &dijs[i]);
 		if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) {
 			result = g_pGamePad[i]->Acquire();
 			while (result == DIERR_INPUTLOST)
@@ -291,6 +278,7 @@ void MouseInit() {
 
 void MouseUpdate() {
 	GetCursorPos(&mousePosition);
+	ScreenToClient(MainWindowHandle, &mousePosition);
 	for (int i = 0; i < 5; i++)m_stateOLD[i] = m_stateNEW[i];
 	m_stateNEW[0] = GetAsyncKeyState(VK_LBUTTON);
 	m_stateNEW[1] = GetAsyncKeyState(VK_RBUTTON);

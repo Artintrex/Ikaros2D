@@ -5,7 +5,6 @@ public:
 	Player1() {
 		type = typeid(*this).name(); if (isAwake[type] == false)Awake(); isAwake[type] = true; if (SceneManager::isLoaded == true)Start();
 	}
-	GameObject* player1;
 	RigidBody* rb_player1;
 	Texture* PlayerTex[9];
 	Sprite* PlayerSpr[9];
@@ -23,7 +22,7 @@ public:
 	void Start() {
 
 
-		player1 = new GameObject("Player1");
+		//player1 = new GameObject("Player1");
 
 		PlayerTex[0] = Texture::LoadTexture("player1", "Assets/Textures/player1t.png");
 		PlayerTex[1] = Texture::LoadTexture("player2", "Assets/Textures/player2t.png");
@@ -40,7 +39,7 @@ public:
 		sprSpear->texture = texSpear;
 		sprSpear->GenereteSprite();
 
-		p1rend = player1->AddComponent<Renderer>();
+		p1rend = parent->AddComponent<Renderer>();
 
 
 
@@ -55,10 +54,10 @@ public:
 			PlayerSpr[player_shin]->GenereteSprite();
 		}
 
-		player1->transform->Scale(0.6, 0.6, 0.6);
+		parent->transform->Scale(0.6, 0.6, 0.6);
 		p1rend->sprite = PlayerSpr[0];
 
-		rb_player1 = player1->AddComponent<RigidBody>();
+		rb_player1 = parent->AddComponent<RigidBody>();
 		rb_player1->SetType(b2_dynamicBody);
 		rb_player1->rigidbody->SetFixedRotation(true);
 		rb_player1->AddBoxCollider(Vector2(PlayerSpr[0]->size.x - 2, PlayerSpr[0]->size.y - 0.4) * 0.6f);
@@ -78,19 +77,27 @@ public:
 
 		if (GetKey(DIK_A)) {
 			rb_player1->AddForce(Vector2(-200,0), Force);
-			player1->transform->scale = Vector3(-0.6, 0.6, 0.6);
+			parent->transform->scale = Vector3(-0.6, 0.6, 0.6);
 			direction = -1;
 		}
 		if (GetKey(DIK_D)) {
 			rb_player1->AddForce(Vector2(200, 0), Force);
-			player1->transform->scale = Vector3(0.6, 0.6, 0.6);
+			parent->transform->scale = Vector3(0.6, 0.6, 0.6);
 			direction = 1;
 		}
 		if (GetKeyDown(DIK_SPACE)) {
 			rb_player1->AddForce(Vector2(0, 300), Impulse);
 		}
 		if (GetKeyDown(DIK_B)) {
-			new Javelin(Vector2(player1->transform->position.x, player1->transform->position.y), direction, sprSpear);
+			new Javelin(Vector2(parent->transform->position.x, parent->transform->position.y), direction, sprSpear);
 		}
+	}
+
+	void OnCollisionEnter(Collision collider) {
+		std::cout << "Collided with: " << collider.parent->name << std::endl;
+	}
+
+	void OnCollisionExit(Collision collider) {
+		std::cout << "Collision ended: " << collider.parent->name << std::endl;
 	}
 };

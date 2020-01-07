@@ -48,6 +48,7 @@ void SceneManager::LoadScene(std::string Path) {
 		scene.path = Path;
 		isLoaded = true;
 	}
+	std::cout << "Scene " << scene.name << " is loaded" << std::endl;
 }
 
 void SceneManager::LoadScene(int SceneNumber) {
@@ -57,13 +58,6 @@ void SceneManager::LoadScene(int SceneNumber) {
 		scene.name = SceneList[SceneNumber].name;
 		scene.path = SceneList[SceneNumber].path;
 		isLoaded = true;
-
-		std::cout << "\n" << "--------Object List--------" << "\n" << "\n" << "\n";
-		for (auto p : Object::ObjectList)
-		{
-			std::cout << p->name << " " << p << "\n";
-		}
-		std::cout << "\n" << "Number of Objects:  " << Object::ObjectList.size() << "\n";
 	}
 	else {
 		SceneManager::UnloadScene();
@@ -73,6 +67,8 @@ void SceneManager::LoadScene(int SceneNumber) {
 		scene.path = SceneList[SceneNumber].path;
 		isLoaded = true;
 	}
+	std::cout << "Scene" << SceneNumber << " " << scene.name << " is loaded" << std::endl;
+	std::cout << "Number of objects created: " << Object::ObjectList.size() << std::endl;
 }
 
 void SceneManager::UnloadScene() {

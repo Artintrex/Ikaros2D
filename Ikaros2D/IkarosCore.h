@@ -24,8 +24,10 @@
 
 typedef D3DXVECTOR2 Vector2;
 typedef D3DXVECTOR3 Vector3;
+typedef D3DXVECTOR4 Vector4;
 
 class iTime;
+class iScreen;
 class Object;
 class GameObject;
 class Component;
@@ -41,6 +43,7 @@ class Camera;
 
 //Have to have my Time.DeltaTime
 extern iTime Time;
+extern iScreen Screen;
 
 struct VertexBufferData {
 	D3DXVECTOR3 position;
@@ -118,20 +121,60 @@ public:
 
 	iTime() {
 		DeltaTime = 1;
+		timeScale = 1000000000;
+	}
+
+	void SetTimeScale(float t) {
+		timeScale = 1000000000 / t;
 	}
 
 	void Start() {
-		t1 = std::chrono::high_resolution_clock::now();
+		t1 = std::chrono::steady_clock::now();
 	}
 	void End() {
-		t2 = std::chrono::high_resolution_clock::now();
-		DeltaTime = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-		DeltaTime /= 1000000;
+		t2 = std::chrono::steady_clock::now();
+		DeltaTime = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count();
+		DeltaTime /= timeScale;
 	}
 private:
-	std::chrono::time_point<std::chrono::high_resolution_clock> t1, t2;
-
+	std::chrono::time_point<std::chrono::steady_clock> t1, t2;
+	int timeScale;
 };
+
+struct Resolution {
+	Resolution() {
+		height = NULL;
+		width = NULL;
+		refreshRate = NULL;
+	}
+	int height;
+	int width;
+	int refreshRate;
+};
+
+class iScreen {
+public:
+	iScreen() {
+		width = SCREEN_WIDTH;
+		height = SCREEN_HEIGHT;
+		fullScreen = false;
+	}
+
+	//Current window width
+	int width;
+	//Current window height
+	int height;
+	//Current screen resolution
+	Resolution currentResolution;
+
+	bool fullScreen;
+
+	//fullScreenMode
+
+	//float brightness
+	//void SetResolution();
+};
+
 
 class Object {
 public:
@@ -348,6 +391,7 @@ private:
 
 class Camera : public Behavior {
 public:
+	static Camera* main;
 	Transform* transform;
 	float fieldOfView;
 	float aspect;
@@ -355,12 +399,18 @@ public:
 	float nearClipPlane;
 	bool orthographic;
 	float orthographicSize;
+	int pixelWidth;
+	int pixelHeight;
 	Rect rect;
 	
-	//NEED UPDATE: Add Layer systems to filter objects for cameras and clear camera list
+	//NEED UPDATE: Add Layer systems to filter objects for cameras
+	//frustum culling needed too
 
 	Camera(GameObject* Parent, std::string Name = "Camera");
 	~Camera();
+
+	//Calculates world position from 2D screen position using depth value
+	Vector3 ScreenToWorldPoint(Vector3 position);
 
 	///Calculates projection matrix
 	void SetProjection();
@@ -373,7 +423,6 @@ private:
 	D3DVIEWPORT9 viewport;
 
 	D3DXMATRIX mCameraRot;
-	D3DXMATRIX mCameraWorld;
 	D3DXMATRIX View;
 	D3DXMATRIX Projection;
 
@@ -392,6 +441,7 @@ private:
 class GameObject : public Object {
 public:
 	Transform *transform;
+	std::string tag;
 
 	GameObject(std::string Name = "GameObject");
 	~GameObject();

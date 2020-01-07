@@ -5,7 +5,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-//WindowProperties
+//Window Properties
 #define CLASS_NAME     "MainWindow"
 #define WINDOW_CAPTION "Ikaros2D"
 
@@ -15,7 +15,7 @@ static D3DVIEWPORT9 MainViewport;
 
 static HWND g_hWnd; //Window Handler
 
-//Class static definitions
+//Class static allocations
 std::vector<Object*> Object::ObjectList{};
 std::vector<Texture*> Texture::TextureList{};
 std::vector<Transform*> Transform::TransformList{};
@@ -29,7 +29,9 @@ std::unordered_map<std::string, bool> MonoBehavior::isAwake{};
 
 std::unordered_map<b2Body*, RigidBody*> mRigidBody;
 
+Camera* Camera::main = nullptr;
 iTime Time;
+iScreen Screen;
 
 CollisionCallback ContactListener;
 
@@ -204,6 +206,8 @@ bool D3D_Initialize()
 Object::Object(std::string Name) {
 	name = Name;
 	ObjectList.push_back(this);
+
+	std::cout << "Object" << ObjectList.size() << " created: " << name << std::endl;
 }
 
 Object::~Object() {
@@ -212,11 +216,13 @@ Object::~Object() {
 
 void Object::ReleaseObjects() {
 
+	size_t s = ObjectList.size();
+
 	while (ObjectList.size() > 0) {
-		std::cout << ObjectList[0]->name << std::endl;
-		std::cout << ObjectList.size() << std::endl;
 		delete ObjectList.at(0);
 	}
+
+	std::cout << s << " objects unloaded" << std::endl;
 
 	ObjectList.clear();
 }
@@ -500,6 +506,7 @@ Transform::~Transform() {
 	}
 }
 
+//NEED UPDATE add to a set of transforms to be updated.
 void Transform::Translate(float x, float y, float z) {
 	position += Vector3(x, y, z);
 }
@@ -540,23 +547,54 @@ Camera::Camera(GameObject* Parent, std::string Name) : Behavior(Name) {
 	orthographic = false;
 	orthographicSize = 5.0f;
 
-	D3DXMatrixIdentity(&mCameraWorld);
 	D3DXMatrixIdentity(&Projection);
 	D3DXMatrixIdentity(&View);
 
 	SetProjection();
 
 	CameraList.push_back(this);
+
+	//Assign first created camera as main camera
+	if (main == nullptr) {
+		main = this;
+	}
 }
 
 Camera::~Camera() {
 	for (std::vector<Camera*>::iterator it = CameraList.begin(); it != CameraList.end(); ++it)
 	{
 		if (this == (*it)) {
+			//If main camera deleted set it to next camera or nullptr
+			if (main == this) {
+				for (auto p : CameraList) {
+					if (p != this) {
+						main = p;
+					}
+					else main = nullptr;
+				}
+			}
 			CameraList.erase(it);
 			break;
 		}
 	}
+}
+
+Vector3 Camera::ScreenToWorldPoint(Vector3 position) {
+
+	float z = position.z;
+
+	D3DXVec3Unproject(&position, &position, &viewport, &Projection, &View, &transform->localToWorldMatrix);
+
+	D3DXVec3TransformCoord(&position, &position, &transform->localToWorldMatrix);
+
+	if (!orthographic) {
+		float t = (transform->position.z - z) / (transform->position.z - position.z);
+
+		position.y = transform->position.y - (transform->position.y - position.y) * t;
+		position.x = transform->position.x - (transform->position.x - position.x) * t;
+	}
+
+	return position;
 }
 
 //Draw all cameras
@@ -596,10 +634,10 @@ void Camera::draw() {
 }
 
 void Camera::SetViewport() {
-	viewport.X = rect.X * SCREEN_WIDTH;
-	viewport.Width = rect.W * SCREEN_WIDTH;
-	viewport.Y = rect.Y * SCREEN_HEIGHT;
-	viewport.Height = rect.H * SCREEN_HEIGHT;
+	viewport.X = rect.X * Screen.width;
+	viewport.Width = pixelWidth;
+	viewport.Y = rect.Y * Screen.height;
+	viewport.Height = pixelHeight;
 	viewport.MinZ = nearClipPlane;
 	viewport.MaxZ = farClipPlane;
 }
@@ -693,10 +731,11 @@ void Camera::SetD3DDevice() {
 
 	// D3DTEXTUREOP Texture blending settings
 	//	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-
 }
 
 void Camera::SetProjection() {
+	pixelWidth = Screen.width * rect.W;
+	pixelHeight = Screen.height * rect.H;
 	SetViewport();
 
 	D3DXMatrixPerspectiveFovLH(&Projection,
@@ -708,8 +747,8 @@ void Camera::SetProjection() {
 		D3DXMatrixIdentity(&Projection);
 
 		D3DXMatrixOrthoLH(&Projection,
-			SCREEN_WIDTH * rect.W * orthographicSize,
-			SCREEN_HEIGHT * rect.H * orthographicSize,
+			pixelWidth * orthographicSize,
+			pixelHeight * orthographicSize,
 			nearClipPlane,
 			farClipPlane);
 	}
@@ -726,14 +765,9 @@ void Camera::SetCamera() {
 	D3DXVec3TransformCoord(&vWorldUp, &vLocalUp, &mCameraRot);
 	D3DXVec3TransformCoord(&vWorldAhead, &vLocalAhead, &mCameraRot);
 
-	//Local to World Coord for relative camera translation
-	//D3DXVec3TransformCoord(&vPosWorld, &vDelta, &mCameraRot);
-	//add postworld to transform for movement
-
 	Vector3 LookAt = transform->position + vWorldAhead;
 
 	D3DXMatrixLookAtLH(&View, &(transform->position), &LookAt, &vWorldUp);
-	D3DXMatrixInverse(&mCameraWorld, NULL, &View);
 }
 
 void CollisionCallback::BeginContact(b2Contact* contact) {
@@ -892,6 +926,7 @@ void RigidBody::AddBoxCollider(Vector2 size, Vector2 center, float angle, float 
 GameObject::GameObject(std::string Name) : Object(Name) {
 	transform = new Transform();
 	transform->parent = this;
+	tag = "default";
 	GameObjectList.push_back(this);
 }
 
@@ -921,8 +956,6 @@ GameObject* GameObject::Find(std::string Name) {
 	return nullptr;
 }
 
-
-// Uninitialization
 void D3D_Finalize()
 {
 	//Device
@@ -965,9 +998,17 @@ bool Initialize(HINSTANCE hInstance)
 	ImGui_ImplDX9_Init(pD3DDevice);
 
 	world.SetContactListener(&ContactListener);
+
+	D3DDISPLAYMODE gDisplayMode;
+	g_pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &gDisplayMode);
+	Screen.currentResolution.height = gDisplayMode.Height;
+	Screen.currentResolution.width = gDisplayMode.Width;
+	Screen.currentResolution.refreshRate = gDisplayMode.RefreshRate;
+
 	return true;
 }
 
+//Release all memory after shutdown
 void Finalize(void)
 {
 	SceneManager::UnloadScene();
@@ -984,22 +1025,20 @@ void Finalize(void)
 
 void GameLoop() {
 	Time.Start();
-	//NEED UPDATE: Want an outer loop for scene management
 
 	world.Step(Time.DeltaTime, 6, 2); //Physics engine iteration
 	RigidBody::UpdateRigidBody(); //Update transforms to physics engine output
-
 
 	InputUpdate(); //Update keyboard, mouse and gamepad inputs
 
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 
-	ImGui::NewFrame();
+	ImGui::NewFrame(); //GUI frame start
 	MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
-	ImGui::EndFrame();
-	Transform::UpdateTransform(); //Update matrices if transforms are changed
+	ImGui::EndFrame(); //GUI frame end
 
+	Transform::UpdateTransform(); //Update matrices if transforms are changed
 
 	//
 	//Begin drawing
@@ -1007,9 +1046,9 @@ void GameLoop() {
 
 	pD3DDevice->BeginScene();
 
-	Camera::Draw();
+	Camera::Draw(); //Scene render
 
-	ImGui::Render();
+	ImGui::Render(); //GUI render
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 
 	//End drawing

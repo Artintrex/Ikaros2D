@@ -160,7 +160,5 @@ public:
 		if (GetKeyDown(DIK_RETURN) && BUTTON == 0) {
 			SceneManager::LoadScene(1);
 		}
-
-
 	}
 };

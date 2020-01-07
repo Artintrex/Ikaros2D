@@ -13,6 +13,8 @@ public:
 	}
 
 	void Start() {
+		/*
+	
 		std::cout << "Factory Register" << "\n";
 		for (auto it = Component::factories.cbegin(); it != Component::factories.cend(); ++it)
 		{
@@ -20,6 +22,7 @@ public:
 		}
 
 		std::cout << SceneManager::GetActiveScene().path << "\n";
+		*/
 
 		Texture::LoadTexture("null", "Assets/Textures/null.png");
 
@@ -40,7 +43,7 @@ public:
 		Timer -= Time.DeltaTime;
 
 		if (Timer < 0) {
-			ListObject();
+			//ListObject();
 			Timer = 120;
 		}
 	}
