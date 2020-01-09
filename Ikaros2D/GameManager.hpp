@@ -1,88 +1,83 @@
 #pragma once
 #include "IkarosCore.h"
-#include "Title.hpp"
 
 class GameManager : public MonoBehavior {
 public:
 	GameManager() {
-		type = typeid(*this).name(); if (isAwake[type] == false)Awake(); isAwake[type] = true; if (SceneManager::isLoaded == true)Start();
+		type = typeid(*this).name();
+		mb_init();
 	}
-	enum Scene {
-		sTitle,
-		sAlpha
-	};
-	int ActiveScene;
-	bool SceneisLoaded;
 
-	GameObject* Alpha;
-	GameObject* objTitle;
-	Title* mTitle;
+	GameObject* MainCamera;
+	Camera* MainCameraComponent;
+
+	PlayerController* gPlayerController;
 
 	void Awake() {
+		parent->AddComponent<SceneAlpha>();
+		gPlayerController = parent->AddComponent<PlayerController>();
 
+		MainCamera = new GameObject("MainCamera");
+		MainCameraComponent = MainCamera->AddComponent<Camera>();
+		MainCamera->transform->Translate(0, 0, -40);
 	}
-	ImGuiWindowFlags window_flags;
+
 	void Start() {
-		this->parent->AddComponent<Debug>();
-
-		LoadAlpha();
-
-		window_flags = 0;
-		window_flags |= ImGuiWindowFlags_NoTitleBar;
-		window_flags |= ImGuiWindowFlags_NoScrollbar;
-
-		window_flags |= ImGuiWindowFlags_NoMove;
-		window_flags |= ImGuiWindowFlags_NoResize;
-		window_flags |= ImGuiWindowFlags_NoCollapse;
-	    window_flags |= ImGuiWindowFlags_NoNav;
-		window_flags |= ImGuiWindowFlags_NoBackground;
-		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
-		// window_flags |= ImGuiWindowFlags_MenuBar;
+		parent->AddComponent<Debug>();
 	}
+
 	void Update() {
 		{
-			static float f = 0.0f;
-			static int counter = 0;
+			//Camera Animation Calculation
+			float xP1 = gPlayerController->player1->transform->position.x;
+			float xP2 = gPlayerController->player2->transform->position.x;
 
-			ImGui::Begin("Hello, world!", 0, window_flags);                          // Create a window called "Hello, world!" and append into it.
-			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+			float dxP1 = xP1 - MainCamera->transform->position.x;
+			float dxP2 = xP2 - MainCamera->transform->position.x;
 
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+			float Xavg = (xP1 + xP2) / 2;
+			float Yavg = (gPlayerController->player1->transform->position.y + gPlayerController->player2->transform->position.y) / 2;
 
-		    if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-		        counter++;
-		    ImGui::SameLine();
-		    ImGui::Text("counter = %d", counter);
+			float speed = abs(MainCamera->transform->position.x - Xavg);
+			float speedY = abs(MainCamera->transform->position.y - Yavg);
 
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::End();
-			//ImGui::ShowDemoWindow();
+			if (MainCamera->transform->position.x > Xavg + 0.2f){
+				MainCamera->transform->position.x -= speed * Time.DeltaTime;
+			}
+			else if (MainCamera->transform->position.x < Xavg - 0.2f) {
+				MainCamera->transform->position.x += speed * Time.DeltaTime;
+			}
+
+			if (MainCamera->transform->position.y > Yavg + 15.0f) {
+				MainCamera->transform->position.y -= speedY * Time.DeltaTime;
+			}
+			else if (MainCamera->transform->position.y < Yavg + 5.0f) {
+				MainCamera->transform->position.y += speedY * Time.DeltaTime;
+			}
+
+			Vector3 lmax = MainCameraComponent->ScreenToWorldPoint(Vector3(0, 0, 0));
+			Vector3 Rmax = MainCameraComponent->ScreenToWorldPoint(Vector3(MainCameraComponent->pixelWidth, 0, 0));
+
+			float plmax, pRmax;
+
+			if (xP1 < xP2) {
+				plmax = xP1;
+				pRmax = xP2;
+			}
+			else {
+				plmax = xP2;
+				pRmax = xP1;
+			}
+
+			if(plmax < lmax.x + 3 || pRmax > Rmax.x - 3){
+				MainCamera->transform->position.z *= 1.0007f;
+			}
+			else if (plmax > lmax.x + 15 && pRmax < Rmax.x - 15) {
+				MainCamera->transform->position.z *= 0.9993f;
+			}
+
+			if (MainCamera->transform->position.z > -40)MainCamera->transform->position.z = -40;
+
 		}
-	}
-
-	void ChangeScene(Scene scene) {
-		if (ActiveScene == sAlpha)UnLoadAlpha();
-		else if (ActiveScene == sTitle)UnLoadTitle();
-	
-		if (scene == sAlpha) LoadAlpha();
-		else if (scene == sTitle) LoadTitle();
-	}
-
-private:
-	void LoadAlpha() {
-		ActiveScene = sAlpha;
-
-		Alpha = new GameObject();
-		Alpha->AddComponent<SceneAlpha>(); //run start here for now
-	}
-
-	void LoadTitle() {
-		ActiveScene = sTitle;
-	}
-
-	void UnLoadAlpha() {
-	}
-
-	void UnLoadTitle() {
 	}
 };

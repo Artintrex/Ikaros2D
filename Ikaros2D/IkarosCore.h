@@ -25,6 +25,139 @@
 typedef D3DXVECTOR2 Vector2;
 typedef D3DXVECTOR3 Vector3;
 typedef D3DXVECTOR4 Vector4;
+typedef D3DXQUATERNION Quaternion; //NEED UPDATE Switch to quaternion rotation
+
+//Vector3
+/*
+struct Vector3 {
+	/// Constructors
+	Vector3() {
+		x = 0;
+		y = 0;
+		z = 0;
+	}
+	Vector3(float x, float y, float z) : x(x), y(y), z(z) { ; }
+	Vector3(Vector3 const& p) { x = p.x; y = p.y; z = p.z; }
+
+	float sqrMagnitude() {
+		return (float)((double)x * (double)x + (double)y * (double)y + (double)z * (double)z);
+	}
+
+	/// Arithmetic operators for Vector3
+	Vector3 operator + (Vector3 const& p)
+	{
+		return Vector3(x + p.x, y + p.y, z + p.z);
+	}
+
+	Vector3 operator - (Vector3 const& p)
+	{
+		return Vector3(x - p.x, y - p.y, z - p.z);
+	}
+
+	Vector3 operator * (Vector3 const& p)
+	{
+		return Vector3(x * p.x, y * p.y, z * p.z);
+	}
+
+	Vector3 operator / (Vector3 const& p)
+	{
+		return Vector3(x / p.x, y / p.y, z / p.z);
+	}
+
+	/// Assignation operators for Vector3
+	Vector3 operator += (Vector3 const& p)
+	{
+		x += p.x; y += p.y; z += p.z;
+		return *this;
+	}
+
+	Vector3 operator -= (Vector3 const& p)
+	{
+		x -= p.x; y -= p.y; z -= p.z;
+		return *this;
+	}
+
+	Vector3 operator *= (Vector3 const& p)
+	{
+		x *= p.x; y *= p.y; z *= p.z;
+		return *this;
+	}
+
+	Vector3 operator /= (Vector3 const& p)
+	{
+		x /= p.x; y /= p.y; z /= p.z;
+		return *this;
+	}
+
+	/// Arithmetic operators for float
+	Vector3 operator + (float const& p)
+	{
+		return Vector3(x + p, y + p, z + p);
+	}
+
+	Vector3 operator - (float const& p)
+	{
+		return Vector3(x - p, y - p, z - p);
+	}
+
+	Vector3 operator * (float const& p)
+	{
+		return Vector3(x * p, y * p, z * p);
+	}
+
+	Vector3 operator / (float const& p)
+	{
+		return Vector3(x / p, y / p, z / p);
+	}
+
+	/// Assignation operators for float
+	Vector3 operator += (float const& p)
+	{
+		x += p; y += p; z += p;
+		return *this;
+	}
+
+	Vector3 operator -= (float const& p)
+	{
+		x -= p; y -= p; z -= p;
+		return *this;
+	}
+
+	Vector3 operator *= (float const& p)
+	{
+		x *= p; y *= p; z *= p;
+		return *this;
+	}
+
+	Vector3 operator /= (float const& p)
+	{
+		x /= p; y /= p; z /= p;
+		return *this;
+	}
+
+	//Logical operators for Vector3
+	bool operator == (Vector3 const& p)
+	{
+		Vector3 p2(*this - p);
+		return (double)p2.sqrMagnitude() < 9.99999943962493E-11;
+	}
+
+	bool operator !=(Vector3 const& p)
+	{
+		Vector3 p2(*this - p);
+		return (double)p2.sqrMagnitude() >= 9.99999943962493E-11;
+	}
+
+	//Convert to D3DXVECTOR3 for D3DX functions
+	D3DXVECTOR3 ToD3DXVECTOR3() {
+		return D3DXVECTOR3(x, y, z);
+	}
+
+	float x;
+	float y;
+	float z;
+};
+*/
 
 class iTime;
 class iScreen;
@@ -215,6 +348,10 @@ public:
 
 	}
 
+	virtual void OnCollision(Collision collider) {
+
+	}
+
 	static void registerType(const std::string& name, ComponentFactory* factory) {
 		factories[name] = factory;
 	}
@@ -242,14 +379,28 @@ public:
 	virtual void Update() = 0;
 
 	///Do not call this function, meant for main loop
+	static void AwakeMonoBehaviorArray();
+	///Do not call this function, meant for main loop
 	static void StartMonoBehaviorArray();
 	///Do not call this function, meant for main loop
 	static void UpdateMonoBehaviorArray();
 
 protected:
 	static std::unordered_map<std::string, bool> isAwake;
+
+	//Handles Awake and Start initilization and adds reflection to MB
+	void mb_init() {
+		if (isAwake[type] == false && SceneManager::isLoaded) {
+			SceneManager::ActiveAwakerList.push_back(this); isAwake[type] = true;
+		}
+		if (SceneManager::isLoaded) {
+			SceneManager::ActiveStarterList.push_back(this);
+		}
+	}
 private:
 	static std::vector<MonoBehavior*> MonoBehaviorList;
+
+	friend class SceneManager;
 };
 
 class Texture : public Object {
@@ -262,7 +413,7 @@ public:
 	~Texture();
 
 	///File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
-	static Texture* LoadTexture(std::string TextureName, LPCTSTR FilePath);
+	static Texture* LoadTexture(std::string TextureName, std::string FilePath);
 
 	static Texture* FindTexturebyName(std::string Name);
 
@@ -277,10 +428,13 @@ public:
 	Texture* texture;
 	Vector2 size;
 
+	//Enables generating double-sided polygon for this spite
+	bool doubleSided;
+
 	LPDIRECT3DVERTEXBUFFER9 VertexBuffer;
 	LPDIRECT3DINDEXBUFFER9 IndexBuffer;
 
-	Sprite(Texture* pTexture = nullptr, std::string Name = "Sprite");
+	Sprite(std::string Name = "Sprite", Texture* pTexture = nullptr);
 	~Sprite();
 
 	void SetColor(D3DCOLOR rgba);
@@ -346,6 +500,8 @@ class CollisionCallback : public b2ContactListener {
 	void BeginContact(b2Contact* contact);
 
 	void EndContact(b2Contact* contact);
+
+	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
 };
 
 //Adds physics to a GameObject

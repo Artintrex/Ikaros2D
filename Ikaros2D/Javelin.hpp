@@ -3,28 +3,36 @@
 
 class Javelin : public MonoBehavior {
 public:
-	GameObject* spear;
-
-	Javelin(Vector2 pos, int direction, Sprite* sprSpear) {
-		spear = new GameObject("spear");
-		spear->AddComponent<Renderer>()->sprite = sprSpear;
-		spear->transform->position = Vector3(pos.x, pos.y, 0);
-		spear->transform->Rotate(0, 0, 90);
-		if (direction == -1)spear->transform->position.x -= 2;
-		spear->transform->Scale(3, 3, 1);
-
-		RigidBody* rb_spear = spear->AddComponent<RigidBody>();
-		rb_spear->SetType(b2_dynamicBody);
-		rb_spear->AddBoxCollider(sprSpear->size * 3.0f);
-		rb_spear->Rotate(0, 0, -90 * direction);
-		rb_spear->AddForce(Vector2(50 * direction, 0), VelocityChange);
+	Javelin() {
+		type = typeid(*this).name();
+		mb_init();
 	}
+
+	Sprite* SpearSprite;
+	RigidBody* rb_spear;
+
 	void Awake() {
-
+		Texture::LoadTexture("SpearTexture", "Assets/Textures/javelin.png");
 	}
+
+	int direction = 1;
+	float speed = 50;
 
 	void Start() {
+		SpearSprite = new Sprite("JavelinSprite");
+		SpearSprite->GenereteSprite("SpearTexture");
 
+		Renderer* rend = parent->AddComponent<Renderer>();
+		rend->sprite = SpearSprite;
+		parent->transform->Rotate(0, 0, 90);
+		parent->transform->Scale(3, 3, 1);
+
+		rb_spear = parent->AddComponent<RigidBody>();
+		rb_spear->SetType(b2_dynamicBody);
+		rb_spear->AddBoxCollider(SpearSprite->size * 3.0f);
+
+		rb_spear->Rotate(0, 0, -90 * direction);
+		rb_spear->AddForce(Vector2(speed * direction, 0), VelocityChange);
 	}
 
 	float Timer = 3;
@@ -32,8 +40,7 @@ public:
 		Timer -= Time.DeltaTime;
 
 		if (Timer < 0) {
-			delete spear;  
-			delete this;
+			delete parent;
 		}
 	}
 };

@@ -1,103 +1,89 @@
 #pragma once
 #include "IkarosCore.h"
+#include "Javelin.hpp"
+
 class Player1 : public MonoBehavior {
 public:
 	Player1() {
-		type = typeid(*this).name(); if (isAwake[type] == false)Awake(); isAwake[type] = true; if (SceneManager::isLoaded == true)Start();
+		type = typeid(*this).name();
+		mb_init();
 	}
-	RigidBody* rb_player1;
-	Texture* PlayerTex[9];
-	Sprite* PlayerSpr[9];
-	Renderer* p1rend;
+	RigidBody* rigidbody;
+	Renderer* renderer;
 
-	Texture* texSpear;
-	Sprite* sprSpear;
+	Sprite* RunningSprite[9];
 
 	void Awake() {
-
-		
 
 	}
 
 	void Start() {
-
-
-		//player1 = new GameObject("Player1");
-
-		PlayerTex[0] = Texture::LoadTexture("player1", "Assets/Textures/player1t.png");
-		PlayerTex[1] = Texture::LoadTexture("player2", "Assets/Textures/player2t.png");
-		PlayerTex[2] = Texture::LoadTexture("player3", "Assets/Textures/player3t.png");
-		PlayerTex[3] = Texture::LoadTexture("player4", "Assets/Textures/player4t.png");
-		PlayerTex[4] = Texture::LoadTexture("player5", "Assets/Textures/player5t.png");
-		PlayerTex[5] = Texture::LoadTexture("player6", "Assets/Textures/player6t.png");
-		PlayerTex[6] = Texture::LoadTexture("player7", "Assets/Textures/player7t.png");
-		PlayerTex[7] = Texture::LoadTexture("player8", "Assets/Textures/player8t.png");
-		PlayerTex[8] = Texture::LoadTexture("player9", "Assets/Textures/player9t.png");
-
-		texSpear = Texture::LoadTexture("SpearTexture", "Assets/Textures/javelin.png");
-		sprSpear = new Sprite();
-		sprSpear->texture = texSpear;
-		sprSpear->GenereteSprite();
-
-		p1rend = parent->AddComponent<Renderer>();
-
-
-
-		for (int player_shin = 0; player_shin < 9; player_shin++)
+		for (int i = 0; i < 9; i++)
 		{
+			std::string textureName = "player_running" + std::to_string(i + 1);
 
-			PlayerSpr[player_shin] = new Sprite();
-
-			PlayerSpr[player_shin]->texture = PlayerTex[player_shin];
-
-
-			PlayerSpr[player_shin]->GenereteSprite();
+			RunningSprite[i] = new Sprite(textureName + "Sprite");
+			RunningSprite[i]->doubleSided = true;
+			RunningSprite[i]->GenereteSprite(textureName);
 		}
+		
+		renderer = parent->AddComponent<Renderer>();
 
 		parent->transform->Scale(0.6, 0.6, 0.6);
-		p1rend->sprite = PlayerSpr[0];
+		renderer->sprite = RunningSprite[0];
 
-		rb_player1 = parent->AddComponent<RigidBody>();
-		rb_player1->SetType(b2_dynamicBody);
-		rb_player1->rigidbody->SetFixedRotation(true);
-		rb_player1->AddBoxCollider(Vector2(PlayerSpr[0]->size.x - 2, PlayerSpr[0]->size.y - 0.4) * 0.6f);
-
+		rigidbody = parent->AddComponent<RigidBody>();
+		rigidbody->SetType(b2_dynamicBody);
+		rigidbody->rigidbody->SetGravityScale(5.0f);
+		rigidbody->rigidbody->SetFixedRotation(true);
+		rigidbody->AddBoxCollider(Vector2(RunningSprite[0]->size.x - 2, RunningSprite[0]->size.y - 0.4) * 0.6f);
 	}
-	int cnt = 0;
+
+	int cnt = 0, direction = 1;
 	float Timer = 0.5;
-	int direction = 1;
+	bool JumpFlag = true;
 	void Update() {
-		p1rend->sprite = PlayerSpr[cnt];
+		renderer->sprite = RunningSprite[cnt];
 		if (Timer < 0) {
 			cnt++;
 			Timer = 0.5;
 		}
-		Timer -= Time.DeltaTime * abs(rb_player1->velocity.x);
+		Timer -= Time.DeltaTime * abs(rigidbody->velocity.x);
 		if (cnt > 8) cnt = 0;
 
+		if(abs(rigidbody->velocity.y) > 0.1f)JumpFlag = false;
+
 		if (GetKey(DIK_A)) {
-			rb_player1->AddForce(Vector2(-200,0), Force);
-			parent->transform->scale = Vector3(-0.6, 0.6, 0.6);
+			if (JumpFlag) {
+				rigidbody->AddForce(Vector2(-500, 0), Force);
+			}
+			transform->scale = Vector3(-0.6, 0.6, 0.6);
 			direction = -1;
 		}
 		if (GetKey(DIK_D)) {
-			rb_player1->AddForce(Vector2(200, 0), Force);
-			parent->transform->scale = Vector3(0.6, 0.6, 0.6);
+			if (JumpFlag) {
+				rigidbody->AddForce(Vector2(500, 0), Force);
+			}
+			transform->scale = Vector3(0.6, 0.6, 0.6);
 			direction = 1;
 		}
-		if (GetKeyDown(DIK_SPACE)) {
-			rb_player1->AddForce(Vector2(0, 300), Impulse);
+		if (GetKeyDown(DIK_SPACE) && JumpFlag) {
+			rigidbody->AddForce(Vector2(0, 600), Impulse);
 		}
 		if (GetKeyDown(DIK_B)) {
-			new Javelin(Vector2(parent->transform->position.x, parent->transform->position.y), direction, sprSpear);
+			GameObject* jav = new GameObject("Javelin");
+			jav->transform->position = Vector3(transform->position.x + (direction * 3), 
+												transform->position.y, 
+												transform->position.z);
+
+			Javelin* gjav = jav->AddComponent<Javelin>();
+			gjav->direction = direction;
 		}
 	}
 
-	void OnCollisionEnter(Collision collider) {
-		std::cout << "Collided with: " << collider.parent->name << std::endl;
-	}
-
-	void OnCollisionExit(Collision collider) {
-		std::cout << "Collision ended: " << collider.parent->name << std::endl;
+	void OnCollision(Collision collider) {
+		if (rigidbody->velocity.y <= 0) {
+			JumpFlag = true;
+		}
 	}
 };

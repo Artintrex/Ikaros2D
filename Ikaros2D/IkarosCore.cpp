@@ -207,7 +207,7 @@ Object::Object(std::string Name) {
 	name = Name;
 	ObjectList.push_back(this);
 
-	std::cout << "Object" << ObjectList.size() << " created: " << name << std::endl;
+	std::cout << "Object " << ObjectList.size() << " created: " << name << std::endl;
 }
 
 Object::~Object() {
@@ -257,6 +257,14 @@ MonoBehavior::~MonoBehavior() {
 	}
 }
 
+void MonoBehavior::AwakeMonoBehaviorArray() {
+	std::vector<MonoBehavior*>::size_type size = MonoBehaviorList.size();
+	for (int i = 0; i < size; ++i) {
+		MonoBehaviorList[i]->Awake();
+		size = MonoBehaviorList.size();
+	}
+}
+
 void MonoBehavior::StartMonoBehaviorArray() {
 	std::vector<MonoBehavior*>::size_type size = MonoBehaviorList.size();
 	for (int i = 0; i < size; ++i) {
@@ -291,13 +299,13 @@ Texture::~Texture() {
 }
 
 //File formats : .bmp, .dds, .dib, .hdr, .jpg, .pfm, .png, .ppm, and .tga
-Texture* Texture::LoadTexture(std::string TextureName, LPCTSTR FilePath) {
+Texture* Texture::LoadTexture(std::string TextureName, std::string FilePath) {
 		LPDIRECT3DTEXTURE9* tex = new LPDIRECT3DTEXTURE9;
-		if (CreateTexture(FilePath, tex)) {
+		if (CreateTexture(FilePath.c_str(), tex)) {
 			Texture* texture = new Texture(TextureName);
 			texture->texturedata = tex;
 
-			stbi_info(FilePath, &(texture->Width), &(texture->Height), 0);
+			stbi_info(FilePath.c_str(), &(texture->Width), &(texture->Height), 0);
 
 			TextureList.push_back(texture);
 
@@ -346,13 +354,14 @@ bool Texture::CreateTexture(LPCTSTR FilePath, LPDIRECT3DTEXTURE9* texturedata)
 	}
 }
 
-Sprite::Sprite(Texture* pTexture, std::string Name) : Object(Name) {
+Sprite::Sprite(std::string Name, Texture* pTexture) : Object(Name) {
 	renderer = nullptr;
 	texture = pTexture;
 	vertices = nullptr;
 	indices = nullptr;
 	VertexBuffer = NULL;
 	IndexBuffer = NULL;
+	doubleSided = false;
 
 	color = D3DCOLOR_RGBA(255, 255, 255, 255);
 
@@ -422,17 +431,18 @@ void Sprite::GenereteSprite(std::string Name) {
 			indices[1] = 1;
 			indices[2] = 2;
 
-			indices[3] = 2;
-			indices[4] = 3;
-			indices[5] = 1;
+			indices[6] = 2;
+			indices[7] = 1;
+			indices[8] = 3;
+			if (doubleSided) {
+				indices[3] = 3;
+				indices[4] = 1;
+				indices[5] = 2;
 
-			indices[6] = 3;
-			indices[7] = 2;
-			indices[8] = 1;
-
-			indices[9] = 1;
-			indices[10] = 0;
-			indices[11] = 2;
+				indices[9] = 2;
+				indices[10] = 1;
+				indices[11] = 0;
+			}
 
 			IndexBuffer->Unlock();
 		}
@@ -649,7 +659,7 @@ void Camera::SetD3DDevice() {
 
 	//Turn off lighting
 	pD3DDevice->SetRenderState(D3DRS_LIGHTING, false);
-	//	g_pD3DDevice->SetRenderState(D3DRS_ZENABLE, true);
+	//pD3DDevice->SetRenderState(D3DRS_ZENABLE, true);
 
 	//g_pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	//g_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
@@ -658,8 +668,8 @@ void Camera::SetD3DDevice() {
 	/*
 	Tile the texture at every integer junction. For example, for u values between 0 and 3, the texture is repeated three times; no mirroring is performed.
 	*/
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
 
 	/*
 	Similar to D3DTADDRESS_WRAP, except that the texture is flipped at every integer junction.
@@ -672,14 +682,14 @@ void Camera::SetD3DDevice() {
 	/*
 	Texture coordinates outside the range [0.0, 1.0] are set to the texture color at 0.0 or 1.0, respectively.
 	*/
-	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 
 	/*
 	Texture coordinates outside the range [0.0, 1.0] are set to the border color.
 	*/
-	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
-	pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
 	//pD3DDevice->SetSamplerState(0, D3DSAMP_BORDERCOLOR, D3DCOLOR_RGBA(0, 0, 0, 255));
 
 	/*
@@ -688,8 +698,8 @@ void Camera::SetD3DDevice() {
 	minification filter respectively. When used with D3DSAMP_MIPFILTER,
 	enables mipmapping and specifies that the rasterizer chooses the color from the texel of the nearest mip level.
 	*/
-	pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-	pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 
 	/*
 	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER,
@@ -697,8 +707,8 @@ void Camera::SetD3DDevice() {
 	minification filter respectively. When used with D3DSAMP_MIPFILTER, enables mipmapping and trilinear filtering;
 	it specifies that the rasterizer interpolates between the two nearest mip levels.
 	*/
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 
 	/*
 	When used with D3DSAMP_ MAGFILTER or D3DSAMP_MINFILTER,
@@ -706,12 +716,12 @@ void Camera::SetD3DDevice() {
 	minification filter respectively. Compensates for distortion caused by the difference in angle between the texture polygon
 	and the plane of the screen. Use with D3DSAMP_MIPFILTER is undefined.
 	*/
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
-	//	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
+	pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
+	pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_ANISOTROPIC);
 
-	//	g_pD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	//	g_pD3DDevice->SetRenderState(D3DRS_ALPHAREF, 0x80);
-	//	g_pD3DDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+	pD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	pD3DDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+	pD3DDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
 	// Alpha blend settings
 	pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -725,12 +735,12 @@ void Camera::SetD3DDevice() {
 	pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 
-	pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	pD3DDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	//pD3DDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 
 	// D3DTEXTUREOP Texture blending settings
-	//	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+	// pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 }
 
 void Camera::SetProjection() {
@@ -821,6 +831,33 @@ void CollisionCallback::EndContact(b2Contact* contact) {
 
 	for (int i = 0; i < B.parent->ComponentList.size(); ++i) {
 		B.parent->ComponentList[i]->OnCollisionExit(A);
+	}
+}
+
+void CollisionCallback::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
+	Collision A, B;
+
+	b2Fixture* FixtureA = contact->GetFixtureA();
+	b2Fixture* FixtureB = contact->GetFixtureB();
+
+	b2Body* BodyA = FixtureA->GetBody();
+	b2Body* BodyB = FixtureB->GetBody();
+
+	A.b2fixture = FixtureA;
+	B.b2fixture = FixtureB;
+
+	A.rigidbody = mRigidBody[BodyA];
+	B.rigidbody = mRigidBody[BodyB];
+
+	A.parent = A.rigidbody->parent;
+	B.parent = B.rigidbody->parent;
+
+	for (int i = 0; i < A.parent->ComponentList.size(); ++i) {
+		A.parent->ComponentList[i]->OnCollision(B);
+	}
+
+	for (int i = 0; i < B.parent->ComponentList.size(); ++i) {
+		B.parent->ComponentList[i]->OnCollision(A);
 	}
 }
 
@@ -1035,6 +1072,7 @@ void GameLoop() {
 	ImGui_ImplWin32_NewFrame();
 
 	ImGui::NewFrame(); //GUI frame start
+	SceneManager::RunActiveInitilizer();
 	MonoBehavior::UpdateMonoBehaviorArray(); //Update MonoBehavior
 	ImGui::EndFrame(); //GUI frame end
 

@@ -12,6 +12,7 @@
 REGISTER_COMPONENT(Debug)
 REGISTER_COMPONENT(Player1)
 REGISTER_COMPONENT(Player2)
+REGISTER_COMPONENT(PlayerController)
 REGISTER_COMPONENT(GameManager)
 REGISTER_COMPONENT(SceneAlpha)
 REGISTER_COMPONENT(Title)
@@ -28,6 +29,20 @@ void ReadSceneFile(std::string FilePath);
 Scene SceneManager::scene;
 bool SceneManager::isLoaded = false;
 
+std::vector<MonoBehavior*> SceneManager::ActiveStarterList{};
+std::vector<MonoBehavior*> SceneManager::ActiveAwakerList{};
+
+void SceneManager::RunActiveInitilizer() {
+	for (auto p : ActiveAwakerList) {
+		p->Awake();
+	}
+	ActiveAwakerList.clear();
+	for (auto p : ActiveStarterList) {
+		p->Start();
+	}
+	ActiveStarterList.clear();
+}
+
 Scene SceneManager::GetActiveScene() {
 	return scene;
 }
@@ -35,6 +50,7 @@ Scene SceneManager::GetActiveScene() {
 void SceneManager::LoadScene(std::string Path) {
 	if (isLoaded == false) {
 		ReadSceneFile(Path);
+		MonoBehavior::AwakeMonoBehaviorArray();
 		MonoBehavior::StartMonoBehaviorArray();
 		scene.name = Path;
 		scene.path = Path;
@@ -43,6 +59,7 @@ void SceneManager::LoadScene(std::string Path) {
 	else {
 		SceneManager::UnloadScene();
 		ReadSceneFile(Path);
+		MonoBehavior::AwakeMonoBehaviorArray();
 		MonoBehavior::StartMonoBehaviorArray();
 		scene.name = Path;
 		scene.path = Path;
@@ -54,6 +71,7 @@ void SceneManager::LoadScene(std::string Path) {
 void SceneManager::LoadScene(int SceneNumber) {
 	if (isLoaded == false) {
 		ReadSceneFile(SceneList[SceneNumber].path);
+		MonoBehavior::AwakeMonoBehaviorArray();
 		MonoBehavior::StartMonoBehaviorArray();
 		scene.name = SceneList[SceneNumber].name;
 		scene.path = SceneList[SceneNumber].path;
@@ -62,6 +80,7 @@ void SceneManager::LoadScene(int SceneNumber) {
 	else {
 		SceneManager::UnloadScene();
 		ReadSceneFile(SceneList[SceneNumber].path);
+		MonoBehavior::AwakeMonoBehaviorArray();
 		MonoBehavior::StartMonoBehaviorArray();
 		scene.name = SceneList[SceneNumber].name;
 		scene.path = SceneList[SceneNumber].path;
@@ -73,6 +92,8 @@ void SceneManager::LoadScene(int SceneNumber) {
 
 void SceneManager::UnloadScene() {
 	Object::ReleaseObjects();
+	MonoBehavior::isAwake.clear();
+
 	isLoaded = false;
 }
 

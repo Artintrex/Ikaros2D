@@ -4,7 +4,8 @@
 class Title : public MonoBehavior {
 public:
 	Title() {
-		type = typeid(*this).name(); if (isAwake[type] == false)Awake(); isAwake[type] = true; if (SceneManager::isLoaded == true)Start();
+		type = typeid(*this).name();
+		mb_init();
 	}
 
 	GameObject* TitleBack;

@@ -1,17 +1,17 @@
 #pragma once
 #include "IkarosCore.h"
-#include "SceneManager.h"
 
 class Debug : public MonoBehavior {
 public:
 	Debug() {
-		type = typeid(*this).name(); if (isAwake[type] == false)Awake(); isAwake[type] = true; if (SceneManager::isLoaded == true)Start();
+		type = typeid(*this).name();
+		mb_init();
 	}
 
 	void Awake() {
 
 	}
-
+	ImGuiWindowFlags window_flags;
 	void Start() {
 		/*
 	
@@ -36,7 +36,19 @@ public:
 		cam->SetProjection();
 		*/
 
+		window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoTitleBar;
+		window_flags |= ImGuiWindowFlags_NoScrollbar;
+
+		window_flags |= ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoResize;
+		window_flags |= ImGuiWindowFlags_NoCollapse;
+		window_flags |= ImGuiWindowFlags_NoNav;
+		window_flags |= ImGuiWindowFlags_NoBackground;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+		// window_flags |= ImGuiWindowFlags_MenuBar;
 	}
+
 
 	float Timer = 0;
 	void Update() {
@@ -46,6 +58,23 @@ public:
 			//ListObject();
 			Timer = 120;
 		}
+
+		static float f = 0.0f;
+		static int counter = 0;
+
+		ImGui::Begin("Hello, world!", 0, window_flags);                          // Create a window called "Hello, world!" and append into it.
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		//ImGui::ShowDemoWindow();
+		ImGui::End();
 	}
 
 
