@@ -250,6 +250,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Player2.hpp" />
     <ClInclude Include="PlayerController.hpp" />
+    <ClInclude Include="Result.hpp" />
     <ClInclude Include="SceneAlpha.hpp" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Debug.hpp" />

@@ -9,6 +9,7 @@
 #include "Player1.hpp"
 #include "Player2.hpp"
 #include "Title.hpp"
+#include "Result.hpp"
 
 #include "PlayerController.hpp"
 #include "SceneAlpha.hpp"

@@ -7,11 +7,21 @@ public:
 		type = typeid(*this).name();
 		mb_init();
 	}
-
+	//ImGuiWindowFlags window_flags;
 	void Awake() {
+		//window_flags = 0;
+		//window_flags |= ImGuiWindowFlags_NoTitleBar;
+		//window_flags |= ImGuiWindowFlags_NoScrollbar;
 
+		//window_flags |= ImGuiWindowFlags_NoMove;
+		//window_flags |= ImGuiWindowFlags_NoResize;
+		//window_flags |= ImGuiWindowFlags_NoCollapse;
+		//window_flags |= ImGuiWindowFlags_NoNav;
+	//	window_flags |= ImGuiWindowFlags_NoBackground;
+	//	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+		// window_flags |= ImGuiWindowFlags_MenuBar;
 	}
-	ImGuiWindowFlags window_flags;
+
 	void Start() {
 		/*
 	
@@ -35,18 +45,6 @@ public:
 		cam->rect.H = 0.5;
 		cam->SetProjection();
 		*/
-
-		window_flags = 0;
-		window_flags |= ImGuiWindowFlags_NoTitleBar;
-		window_flags |= ImGuiWindowFlags_NoScrollbar;
-
-		window_flags |= ImGuiWindowFlags_NoMove;
-		window_flags |= ImGuiWindowFlags_NoResize;
-		window_flags |= ImGuiWindowFlags_NoCollapse;
-		window_flags |= ImGuiWindowFlags_NoNav;
-		window_flags |= ImGuiWindowFlags_NoBackground;
-		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
-		// window_flags |= ImGuiWindowFlags_MenuBar;
 	}
 
 
@@ -62,6 +60,7 @@ public:
 		static float f = 0.0f;
 		static int counter = 0;
 
+		/*
 		ImGui::Begin("Hello, world!", 0, window_flags);                          // Create a window called "Hello, world!" and append into it.
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 
@@ -75,6 +74,7 @@ public:
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		//ImGui::ShowDemoWindow();
 		ImGui::End();
+		*/
 	}
 
 

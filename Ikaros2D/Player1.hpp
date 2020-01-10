@@ -18,12 +18,27 @@ public:
 
 	RigidBody* sword;
 
+
 	void Awake() {
 
 	}
 
+	ImGuiWindowFlags UIFlags;
+
 	Vector3 scale = Vector3(1.5, 1.5, 1);
 	void Start() {
+		UIFlags = 0;
+		UIFlags |= ImGuiWindowFlags_NoTitleBar;
+		UIFlags |= ImGuiWindowFlags_NoScrollbar;
+
+		UIFlags |= ImGuiWindowFlags_NoMove;
+		UIFlags |= ImGuiWindowFlags_NoResize;
+		UIFlags |= ImGuiWindowFlags_NoCollapse;
+		UIFlags |= ImGuiWindowFlags_NoNav;
+		UIFlags |= ImGuiWindowFlags_NoBackground;
+		UIFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+		// UIFlags |= ImGuiWindowFlags_MenuBar;
+
 		renderer = parent->AddComponent<Renderer>();
 
 		parent->transform->scale = scale;
@@ -68,7 +83,7 @@ public:
 
 		if (ActiveItem == 0) {
 			renderer->sprite = RunningSprite[cnt];
-		}else renderer->sprite = RunningSpriteWithSword[cnt];
+		}else if (ActiveItem == gSword)renderer->sprite = RunningSpriteWithSword[cnt];
 
 
 		if(abs(rigidbody->velocity.y) > 0.1f)JumpFlag = false;
@@ -111,7 +126,7 @@ public:
 
 		AttackTimer -= Time.DeltaTime;
 
-		if (GetKey(DIK_LSHIFT)) {
+		if (GetKey(DIK_LSHIFT) && ActiveItem == gSword) {
 			if (isAttacking == false) {
 				AttackTimer = AttackDelay; AtkCnt = 0;
 			}
@@ -137,6 +152,8 @@ public:
 		else {
 			sword->Translate(0, 1000, 0);
 		}
+
+		UIUpdate();
 	}
 
 	void OnCollision(Collision collider) {
@@ -166,5 +183,15 @@ public:
 		if (collider.parent->tag == "Sword") {
 			RecieveBlow();
 		}
+	}
+
+	void UIUpdate() {
+		Vector3 ScreenCoord = Camera::main->WorldToScreenPoint(transform->position);
+		ImGui::SetNextWindowPos(ImVec2(ScreenCoord.x, -ScreenCoord.y + Screen.height - 150));
+		ImGui::SetNextWindowSize(ImVec2(100, 200));
+		ImGui::Begin("Player 1", 0, UIFlags);
+		ImGui::Text("PLAYER 1");
+		ImGui::Text("Javelin: %d", JavelinCount);
+		ImGui::End();
 	}
 };

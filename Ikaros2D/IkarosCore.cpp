@@ -618,6 +618,9 @@ Vector3 Camera::WorldToScreenPoint(Vector3 position) {
 	D3DXMATRIX projection = View * Projection;
 	D3DXVec3TransformCoord(&position, &position, &projection);
 
+	position.x = (position.x + 1) / 2;
+	position.y = (position.y + 1) / 2;
+
 	position.x *= pixelWidth;
 	position.y *= pixelHeight;
 

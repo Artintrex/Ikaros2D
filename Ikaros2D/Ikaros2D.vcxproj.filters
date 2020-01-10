@@ -115,6 +115,9 @@
     <ClInclude Include="_Template.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
+    <ClInclude Include="Result.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\Libs\imgui\misc\natvis\imgui.natvis">
