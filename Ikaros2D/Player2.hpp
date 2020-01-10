@@ -43,6 +43,12 @@ public:
 
 	int ActiveItem = 0;
 	int JavelinCount = 0;
+
+	int AtkCnt = 0;
+	bool isAttacking = false;
+	float AttackDelay = 0.2;
+	float AttackTimer = AttackDelay;
+
 	void Update() {
 		if (Timer < 0) {
 			cnt++;
@@ -81,7 +87,7 @@ public:
 			rigidbody->AddForce(Vector2(0, 400), Impulse);
 		}
 
-		if (GetKeyDown(DIK_RCONTROL)) {
+		if (GetKeyDown(DIK_RCONTROL) && JavelinCount > 0) {
 			GameObject* jav = new GameObject("Javelin");
 			jav->transform->position = Vector3(transform->position.x + (direction * 3),
 				transform->position.y,
@@ -89,6 +95,31 @@ public:
 
 			Javelin* gjav = jav->AddComponent<Javelin>();
 			gjav->direction = direction;
+
+			JavelinCount--;
+		}
+
+		AttackTimer -= Time.DeltaTime;
+
+		if (GetKey(DIK_RSHIFT)) {
+			if (isAttacking == false) {
+				AttackTimer = AttackDelay; AtkCnt = 0;
+			}
+			isAttacking = true;
+		}
+
+		if (AttackTimer < 0) {
+			AtkCnt++;
+			AttackTimer = AttackDelay;
+		}
+
+		if (AtkCnt >= AttackSprite.size()) {
+			isAttacking = false;
+			AtkCnt = 0;
+		}
+
+		if (isAttacking == true) {
+			renderer->sprite = AttackSprite[AtkCnt];
 		}
 	}
 
@@ -98,7 +129,7 @@ public:
 		}
 
 		if (collider.parent->tag == "Box") {
-			if (GetKeyDown(DIK_F)) {
+			if (GetKeyDown(DIK_RETURN)) {
 				switch (collider.parent->GetComponent<Box>()->TypeOfBox) {
 				case 0:
 					ActiveItem = gSword;

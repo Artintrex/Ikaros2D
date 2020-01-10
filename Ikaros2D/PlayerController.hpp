@@ -57,9 +57,9 @@ public:
 			std::string textureName = "player_idle_test_" + std::to_string(i + 1);
 			std::string path = "Assets/Textures/Player/" + textureName + ".png";
 
-			AttackSprite.push_back(new Sprite(textureName + "Sprite", Texture::LoadTexture(textureName, path)));
-			AttackSprite[i]->doubleSided = true;
-			AttackSprite[i]->GenereteSprite(textureName);
+			IdleSprite.push_back(new Sprite(textureName + "Sprite", Texture::LoadTexture(textureName, path)));
+			IdleSprite[i]->doubleSided = true;
+			IdleSprite[i]->GenereteSprite(textureName);
 		}
 	}
 
