@@ -3,6 +3,7 @@
 #include <cmath>
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <algorithm>
 #include <string>
@@ -15,7 +16,7 @@
 #include "imgui\imgui.h"
 #include "imgui\imgui_impl_dx9.h"
 #include "imgui\imgui_impl_win32.h"
-#include <tchar.h>
+//#include <tchar.h>
 #include "SceneManager.h"
 
 //NEED UPDATE: Change Resolution Settings needs to read from file!! Also set d3d parameters like fullscreen etc
@@ -316,14 +317,18 @@ public:
 
 	Object(std::string Name);
 	virtual ~Object();
+
+	void Destroy(Object* obj);
 	
 private:
 	static std::vector<Object*> ObjectList;
+	static std::unordered_set<Object*> DestroyList;
 
 	static void ReleaseObjects();
 
 	friend class SceneManager;
 	friend class Debug;
+	friend void GameLoop();
 };
 
 struct Collision {
@@ -336,6 +341,7 @@ class Component : public Object {
 public:
 	GameObject* parent;
 	Transform* transform;
+	std::string type;
 
 	Component(std::string Name = "EmptyComponent");
 	virtual ~Component();
@@ -369,7 +375,6 @@ public:
 
 class MonoBehavior : public Behavior {
 public:
-	std::string type;
 	MonoBehavior(std::string Name = "MonoBehavior");
 	virtual ~MonoBehavior();
 
@@ -378,11 +383,13 @@ public:
 	virtual void Start() = 0;
 	virtual void Update() = 0;
 
-	///Do not call this function, meant for main loop
+private:
+	friend class SceneManager;
+	friend class Debug;
+	friend void GameLoop();
+
 	static void AwakeMonoBehaviorArray();
-	///Do not call this function, meant for main loop
 	static void StartMonoBehaviorArray();
-	///Do not call this function, meant for main loop
 	static void UpdateMonoBehaviorArray();
 
 protected:
@@ -570,10 +577,11 @@ public:
 
 	///Calculates projection matrix
 	void SetProjection();
-
-	///Do NOT CALL THIS METHOD. It's meant for main loop
-	static void Draw();
 private:
+	friend class SceneManager;
+	friend class Debug;
+	friend void GameLoop();
+
 	static std::vector<Camera*> CameraList;
 
 	D3DVIEWPORT9 viewport;
@@ -582,6 +590,10 @@ private:
 	D3DXMATRIX View;
 	D3DXMATRIX Projection;
 
+	//Draws all cameras
+	static void Draw();
+
+	//Draws this camera
 	void draw();
 
 	//Calculates viewport based on rect and screen resolution
@@ -633,10 +645,10 @@ public:
 
 	template <class T> T* GetComponent() {
 		std::string Type;
-		Type += GetTypeName<T>();
+		Type = GetTypeName<T>();
 		for (std::vector<Component*>::iterator it = ComponentList.begin(); it != ComponentList.end(); ++it)
 		{
-			if (Type == "class " + (*it)->name)return static_cast<T*>(*it);
+			if (Type == (*it)->type)return static_cast<T*>(*it);
 		}
 		return nullptr;
 	}

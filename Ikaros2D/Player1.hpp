@@ -11,64 +11,74 @@ public:
 	RigidBody* rigidbody;
 	Renderer* renderer;
 
-	Sprite* RunningSprite[9];
+	std::vector <Sprite*> RunningSprite;
+	std::vector <Sprite*> RunningSpriteWithSword;
+	std::vector <Sprite*> AttackSprite;
+	std::vector <Sprite*> IdleSprite;
 
 	void Awake() {
 
 	}
 
+	Vector3 scale = Vector3(1.5, 1.5, 1);
 	void Start() {
-		for (int i = 0; i < 9; i++)
-		{
-			std::string textureName = "player_running" + std::to_string(i + 1);
-
-			RunningSprite[i] = new Sprite(textureName + "Sprite");
-			RunningSprite[i]->doubleSided = true;
-			RunningSprite[i]->GenereteSprite(textureName);
-		}
-		
 		renderer = parent->AddComponent<Renderer>();
 
-		parent->transform->Scale(0.6, 0.6, 0.6);
+		parent->transform->scale = scale;
 		renderer->sprite = RunningSprite[0];
 
 		rigidbody = parent->AddComponent<RigidBody>();
 		rigidbody->SetType(b2_dynamicBody);
 		rigidbody->rigidbody->SetGravityScale(5.0f);
 		rigidbody->rigidbody->SetFixedRotation(true);
-		rigidbody->AddBoxCollider(Vector2(RunningSprite[0]->size.x - 2, RunningSprite[0]->size.y - 0.4) * 0.6f);
+		rigidbody->AddBoxCollider(Vector2(RunningSprite[0]->size.x * parent->transform->scale.x * 0.5f,
+			RunningSprite[0]->size.y * parent->transform->scale.y * 0.8));
+
+		rigidbody->Translate(20, 0, 0);
 	}
 
 	int cnt = 0, direction = 1;
 	float Timer = 0.5;
 	bool JumpFlag = true;
+
+	int ActiveItem = 0;
+	int JavelinCount = 0;
+
 	void Update() {
-		renderer->sprite = RunningSprite[cnt];
 		if (Timer < 0) {
 			cnt++;
 			Timer = 0.5;
 		}
 		Timer -= Time.DeltaTime * abs(rigidbody->velocity.x);
-		if (cnt > 8) cnt = 0;
+		if (cnt >= RunningSprite.size()) cnt = 0;
+
+		if (ActiveItem == 0) {
+			renderer->sprite = RunningSprite[cnt];
+		}else renderer->sprite = RunningSpriteWithSword[cnt];
+
 
 		if(abs(rigidbody->velocity.y) > 0.1f)JumpFlag = false;
 
 		if (GetKey(DIK_A)) {
 			if (JumpFlag) {
-				rigidbody->AddForce(Vector2(-500, 0), Force);
+				rigidbody->AddForce(Vector2(-300, 0), Force);
 			}
-			transform->scale = Vector3(-0.6, 0.6, 0.6);
+			else rigidbody->AddForce(Vector2(-50, 0), Force);
+
+			transform->scale.x = -scale.x;
 			direction = -1;
 		}
 		if (GetKey(DIK_D)) {
 			if (JumpFlag) {
-				rigidbody->AddForce(Vector2(500, 0), Force);
+				rigidbody->AddForce(Vector2(300, 0), Force);
 			}
-			transform->scale = Vector3(0.6, 0.6, 0.6);
+			else rigidbody->AddForce(Vector2(50, 0), Force);
+
+			transform->scale.x = scale.x;
 			direction = 1;
 		}
 		if (GetKeyDown(DIK_SPACE) && JumpFlag) {
-			rigidbody->AddForce(Vector2(0, 600), Impulse);
+			rigidbody->AddForce(Vector2(0, 400), Impulse);
 		}
 		if (GetKeyDown(DIK_B)) {
 			GameObject* jav = new GameObject("Javelin");
@@ -84,6 +94,19 @@ public:
 	void OnCollision(Collision collider) {
 		if (rigidbody->velocity.y <= 0) {
 			JumpFlag = true;
+		}
+
+		if (collider.parent->tag == "Box") {
+			if (GetKeyDown(DIK_F)) {
+				switch (collider.parent->GetComponent<Box>()->TypeOfBox) {
+				case 0:
+					ActiveItem = gSword;
+				case 1:
+					JavelinCount += 2;
+				}
+
+				Destroy(collider.parent);
+			}
 		}
 	}
 };

@@ -8,20 +8,20 @@ public:
 		mb_init();
 	}
 
-	Sprite* SpearSprite;
+	static Sprite* SpearSprite;
 	RigidBody* rb_spear;
 
 	void Awake() {
 		Texture::LoadTexture("SpearTexture", "Assets/Textures/javelin.png");
+
+		SpearSprite = new Sprite("JavelinSprite");
+		SpearSprite->GenereteSprite("SpearTexture");
 	}
 
 	int direction = 1;
 	float speed = 50;
 
 	void Start() {
-		SpearSprite = new Sprite("JavelinSprite");
-		SpearSprite->GenereteSprite("SpearTexture");
-
 		Renderer* rend = parent->AddComponent<Renderer>();
 		rend->sprite = SpearSprite;
 		parent->transform->Rotate(0, 0, 90);

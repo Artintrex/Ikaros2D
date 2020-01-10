@@ -47,6 +47,9 @@
     <ClCompile Include="..\Libs\imgui\imgui_widgets.cpp">
       <Filter>Library\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="GameVariables.cpp">
+      <Filter>GameSources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IkarosCore.h">
@@ -71,9 +74,6 @@
       <Filter>GameSource</Filter>
     </ClInclude>
     <ClInclude Include="SceneAlpha.hpp">
-      <Filter>GameSource</Filter>
-    </ClInclude>
-    <ClInclude Include="Template.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
     <ClInclude Include="Debug.hpp">
@@ -105,6 +105,15 @@
     </ClInclude>
     <ClInclude Include="GameHeader.h">
       <Filter>GameSources</Filter>
+    </ClInclude>
+    <ClInclude Include="BoxSpawner.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Gods.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="_Template.hpp">
+      <Filter>GameSource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

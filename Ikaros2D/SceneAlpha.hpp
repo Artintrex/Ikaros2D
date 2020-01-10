@@ -7,16 +7,12 @@ public:
 		type = typeid(*this).name();
 		mb_init();
 	}
-	GameObject* GroundCollider;
 
 	Texture* texBG[7];
 	Sprite* sprBG[7];
 
 	Texture* texFloor;
 	Sprite* sprFloor;
-
-	Texture* texBox;
-	Sprite* sprBox;
 
 	void Awake() {
 		texBG[0] = Texture::LoadTexture("clouds1Sprite", "Assets/Textures/BG/clouds_1.png");
@@ -33,6 +29,11 @@ public:
 			sprBG[i]->texture = texBG[i];
 			sprBG[i]->GenereteSprite();
 		}
+
+		texFloor = Texture::LoadTexture("floor", "Assets/Textures/floor.png");
+		sprFloor = new Sprite();
+		sprFloor->texture = texFloor;
+		sprFloor->GenereteSprite();
 	}
 
 	void Start() {
@@ -111,21 +112,52 @@ public:
 		Fclouds3->transform->position = Vector3(-400, -50, 150);
 		Fclouds3->transform->scale = Vector3(15, 15, 1);
 
-		texFloor = Texture::LoadTexture("floor", "Assets/Textures/floor.png");
-		sprFloor = new Sprite();
-		sprFloor->texture = texFloor;
-		sprFloor->GenereteSprite();
-
+		//GroundCollider
 		for (float i = 150; i > -150; i -= 3.6) {
 			CreateFloor(i, -50);
 		}
 
+		GameObject* GroundCollider;
 		GroundCollider = new GameObject("GroundCollider");
 		GroundCollider->tag = "Ground";
 		GroundCollider->transform->position = Vector3(0, -50, 0);
 		RigidBody* ground = GroundCollider->AddComponent<RigidBody>();
 		ground->AddBoxCollider(Vector2(250, 1));
 
+		//PlatformEast
+		for (float i = -25; i > -50; i -= 3.6) {
+			CreateFloor(i, -42);
+		}
+
+		GroundCollider = new GameObject("PlatformEast");
+		GroundCollider->tag = "Ground";
+		GroundCollider->transform->position = Vector3(-36.5f, -42, 0);
+		ground = GroundCollider->AddComponent<RigidBody>();
+		ground->AddBoxCollider(Vector2(25, 1));
+
+		//PlatformWest
+		for (float i = 50; i > 25; i -= 3.6) {
+			CreateFloor(i, -42);
+		}
+
+		GroundCollider = new GameObject("PlatformWest");
+		GroundCollider->tag = "Ground";
+		GroundCollider->transform->position = Vector3(38.5f, -42, 0);
+		ground = GroundCollider->AddComponent<RigidBody>();
+		ground->AddBoxCollider(Vector2(25, 1));
+
+		//PlatformMiddle
+		for (float i = 25; i > -25; i -= 3.6) {
+			CreateFloor(i, -34);
+		}
+
+		GroundCollider = new GameObject("PlatformMiddle");
+		GroundCollider->tag = "Ground";
+		GroundCollider->transform->position = Vector3(2, -34, 0);
+		ground = GroundCollider->AddComponent<RigidBody>();
+		ground->AddBoxCollider(Vector2(50, 1));
+		
+		//Collision box at the edges of the scene
 		GameObject* WallE = new GameObject("EastWall");
 		WallE->tag = "Wall";
 		WallE->transform->position = Vector3(125, -50, 0);
@@ -137,35 +169,10 @@ public:
 		WallW->transform->position = Vector3(-125, -50, 0);
 		RigidBody* rbWW = WallW->AddComponent<RigidBody>();
 		rbWW->AddBoxCollider(Vector2(1, 500));
-
-
-
-		texBox = Texture::LoadTexture("Box", "Assets/Textures/crate.png");
-		sprBox = new Sprite();
-		sprBox->texture = texBox;
-		sprBox->GenereteSprite();
-
-		CreateBox(0, 0);
-
-		CreateBox(20, 0, 0.5);
-		CreateBox(20, 10, 0.5);
-		CreateBox(20, 20, 0.5);
-		CreateBox(20, 30, 0.5);
-		CreateBox(20, 40, 0.5);
-
-		CreateBox(-20, 40, 0.5);
-		CreateBox(-20, 30, 0.5);
-		CreateBox(-20, 20, 0.5);
-		CreateBox(-20, 10, 0.5);
-		CreateBox(-20, 10, 0.5);
-		CreateBox(-20, 10, 0.5);
-		
 	}
 
 	void Update() {
-		if (GetKeyDown(DIK_F)) {
-			CreateBox(0, 0, 0.5);
-		}
+
 	}
 
 	int numberofFloor = 0;
@@ -175,20 +182,5 @@ public:
 		floorblock->transform->position = Vector3(x, y, 0);
 
 		numberofFloor++;
-	}
-
-	int numberofBoxes = 0;
-	void CreateBox(float x, float y, float size = 1) {
-		GameObject* box = new GameObject("box" + std::to_string(numberofBoxes));
-		box->tag = "Box";
-		box->AddComponent<Renderer>()->sprite = sprBox;
-		box->transform->position = Vector3(x, y, 0);
-		box->transform->scale *= size;
-
-		RigidBody* rb_box = box->AddComponent<RigidBody>();
-		rb_box->SetType(b2_dynamicBody);
-		rb_box->AddBoxCollider(sprBox->size * size);
-
-		numberofBoxes++;
 	}
 };

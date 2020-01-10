@@ -12,14 +12,21 @@ public:
 	Camera* MainCameraComponent;
 
 	PlayerController* gPlayerController;
+	BoxSpawner* gBoxSpawner;
+
+	GameObject* gZeus;
 
 	void Awake() {
 		parent->AddComponent<SceneAlpha>();
 		gPlayerController = parent->AddComponent<PlayerController>();
+		gBoxSpawner = parent->AddComponent<BoxSpawner>();
 
 		MainCamera = new GameObject("MainCamera");
 		MainCameraComponent = MainCamera->AddComponent<Camera>();
 		MainCamera->transform->Translate(0, 0, -40);
+
+		gZeus = new GameObject("Zeus");
+		gZeus->AddComponent<Zeus>();
 	}
 
 	void Start() {

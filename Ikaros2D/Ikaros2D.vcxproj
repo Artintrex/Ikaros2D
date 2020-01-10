@@ -228,6 +228,7 @@
     <ClCompile Include="..\Libs\imgui\imgui_impl_dx9.cpp" />
     <ClCompile Include="..\Libs\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="..\Libs\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="GameVariables.cpp" />
     <ClCompile Include="IkarosCore.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="SceneManager.cpp" />
@@ -239,8 +240,10 @@
     <ClInclude Include="..\Libs\imgui\imgui_impl_dx9.h" />
     <ClInclude Include="..\Libs\imgui\imgui_impl_win32.h" />
     <ClInclude Include="..\Libs\imgui\imgui_internal.h" />
+    <ClInclude Include="BoxSpawner.hpp" />
     <ClInclude Include="GameHeader.h" />
     <ClInclude Include="GameManager.hpp" />
+    <ClInclude Include="Gods.hpp" />
     <ClInclude Include="Javelin.hpp" />
     <ClInclude Include="Player1.hpp" />
     <ClInclude Include="IkarosCore.h" />
@@ -250,7 +253,7 @@
     <ClInclude Include="SceneAlpha.hpp" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Debug.hpp" />
-    <ClInclude Include="Template.hpp" />
+    <ClInclude Include="_Template.hpp" />
     <ClInclude Include="Title.hpp" />
   </ItemGroup>
   <ItemGroup>

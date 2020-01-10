@@ -16,17 +16,19 @@ static D3DVIEWPORT9 MainViewport;
 static HWND g_hWnd; //Window Handler
 
 //Class static allocations
-std::vector<Object*> Object::ObjectList{};
-std::vector<Texture*> Texture::TextureList{};
-std::vector<Transform*> Transform::TransformList{};
-std::vector<GameObject*> GameObject::GameObjectList{};
-std::vector<Renderer*> Renderer::RendererList{};
-std::vector<Camera*> Camera::CameraList{};
-std::vector<MonoBehavior*> MonoBehavior::MonoBehaviorList{};
-std::vector<RigidBody*> RigidBody::RigidBodyList{};
-std::unordered_map<std::string, ComponentFactory*> Component::factories{};
-std::unordered_map<std::string, bool> MonoBehavior::isAwake{};
+std::vector<Object*> Object::ObjectList;
+std::vector<Texture*> Texture::TextureList;
+std::vector<Transform*> Transform::TransformList;
+std::vector<GameObject*> GameObject::GameObjectList;
+std::vector<Renderer*> Renderer::RendererList;
+std::vector<Camera*> Camera::CameraList;
+std::vector<MonoBehavior*> MonoBehavior::MonoBehaviorList;
+std::vector<RigidBody*> RigidBody::RigidBodyList;
+std::unordered_map<std::string, ComponentFactory*> Component::factories;
+std::unordered_map<std::string, bool> MonoBehavior::isAwake;
+std::unordered_set<Object*> Object::DestroyList;
 
+//Mapping between b2bodies and rigidbody
 std::unordered_map<b2Body*, RigidBody*> mRigidBody;
 
 Camera* Camera::main = nullptr;
@@ -212,6 +214,10 @@ Object::Object(std::string Name) {
 
 Object::~Object() {
 	ObjectList.erase(std::remove(ObjectList.begin(), ObjectList.end(), this), ObjectList.end());
+}
+
+void Object::Destroy(Object* obj) {
+	DestroyList.insert(obj);
 }
 
 void Object::ReleaseObjects() {
@@ -447,7 +453,7 @@ void Sprite::GenereteSprite(std::string Name) {
 			IndexBuffer->Unlock();
 		}
 	}
-	else std::cout << this->name << "can`t find texture" << std::endl;
+	else std::cout << "ERROR::Can`t find this texture: " << this->name << std::endl;
 }
 
 void Sprite::SetColor(D3DCOLOR rbga) {
@@ -627,7 +633,7 @@ void Camera::draw() {
 	
 	for (auto p : Renderer::RendererList) {
 		if (p->sprite == nullptr) {
-			std::cout << p->parent->name << "has renderer with no sprite set" << std::endl;
+			std::cout <<"ERROR::Renderer has no sprite set: " <<  p->parent->name << std::endl;
 			continue;
 		}
 		pD3DDevice->SetTransform(D3DTS_WORLD, &static_cast<GameObject*>(p->parent)->transform->localToWorldMatrix);
@@ -638,7 +644,7 @@ void Camera::draw() {
 		pD3DDevice->SetTexture(0, *(p->sprite->texture->texturedata));
 	
 		if(pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, 0, 4) != D3D_OK){
-			puts("Failed to Render");
+			std::cout << "ERROR::Renderer failed to render: " << p->parent->name << std::endl;
 		}
 	}
 }
@@ -1094,6 +1100,12 @@ void GameLoop() {
 
 	// Back buffer flipiTiming depends on D3DPRESENT_PARAMETERSj
 	pD3DDevice->Present(NULL, NULL, NULL, NULL);
+
+	//Destroy objects marked objects
+	for (auto i : Object::DestroyList) {
+		delete i;
+	}
+	Object::DestroyList.clear();
 
 	Time.End();
 }
