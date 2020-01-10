@@ -16,6 +16,8 @@ public:
 	std::vector <Sprite*> AttackSprite;
 	std::vector <Sprite*> IdleSprite;
 
+	RigidBody* sword;
+
 	void Awake() {
 
 	}
@@ -35,6 +37,13 @@ public:
 			RunningSprite[0]->size.y * parent->transform->scale.y * 0.8));
 
 		rigidbody->Translate(20, 0, 0);
+
+		//Sword
+		GameObject* GOsword = new GameObject("SwordPlayer1");
+		GOsword->tag = "Sword";
+		GOsword->transform->position = Vector3(0, 1000, 0);
+		sword = GOsword->AddComponent<RigidBody>();
+		sword->AddBoxCollider(Vector2(2, 0.5));
 	}
 
 	int cnt = 0, direction = 1;
@@ -118,6 +127,12 @@ public:
 
 		if (isAttacking == true) {
 			renderer->sprite = AttackSprite[AtkCnt];
+			if (AtkCnt > 1) {
+				sword->Translate(transform->position.x + direction * 2.2 * AtkCnt, transform->position.y, 0);
+			}
+		}
+		else {
+			sword->Translate(0, 1000, 0);
 		}
 	}
 
@@ -137,6 +152,16 @@ public:
 
 				Destroy(collider.parent);
 			}
+		}
+	}
+
+	void RecieveBlow() {
+		//Do stuff aka reduce health gain score etc...
+	}
+
+	void OnCollisionEnter(Collision collider) {
+		if (collider.parent->tag == "Sword") {
+			RecieveBlow();
 		}
 	}
 };
