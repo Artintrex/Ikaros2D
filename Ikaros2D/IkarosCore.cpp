@@ -71,7 +71,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	RegisterClass(&wc);
 
-	// Window stle
+	// Window style
 	DWORD window_style = WS_OVERLAPPEDWINDOW & ~(WS_MAXIMIZEBOX | WS_THICKFRAME);
 	RECT window_rect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
@@ -595,6 +595,7 @@ Camera::~Camera() {
 	}
 }
 
+//NEED UPDATE this works but need optimizing and check again maybe save viewprojection matrix for speed here
 Vector3 Camera::ScreenToWorldPoint(Vector3 position) {
 
 	float z = position.z;
@@ -609,6 +610,19 @@ Vector3 Camera::ScreenToWorldPoint(Vector3 position) {
 		position.y = transform->position.y - (transform->position.y - position.y) * t;
 		position.x = transform->position.x - (transform->position.x - position.x) * t;
 	}
+
+	return position;
+}
+
+Vector3 Camera::WorldToScreenPoint(Vector3 position) {
+	D3DXMATRIX projection = View * Projection;
+	D3DXVec3TransformCoord(&position, &position, &projection);
+
+	position.x *= pixelWidth;
+	position.y *= pixelHeight;
+
+	position.x += viewport.X;
+	position.y += viewport.Y;
 
 	return position;
 }

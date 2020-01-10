@@ -92,6 +92,7 @@ public:
 			transform->scale.x = scale.x;
 			direction = 1;
 		}
+
 		if (GetKeyDown(DIK_UP) && JumpFlag) {
 			rigidbody->AddForce(Vector2(0, 400), Impulse);
 		}

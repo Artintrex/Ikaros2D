@@ -572,8 +572,11 @@ public:
 	Camera(GameObject* Parent, std::string Name = "Camera");
 	~Camera();
 
-	//Calculates world position from 2D screen position using depth value
+	//Calculates world position from 2D screen position using Z value
 	Vector3 ScreenToWorldPoint(Vector3 position);
+
+	//Calculates screen position of a point from world coordinates
+	Vector3 WorldToScreenPoint(Vector3 position);
 
 	///Calculates projection matrix
 	void SetProjection();

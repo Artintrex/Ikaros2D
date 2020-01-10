@@ -82,6 +82,7 @@ public:
 			transform->scale.x = -scale.x;
 			direction = -1;
 		}
+
 		if (GetKey(DIK_D)) {
 			if (JumpFlag) {
 				rigidbody->AddForce(Vector2(300, 0), Force);
@@ -91,9 +92,11 @@ public:
 			transform->scale.x = scale.x;
 			direction = 1;
 		}
+
 		if (GetKeyDown(DIK_SPACE) && JumpFlag) {
 			rigidbody->AddForce(Vector2(0, 400), Impulse);
 		}
+
 		if (GetKeyDown(DIK_LCONTROL) && JavelinCount > 0) {
 			GameObject* jav = new GameObject("Javelin");
 			jav->transform->position = Vector3(transform->position.x + (direction * 3), 
