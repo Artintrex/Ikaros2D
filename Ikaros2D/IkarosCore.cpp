@@ -671,8 +671,8 @@ void Camera::SetViewport() {
 	viewport.Width = pixelWidth;
 	viewport.Y = rect.Y * Screen.height;
 	viewport.Height = pixelHeight;
-	viewport.MinZ = nearClipPlane;
-	viewport.MaxZ = farClipPlane;
+	viewport.MinZ = 0;
+	viewport.MaxZ = 1;
 }
 
 void Camera::SetD3DDevice() {
@@ -682,7 +682,7 @@ void Camera::SetD3DDevice() {
 
 	//Turn off lighting
 	pD3DDevice->SetRenderState(D3DRS_LIGHTING, false);
-	//pD3DDevice->SetRenderState(D3DRS_ZENABLE, true);
+	pD3DDevice->SetRenderState(D3DRS_ZENABLE, true);
 
 	//g_pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	//g_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
