@@ -660,3 +660,5 @@ public:
 private:
 	static std::vector<GameObject*> GameObjectList;
 };
+
+void Shutdown();
