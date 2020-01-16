@@ -7,19 +7,19 @@ public:
 		type = typeid(*this).name();
 		mb_init();
 	}
-	//ImGuiWindowFlags window_flags;
+	ImGuiWindowFlags window_flags;
 	void Awake() {
-		//window_flags = 0;
-		//window_flags |= ImGuiWindowFlags_NoTitleBar;
-		//window_flags |= ImGuiWindowFlags_NoScrollbar;
+		window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoTitleBar;
+		window_flags |= ImGuiWindowFlags_NoScrollbar;
 
-		//window_flags |= ImGuiWindowFlags_NoMove;
-		//window_flags |= ImGuiWindowFlags_NoResize;
-		//window_flags |= ImGuiWindowFlags_NoCollapse;
-		//window_flags |= ImGuiWindowFlags_NoNav;
-	//	window_flags |= ImGuiWindowFlags_NoBackground;
-	//	window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
-		// window_flags |= ImGuiWindowFlags_MenuBar;
+		window_flags |= ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoResize;
+		window_flags |= ImGuiWindowFlags_NoCollapse;
+		window_flags |= ImGuiWindowFlags_NoNav;
+		//window_flags |= ImGuiWindowFlags_NoBackground;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+		window_flags |= ImGuiWindowFlags_MenuBar;
 	}
 
 	void Start() {
@@ -72,9 +72,10 @@ public:
 		ImGui::Text("counter = %d", counter);
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		//ImGui::ShowDemoWindow();
+
 		ImGui::End();
 		*/
+		ImGui::ShowDemoWindow();
 	}
 
 

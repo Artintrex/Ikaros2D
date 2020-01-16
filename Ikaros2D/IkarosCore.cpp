@@ -147,12 +147,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return true;
 
 	switch (uMsg) {
-	case WM_KEYDOWN:
-		if (wParam == VK_ESCAPE) {
-			SendMessage(hWnd, WM_CLOSE, 0, 0);
-		}
-		break;
-
 	case WM_CLOSE:
 				if (MessageBox(hWnd, "Are you sure you want to quit?", WINDOW_CAPTION, MB_OKCANCEL | MB_DEFBUTTON2) == IDOK) {
 		DestroyWindow(hWnd);
@@ -1126,4 +1120,8 @@ void GameLoop() {
 	Object::DestroyList.clear();
 
 	Time.End();
+}
+
+void Shutdown() {
+	SendMessage(g_hWnd, WM_CLOSE, 0, 0);
 }
