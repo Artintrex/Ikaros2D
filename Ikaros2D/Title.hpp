@@ -12,12 +12,29 @@ public:
 	GameObject* Option;
 	GameObject* Exit;
 	GameObject* Editor;
-	GameObject* ButtonBackdrop;
+	GameObject* Start;
 	GameObject* MainCamera;
 	int BUTTON = 0, BACKDROPPOS = 0;
 	int BUTTONS[3] = { -790,-755,-830 };
+	int BUTTONX[6] = { -790,-755,-830,-690,-655,-730 };
 
 	ImGuiWindowFlags window_flags;
+
+	Renderer* OptionRenderer;
+	Renderer* ExitRenderer;
+	Renderer* StartRenderer;
+	Renderer* EditorRenderer;
+
+	Sprite* OptionSpr;
+	Sprite* ExitSpr;
+	Sprite* EditorSpr;
+	Sprite* StartSpr;
+
+	Sprite* OptionSpr1;
+	Sprite* ExitSpr1;
+	Sprite* EditorSpr1;
+	Sprite* StartSpr1;
+
 
 	void Awake() {
 
@@ -38,52 +55,38 @@ public:
 	Option = new GameObject("Option");
 	Exit = new GameObject("Exit");
 	Editor = new GameObject("Editor");
-	ButtonBackdrop = new GameObject("ButtonBackdrop");
+	Start = new GameObject("Start");
 
-
-	Texture* TitleBackTex = Texture::LoadTexture("TitleBackTex", "assets/Textures/title.jpg");
-	Texture* OptionTex = Texture::LoadTexture("OptionTex", "assets/Textures/option.png");
-	Texture* ExitTex = Texture::LoadTexture("ExitTex", "assets/Textures/exit.png");
-	Texture* EditorTex = Texture::LoadTexture("EditorTex", "assets/Textures/editor.png");
-	Texture* ButtonBackdropTex = Texture::LoadTexture("ButtonBackdropTex", "assets/Textures/ButtonBackdrop.png");
-
-	Sprite* TitleBackSpr = new Sprite();
-	Sprite* OptionSpr = new Sprite();
-	Sprite* ExitSpr = new Sprite();
-	Sprite* EditorSpr = new Sprite();
-	Sprite* ButtonBackdropSpr = new Sprite();
-	TitleBackSpr->texture = TitleBackTex;
-	OptionSpr->texture = OptionTex;
-	ExitSpr->texture = ExitTex;
-	EditorSpr->texture = EditorTex;
-	ButtonBackdropSpr->texture = ButtonBackdropTex;
-
-	TitleBackSpr->GenereteSprite();
-	OptionSpr->GenereteSprite();
-	ExitSpr->GenereteSprite();
-	EditorSpr->GenereteSprite();
-	ButtonBackdropSpr->GenereteSprite();
+	Sprite* TitleBackSpr = new Sprite("TitleBackground", Texture::LoadTexture("TitleBackTex", "assets/Textures/title.jpg"));
+	 OptionSpr = new Sprite("OptionButton", Texture::LoadTexture("OptionTex", "assets/Textures/TitleButtons/tStart2.png"));
+	 ExitSpr = new Sprite("ExitButton", Texture::LoadTexture("ExitTex", "assets/Textures/TitleButtons/tEditor2.png"));
+	 EditorSpr = new Sprite("EditorButton", Texture::LoadTexture("EditorTex", "assets/Textures/TitleButtons/tExit2.png"));
+	 StartSpr = new Sprite("StartButton", Texture::LoadTexture("StartTex", "assets/Textures/ButtonBackdrop.png"));
 
 	TitleBack->AddComponent<Renderer>()->sprite = TitleBackSpr;
 	TitleBack->transform->position = Vector3(0, 0, 0.0010);
 	TitleBack->transform->Scale(100, 100, 1);
 
-	ButtonBackdrop->AddComponent<Renderer>()->sprite = ButtonBackdropSpr;
-	ButtonBackdrop->transform->Scale(100, 100, 1);
-	ButtonBackdrop->transform->position = Vector3(-700, -BACKDROPPOS, 0011);
+	StartRenderer = Start->AddComponent<Renderer>();
+	StartRenderer->sprite = StartSpr;
+	Start->transform->Scale(100, 100, 1);
+	Start->transform->position = Vector3(-700, -BACKDROPPOS, 0011);
 
-	Option->AddComponent<Renderer>()->sprite = OptionSpr;
+	OptionRenderer = Option->AddComponent<Renderer>();
+	OptionRenderer->sprite = OptionSpr;
 	Option->transform->position = Vector3(BUTTONS[0], 0, 0.0012);
-	Option->transform->Scale(100, 100, 1);
+	Option->transform->Scale(70, 70, 1);
 
 
-	Editor->AddComponent<Renderer>()->sprite = EditorSpr;
-	Editor->transform->Scale(100, 100, 1);
+	EditorRenderer = Editor->AddComponent<Renderer>();
+	EditorRenderer->sprite = EditorSpr;
+	Editor->transform->Scale(70, 70, 1);
 	Editor->transform->position = Vector3(BUTTONS[1], -100, 0.0012);
 
 
-	Exit->AddComponent<Renderer>()->sprite = ExitSpr;
-	Exit->transform->Scale(100, 100, 1);
+	ExitRenderer = Exit->AddComponent<Renderer>();
+	ExitRenderer->sprite = ExitSpr;
+	Exit->transform->Scale(70, 70, 1);
 	Exit->transform->position = Vector3(BUTTONS[2], -200, 0.0012);
 
 	window_flags = 0;
@@ -106,6 +109,14 @@ public:
 			static float  R = 720.0f;
 			static int counter = 0;
 			static int SOINZU = 0;
+
+			Option->transform->position = Vector3(BUTTONS[0], 0, 0.0012);
+			Editor->transform->position = Vector3(BUTTONS[1], -100, 0.0012);
+			Exit->transform->position = Vector3(BUTTONS[2], -200, 0.0012);
+			Start->transform->position = Vector3(-700, -BACKDROPPOS, 0011);
+
+
+
 			ImGui::Begin("asd, world!", 0, window_flags);
 			ImGui::SetWindowPos(ImVec2(0, 50));
 			// Create a window called "Hello, world!" and append into it.
@@ -144,6 +155,27 @@ public:
 			ImGui::End();
 		}
 
+		if (BUTTON == 0) 
+		{
+			BUTTONS[0] = BUTTONX[3];
+			BUTTONS[1] = BUTTONX[1];
+			BUTTONS[2] = BUTTONX[2];
+		}
+		if (BUTTON == 1)
+		{
+			BUTTONS[1] = BUTTONX[4];
+			BUTTONS[0] = BUTTONX[0];
+			BUTTONS[2] = BUTTONX[2];
+		}
+
+		if (BUTTON == 2)
+		{
+			BUTTONS[2] = BUTTONX[5];
+			BUTTONS[1] = BUTTONX[1];
+			BUTTONS[0] = BUTTONX[0];
+		}
+
+
 		if (GetKeyDown(DIK_S))
 		{
 			BUTTON++;
@@ -156,7 +188,7 @@ public:
 			if (BUTTON < 0)BUTTON = 2;
 			BACKDROPPOS = BUTTON * 100;
 		}
-		ButtonBackdrop->transform->position = Vector3(-700, -BACKDROPPOS, 0.0011);
+		
 
 		if (GetKeyDown(DIK_RETURN) && BUTTON == 0) {
 			SceneManager::LoadScene(1);
