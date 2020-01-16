@@ -14,10 +14,8 @@ public:
 	GameObject* EditorButton;
 	GameObject* StartButton;
 	GameObject* MainCamera;
-	int BUTTON = 0, BACKDROPPOS = 0;
-	int BUTTONS[3] = { -790,-755,-830 };
-	int BUTTONX[6] = { -790,-755,-830,-690,-655,-730 };
-
+	int BUTTON = 0;
+	int BUTTONPOS[4] = {-780};
 	ImGuiWindowFlags window_flags;
 
 	Renderer* OptionRenderer;
@@ -59,13 +57,13 @@ public:
 
 	Sprite* TitleBackSpr = new Sprite("TitleBackground", Texture::LoadTexture("TitleBackTex", "assets/Textures/title.jpg"));
 	 OptionSpr = new Sprite("OptionButton", Texture::LoadTexture("OptionTex", "assets/Textures/TitleButtons/tOptions2.png"));
-	 ExitSpr = new Sprite("ExitButton", Texture::LoadTexture("ExitTex", "assets/Textures/TitleButtons/tEditor2.png"));
-	 EditorSpr = new Sprite("EditorButton", Texture::LoadTexture("EditorTex", "assets/Textures/TitleButtons/tExit2.png"));
+	 ExitSpr = new Sprite("ExitButton", Texture::LoadTexture("ExitTex", "assets/Textures/TitleButtons/tExit2.png"));
+	 EditorSpr = new Sprite("EditorButton", Texture::LoadTexture("EditorTex", "assets/Textures/TitleButtons/tEditor2.png"));
 	 StartSpr = new Sprite("StartButton", Texture::LoadTexture("StartTex", "assets/Textures/TitleButtons/tStart2.png"));
 
 	 OptionSpr1 = new Sprite("OptionButton", Texture::LoadTexture("OptionTex", "assets/Textures/TitleButtons/tOptions2HL.png"));
-	 ExitSpr1 = new Sprite("ExitButton", Texture::LoadTexture("ExitTex", "assets/Textures/TitleButtons/tEditor2HL.png"));
-	 EditorSpr1 = new Sprite("EditorButton", Texture::LoadTexture("EditorTex", "assets/Textures/TitleButtons/tExit2HL.png"));
+	 ExitSpr1 = new Sprite("ExitButton", Texture::LoadTexture("ExitTex", "assets/Textures/TitleButtons/tExit2HL.png"));
+	 EditorSpr1 = new Sprite("EditorButton", Texture::LoadTexture("EditorTex", "assets/Textures/TitleButtons/tEditor2HL.png"));
 	 StartSpr1 = new Sprite("StartButton", Texture::LoadTexture("StartTex", "assets/Textures/TitleButtons/tStart2HL.png"));
 
 
@@ -78,24 +76,24 @@ public:
 	StartRenderer = StartButton->AddComponent<Renderer>();
 	StartRenderer->sprite = StartSpr;
 	StartButton->transform->Scale(70, 70, 1);
-	StartButton->transform->position = Vector3(-700, -BACKDROPPOS, 0012);
+	StartButton->transform->position = Vector3(750, 0, 0012);
 
 	OptionRenderer = OptionButton->AddComponent<Renderer>();
 	OptionRenderer->sprite = OptionSpr;
-	OptionButton->transform->position = Vector3(BUTTONS[0], 0, 0.0012);
+	OptionButton->transform->position = Vector3(750, -100, 0.0012);
 	OptionButton->transform->Scale(70, 70, 1);
 
 
 	EditorRenderer = EditorButton->AddComponent<Renderer>();
 	EditorRenderer->sprite = EditorSpr;
 	EditorButton->transform->Scale(70, 70, 1);
-	EditorButton->transform->position = Vector3(BUTTONS[1], -100, 0.0012);
+	EditorButton->transform->position = Vector3(750, -200, 0.0012);
 
 
 	ExitRenderer = ExitButton->AddComponent<Renderer>();
 	ExitRenderer->sprite = ExitSpr;
 	ExitButton->transform->Scale(70, 70, 1);
-	ExitButton->transform->position = Vector3(BUTTONS[2], -200, 0.0012);
+	ExitButton->transform->position = Vector3(750, -300, 0.0012);
 
 	window_flags = 0;
 	window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -118,10 +116,11 @@ public:
 			static int counter = 0;
 			static int SOINZU = 0;
 
-			OptionButton->transform->position = Vector3(BUTTONS[0], 0, 0.0012);
-			EditorButton->transform->position = Vector3(BUTTONS[1], -100, 0.0012);
-			ExitButton->transform->position = Vector3(BUTTONS[2], -200, 0.0012);
-			StartButton->transform->position = Vector3(-700, -BACKDROPPOS, 0011);
+			StartButton->transform->position = Vector3(BUTTONPOS[0], 0, 0012);
+			OptionButton->transform->position = Vector3(BUTTONPOS[1], -100, 0.0012);
+			EditorButton->transform->position = Vector3(BUTTONPOS[2], -200, 0.0012);
+			ExitButton->transform->position = Vector3(BUTTONPOS[3], -300, 0.0012);
+			
 
 
 
@@ -162,40 +161,61 @@ public:
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::End();
 		}
-
-		if (BUTTON == 0) 
+		if(BUTTON==0)
 		{
-			BUTTONS[0] = BUTTONX[3];
-			OptionRenderer->sprite = StartSpr1;
+			BUTTONPOS[0] = -650;
+			StartRenderer->sprite = StartSpr1;
 		}
 		else {
-			BUTTONS[0] = BUTTONX[0];
-			OptionRenderer->sprite = StartSpr;
+			BUTTONPOS[0] = -780;
+			StartRenderer->sprite = StartSpr;
 		}
-		if (BUTTON == 1)
+		if (BUTTON == 1) 
 		{
-			BUTTONS[1] = BUTTONX[4];
-			
+			BUTTONPOS[1] = -650;
+			OptionRenderer->sprite = OptionSpr1;
 		}
-
+		else {
+			BUTTONPOS[1] = -780;
+			OptionRenderer->sprite = OptionSpr;
+		}
 		if (BUTTON == 2)
 		{
-			BUTTONS[2] = BUTTONX[5];
-		
+			BUTTONPOS[2] = -650;
+			EditorRenderer->sprite = EditorSpr1;
+			
+		}
+		else
+		{
+			BUTTONPOS[2] = -780;
+			EditorRenderer->sprite = EditorSpr;
+
 		}
 
+		if (BUTTON == 3)
+		{
+			BUTTONPOS[3] = -650;
+			ExitRenderer->sprite = ExitSpr1;
+		
+		}
+		else
+		{
+			BUTTONPOS[3] = -780;
+			ExitRenderer->sprite = ExitSpr;
+
+		}
 
 		if (GetKeyDown(DIK_S))
 		{
 			BUTTON++;
-			if (BUTTON > 2)BUTTON = 0;
-			BACKDROPPOS = BUTTON * 100;
+			if (BUTTON > 3)BUTTON = 0;
+			
 		}
 		if (GetKeyDown(DIK_W))
 		{
 			BUTTON--;
-			if (BUTTON < 0)BUTTON = 2;
-			BACKDROPPOS = BUTTON * 100;
+			if (BUTTON < 0)BUTTON = 3;
+			
 		}
 		
 
