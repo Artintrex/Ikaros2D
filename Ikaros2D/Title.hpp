@@ -35,8 +35,12 @@ public:
 	Sprite* ExitSpr1;
 	Sprite* EditorSpr1;
 	Sprite* StartSpr1;
-
-
+	int size[6] = { 720,1080,1920,2000,3000,4000 };
+	int  f = 0;
+	float  R = 720.0f;
+	int counter = 0;
+	int SOINZU = 0;
+	bool GUI_MENU = 0;
 	void Awake() {
 
 	}
@@ -112,53 +116,14 @@ public:
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	void Update() {
 		{
-			int size[6] = { 720,1080,1920,2000,3000,4000 };
-			static int  f = 0;
-			static float  R = 720.0f;
-			static int counter = 0;
-			static int SOINZU = 0;
+			
 
 			StartButton->transform->position = Vector3(BUTTONPOS[0], 0, 0.0012);
 			OptionButton->transform->position = Vector3(BUTTONPOS[1], -100, 0.0012);
 			EditorButton->transform->position = Vector3(BUTTONPOS[2], -200, 0.0012);
 			ExitButton->transform->position = Vector3(BUTTONPOS[3], -300, 0.0012);
 			
-			ImGui::Begin("asd, world!", 0, window_flags);
-			ImGui::SetWindowPos(ImVec2(0, 50));
-			// Create a window called "Hello, world!" and append into it.
-
-			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-			//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-			//ImGui::Checkbox("Another Window", &show_another_window);
-
-
-
-			ImGui::SliderInt("float", &f, 0, 1000);            // Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-			if (ImGui::Button("REDUCE"))SOINZU--; if (SOINZU < 0)SOINZU = 5; ImGui::SameLine();
-			ImGui::Text("Resolution  %d", size[SOINZU]); ImGui::SameLine();
-			if (ImGui::Button("UP")) SOINZU++; if (SOINZU > 5)SOINZU = 0;
-
-			ImGui::SliderInt("Resolution", &size[SOINZU], 720.0f, 4000.0f);
-
-			enum Element { Element_720, Element_1080, Element_1K, Element_2K, Element_3K, Element_4k };
-			const char* element_names[Element_4k] = { "720P", "1080P", "2K", "3K","4k" };
-			static int current_element = Element_720;
-			const char* current_element_name = (current_element >= 0 && current_element < Element_4k) ? element_names[current_element] : "Unknown";
-			ImGui::SliderInt("slider Resolution", &current_element, 0, Element_4k - 1, current_element_name);
-
-
-
-
-
-			if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-				counter++;
-			ImGui::SameLine();//つきは後ろ書く、改行しない
-			ImGui::Text("counter = %d", counter);
-
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::End();
+			
 		}
 
 		if(BUTTON==0)
@@ -205,13 +170,13 @@ public:
 
 		}
 
-		if (GetKeyDown(DIK_S))
+		if (GetKeyDown(DIK_S)&& GUI_MENU == 0)
 		{
 			BUTTON++;
 			if (BUTTON > 3)BUTTON = 0;
 			
 		}
-		if (GetKeyDown(DIK_W))
+		if (GetKeyDown(DIK_W)&& GUI_MENU == 0)
 		{
 			BUTTON--;
 			if (BUTTON < 0)BUTTON = 3;
@@ -222,5 +187,57 @@ public:
 		if (GetKeyDown(DIK_RETURN) && BUTTON == 0) {
 			SceneManager::LoadScene(1);
 		}
+		if (GetKeyDown(DIK_RETURN) && BUTTON == 1)
+		{
+			GUI_MENU = 1;
+		}
+		if (GUI_MENU == 1)
+		{
+			Gui_Options();
+		}
+		if (GetKeyDown(DIK_ESCAPE))
+		{
+			GUI_MENU = 0;
+		}
+		
+	}
+	void Gui_Options()
+	{
+		ImGui::Begin("asd, world!", 0, window_flags);
+		ImGui::SetWindowPos(ImVec2(0, 50));
+		// Create a window called "Hello, world!" and append into it.
+
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+		//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+		//ImGui::Checkbox("Another Window", &show_another_window);
+
+
+
+		ImGui::SliderInt("float", &f, 0, 1000);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+		if (ImGui::Button("REDUCE"))SOINZU--; if (SOINZU < 0)SOINZU = 5; ImGui::SameLine();
+		ImGui::Text("Resolution  %d", size[SOINZU]); ImGui::SameLine();
+		if (ImGui::Button("UP")) SOINZU++; if (SOINZU > 5)SOINZU = 0;
+
+		ImGui::SliderInt("Resolution", &size[SOINZU], 720.0f, 4000.0f);
+
+		enum Element { Element_720, Element_1080, Element_1K, Element_2K, Element_3K, Element_4k };
+		const char* element_names[Element_4k] = { "720P", "1080P", "2K", "3K","4k" };
+		static int current_element = Element_720;
+		const char* current_element_name = (current_element >= 0 && current_element < Element_4k) ? element_names[current_element] : "Unknown";
+		ImGui::SliderInt("slider Resolution", &current_element, 0, Element_4k - 1, current_element_name);
+
+
+
+
+
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();//つきは後ろ書く、改行しない
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
 	}
 };
