@@ -126,25 +126,34 @@ public:
 			
 		}
 
-		if(BUTTON==0)
+		if(BUTTON==0)//start
 		{
 			BUTTONPOS[0] = -650;
 			StartRenderer->sprite = StartSpr1;
+
+			if (GetKeyDown(DIK_RETURN) ) {
+				SceneManager::LoadScene(1);
+				return;
+			}
 		}
 		else {
 			BUTTONPOS[0] = -780;
 			StartRenderer->sprite = StartSpr;
 		}
-		if (BUTTON == 1) 
+		if (BUTTON == 1) //options
 		{
 			BUTTONPOS[1] = -650;
 			OptionRenderer->sprite = OptionSpr1;
+			if (GetKeyDown(DIK_RETURN) )
+			{
+				GUI_MENU = 1;
+			}
 		}
 		else {
 			BUTTONPOS[1] = -780;
 			OptionRenderer->sprite = OptionSpr;
 		}
-		if (BUTTON == 2)
+		if (BUTTON == 2)//editor
 		{
 			BUTTONPOS[2] = -650;
 			EditorRenderer->sprite = EditorSpr1;
@@ -157,10 +166,13 @@ public:
 
 		}
 
-		if (BUTTON == 3)
+		if (BUTTON == 3)//exit
 		{
 			BUTTONPOS[3] = -650;
 			ExitRenderer->sprite = ExitSpr1;
+			if (GetKeyDown(DIK_RETURN)) {
+				Shutdown();
+			}
 		
 		}
 		else
@@ -169,7 +181,7 @@ public:
 			ExitRenderer->sprite = ExitSpr;
 
 		}
-
+		//‘I‚Ô
 		if (GetKeyDown(DIK_S)&& GUI_MENU == 0)
 		{
 			BUTTON++;
@@ -184,14 +196,8 @@ public:
 		}
 		
 
-		if (GetKeyDown(DIK_RETURN) && BUTTON == 0) {
-			SceneManager::LoadScene(1);
-		}
-		if (GetKeyDown(DIK_RETURN) && BUTTON == 1)
-		{
-			GUI_MENU = 1;
-		}
-		if (GUI_MENU == 1)
+		
+		if (GUI_MENU == 1)//GUI_MENU‚É‚æ‚Á‚ÄGui‚ðŒÄ‚Ô
 		{
 			Gui_Options();
 		}
@@ -199,6 +205,7 @@ public:
 		{
 			GUI_MENU = 0;
 		}
+
 		
 	}
 	void Gui_Options()
