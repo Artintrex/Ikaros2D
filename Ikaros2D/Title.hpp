@@ -9,10 +9,10 @@ public:
 	}
 
 	GameObject* TitleBack;
-	GameObject* Option;
-	GameObject* Exit;
-	GameObject* Editor;
-	GameObject* Start;
+	GameObject* OptionButton;
+	GameObject* ExitButton;
+	GameObject* EditorButton;
+	GameObject* StartButton;
 	GameObject* MainCamera;
 	int BUTTON = 0, BACKDROPPOS = 0;
 	int BUTTONS[3] = { -790,-755,-830 };
@@ -52,42 +52,50 @@ public:
 
 
 	TitleBack = new GameObject("TiTleBack");
-	Option = new GameObject("Option");
-	Exit = new GameObject("Exit");
-	Editor = new GameObject("Editor");
-	Start = new GameObject("Start");
+	OptionButton = new GameObject("Option");
+	ExitButton = new GameObject("Exit");
+	EditorButton = new GameObject("Editor");
+	StartButton = new GameObject("Start");
 
 	Sprite* TitleBackSpr = new Sprite("TitleBackground", Texture::LoadTexture("TitleBackTex", "assets/Textures/title.jpg"));
-	 OptionSpr = new Sprite("OptionButton", Texture::LoadTexture("OptionTex", "assets/Textures/TitleButtons/tStart2.png"));
+	 OptionSpr = new Sprite("OptionButton", Texture::LoadTexture("OptionTex", "assets/Textures/TitleButtons/tOptions2.png"));
 	 ExitSpr = new Sprite("ExitButton", Texture::LoadTexture("ExitTex", "assets/Textures/TitleButtons/tEditor2.png"));
 	 EditorSpr = new Sprite("EditorButton", Texture::LoadTexture("EditorTex", "assets/Textures/TitleButtons/tExit2.png"));
-	 StartSpr = new Sprite("StartButton", Texture::LoadTexture("StartTex", "assets/Textures/ButtonBackdrop.png"));
+	 StartSpr = new Sprite("StartButton", Texture::LoadTexture("StartTex", "assets/Textures/TitleButtons/tStart2.png"));
+
+	 OptionSpr1 = new Sprite("OptionButton", Texture::LoadTexture("OptionTex", "assets/Textures/TitleButtons/tOptions2HL.png"));
+	 ExitSpr1 = new Sprite("ExitButton", Texture::LoadTexture("ExitTex", "assets/Textures/TitleButtons/tEditor2HL.png"));
+	 EditorSpr1 = new Sprite("EditorButton", Texture::LoadTexture("EditorTex", "assets/Textures/TitleButtons/tExit2HL.png"));
+	 StartSpr1 = new Sprite("StartButton", Texture::LoadTexture("StartTex", "assets/Textures/TitleButtons/tStart2HL.png"));
+
+
+
 
 	TitleBack->AddComponent<Renderer>()->sprite = TitleBackSpr;
 	TitleBack->transform->position = Vector3(0, 0, 0.0010);
 	TitleBack->transform->Scale(100, 100, 1);
 
-	StartRenderer = Start->AddComponent<Renderer>();
+	StartRenderer = StartButton->AddComponent<Renderer>();
 	StartRenderer->sprite = StartSpr;
-	Start->transform->Scale(100, 100, 1);
-	Start->transform->position = Vector3(-700, -BACKDROPPOS, 0011);
+	StartButton->transform->Scale(70, 70, 1);
+	StartButton->transform->position = Vector3(-700, -BACKDROPPOS, 0012);
 
-	OptionRenderer = Option->AddComponent<Renderer>();
+	OptionRenderer = OptionButton->AddComponent<Renderer>();
 	OptionRenderer->sprite = OptionSpr;
-	Option->transform->position = Vector3(BUTTONS[0], 0, 0.0012);
-	Option->transform->Scale(70, 70, 1);
+	OptionButton->transform->position = Vector3(BUTTONS[0], 0, 0.0012);
+	OptionButton->transform->Scale(70, 70, 1);
 
 
-	EditorRenderer = Editor->AddComponent<Renderer>();
+	EditorRenderer = EditorButton->AddComponent<Renderer>();
 	EditorRenderer->sprite = EditorSpr;
-	Editor->transform->Scale(70, 70, 1);
-	Editor->transform->position = Vector3(BUTTONS[1], -100, 0.0012);
+	EditorButton->transform->Scale(70, 70, 1);
+	EditorButton->transform->position = Vector3(BUTTONS[1], -100, 0.0012);
 
 
-	ExitRenderer = Exit->AddComponent<Renderer>();
+	ExitRenderer = ExitButton->AddComponent<Renderer>();
 	ExitRenderer->sprite = ExitSpr;
-	Exit->transform->Scale(70, 70, 1);
-	Exit->transform->position = Vector3(BUTTONS[2], -200, 0.0012);
+	ExitButton->transform->Scale(70, 70, 1);
+	ExitButton->transform->position = Vector3(BUTTONS[2], -200, 0.0012);
 
 	window_flags = 0;
 	window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -110,10 +118,10 @@ public:
 			static int counter = 0;
 			static int SOINZU = 0;
 
-			Option->transform->position = Vector3(BUTTONS[0], 0, 0.0012);
-			Editor->transform->position = Vector3(BUTTONS[1], -100, 0.0012);
-			Exit->transform->position = Vector3(BUTTONS[2], -200, 0.0012);
-			Start->transform->position = Vector3(-700, -BACKDROPPOS, 0011);
+			OptionButton->transform->position = Vector3(BUTTONS[0], 0, 0.0012);
+			EditorButton->transform->position = Vector3(BUTTONS[1], -100, 0.0012);
+			ExitButton->transform->position = Vector3(BUTTONS[2], -200, 0.0012);
+			StartButton->transform->position = Vector3(-700, -BACKDROPPOS, 0011);
 
 
 
@@ -158,21 +166,22 @@ public:
 		if (BUTTON == 0) 
 		{
 			BUTTONS[0] = BUTTONX[3];
-			BUTTONS[1] = BUTTONX[1];
-			BUTTONS[2] = BUTTONX[2];
+			OptionRenderer->sprite = StartSpr1;
+		}
+		else {
+			BUTTONS[0] = BUTTONX[0];
+			OptionRenderer->sprite = StartSpr;
 		}
 		if (BUTTON == 1)
 		{
 			BUTTONS[1] = BUTTONX[4];
-			BUTTONS[0] = BUTTONX[0];
-			BUTTONS[2] = BUTTONX[2];
+			
 		}
 
 		if (BUTTON == 2)
 		{
 			BUTTONS[2] = BUTTONX[5];
-			BUTTONS[1] = BUTTONX[1];
-			BUTTONS[0] = BUTTONX[0];
+		
 		}
 
 
