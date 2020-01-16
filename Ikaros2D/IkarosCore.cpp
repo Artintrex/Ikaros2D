@@ -399,10 +399,10 @@ void Sprite::GenereteSprite(std::string Name) {
 			vertices[2].position = Vector3(-0.5f, -0.5f, 0);
 			vertices[3].position = Vector3(0.5f, -0.5f, 0);
 
-			vertices[0].uv = Vector2(0, 0);
-			vertices[1].uv = Vector2(1, 0);
-			vertices[2].uv = Vector2(0, 1);
-			vertices[3].uv = Vector2(1, 1);
+			vertices[0].uv = uvMatrix[0];
+			vertices[1].uv = uvMatrix[1];
+			vertices[2].uv = uvMatrix[2];
+			vertices[3].uv = uvMatrix[3];
 
 			size = Vector2((float)texture->Width / 100, (float)texture->Height / 100);
 

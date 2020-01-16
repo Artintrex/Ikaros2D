@@ -210,11 +210,16 @@ public:
 	}
 	void Gui_Options()
 	{
-		ImGui::Begin("asd, world!", 0, window_flags);
-		ImGui::SetWindowPos(ImVec2(0, 50));
-		// Create a window called "Hello, world!" and append into it.
+		ImGui::SetNextWindowPos(ImVec2(50, 50));
+		ImGui::SetNextWindowSize(ImVec2(Camera::main->pixelWidth-100, Camera::main->pixelHeight-100));
+		ImGui::Begin("Option Menu", 0, window_flags);
+		ImGui::SetWindowFontScale(2.0f);
 
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("OPTIONS");
+		ImGui::SameLine(Camera::main->pixelWidth - 800);
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
 		//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 		//ImGui::Checkbox("Another Window", &show_another_window);
 
@@ -236,15 +241,16 @@ public:
 		ImGui::SliderInt("slider Resolution", &current_element, 0, Element_4k - 1, current_element_name);
 
 
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
 
+		if (ImGui::Button("SAVE")) {
 
+		}
 
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();//‚Â‚«‚ÍŒã‚ë‘‚­A‰üs‚µ‚È‚¢
-		ImGui::Text("counter = %d", counter);
-
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
 };
