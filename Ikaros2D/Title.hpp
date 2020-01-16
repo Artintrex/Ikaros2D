@@ -9,13 +9,16 @@ public:
 	}
 
 	GameObject* TitleBack;
+
 	GameObject* OptionButton;
 	GameObject* ExitButton;
 	GameObject* EditorButton;
 	GameObject* StartButton;
+
 	GameObject* MainCamera;
+
 	int BUTTON = 0;
-	int BUTTONPOS[4] = {-780};
+	int BUTTONPOS[4] = {-780,-780 ,-780 ,-780 };
 	ImGuiWindowFlags window_flags;
 
 	Renderer* OptionRenderer;
@@ -53,7 +56,7 @@ public:
 	OptionButton = new GameObject("Option");
 	ExitButton = new GameObject("Exit");
 	EditorButton = new GameObject("Editor");
-	StartButton = new GameObject("Start");
+	StartButton = new GameObject("Start2");
 
 	Sprite* TitleBackSpr = new Sprite("TitleBackground", Texture::LoadTexture("TitleBackTex", "assets/Textures/title.jpg"));
 	 OptionSpr = new Sprite("OptionButton", Texture::LoadTexture("OptionTex", "assets/Textures/TitleButtons/tOptions2.png"));
@@ -76,13 +79,12 @@ public:
 	StartRenderer = StartButton->AddComponent<Renderer>();
 	StartRenderer->sprite = StartSpr;
 	StartButton->transform->Scale(70, 70, 1);
-	StartButton->transform->position = Vector3(750, 0, 0012);
+	StartButton->transform->position = Vector3(750, 0, 0.0012);
 
 	OptionRenderer = OptionButton->AddComponent<Renderer>();
-	OptionRenderer->sprite = OptionSpr;
+	OptionRenderer->sprite = StartSpr;
 	OptionButton->transform->position = Vector3(750, -100, 0.0012);
 	OptionButton->transform->Scale(70, 70, 1);
-
 
 	EditorRenderer = EditorButton->AddComponent<Renderer>();
 	EditorRenderer->sprite = EditorSpr;
@@ -116,14 +118,11 @@ public:
 			static int counter = 0;
 			static int SOINZU = 0;
 
-			StartButton->transform->position = Vector3(BUTTONPOS[0], 0, 0012);
+			StartButton->transform->position = Vector3(BUTTONPOS[0], 0, 0.0012);
 			OptionButton->transform->position = Vector3(BUTTONPOS[1], -100, 0.0012);
 			EditorButton->transform->position = Vector3(BUTTONPOS[2], -200, 0.0012);
 			ExitButton->transform->position = Vector3(BUTTONPOS[3], -300, 0.0012);
 			
-
-
-
 			ImGui::Begin("asd, world!", 0, window_flags);
 			ImGui::SetWindowPos(ImVec2(0, 50));
 			// Create a window called "Hello, world!" and append into it.
@@ -161,6 +160,7 @@ public:
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::End();
 		}
+
 		if(BUTTON==0)
 		{
 			BUTTONPOS[0] = -650;
