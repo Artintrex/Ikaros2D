@@ -318,7 +318,7 @@ public:
 	Object(std::string Name);
 	virtual ~Object();
 
-	void Destroy(Object* obj);
+	static void Destroy(Object* obj);
 	
 private:
 	static std::vector<Object*> ObjectList;
