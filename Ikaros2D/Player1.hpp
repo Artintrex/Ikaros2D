@@ -187,7 +187,7 @@ public:
 
 	void UIUpdate() {
 		Vector3 ScreenCoord = Camera::main->WorldToScreenPoint(transform->position);
-		ImGui::SetNextWindowPos(ImVec2(ScreenCoord.x, -ScreenCoord.y + Screen.height - 150));
+		ImGui::SetNextWindowPos(ImVec2(ScreenCoord.x, ScreenCoord.y + Screen.height - 150));
 		ImGui::SetNextWindowSize(ImVec2(100, 200));
 		ImGui::Begin("Player 1", 0, UIFlags);
 		ImGui::Text("PLAYER 1");

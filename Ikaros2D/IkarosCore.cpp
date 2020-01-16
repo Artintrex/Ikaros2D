@@ -619,7 +619,7 @@ Vector3 Camera::WorldToScreenPoint(Vector3 position) {
 	D3DXVec3TransformCoord(&position, &position, &projection);
 
 	position.x = (position.x + 1) / 2;
-	position.y = (position.y + 1) / 2;
+	position.y = (position.y + 1) / -2;
 
 	position.x *= pixelWidth;
 	position.y *= pixelHeight;
@@ -684,10 +684,6 @@ void Camera::SetD3DDevice() {
 	pD3DDevice->SetRenderState(D3DRS_LIGHTING, false);
 	pD3DDevice->SetRenderState(D3DRS_ZENABLE, true);
 
-	//g_pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	//g_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	//g_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_DESTALPHA);
-
 	/*
 	Tile the texture at every integer junction. For example, for u values between 0 and 3, the texture is repeated three times; no mirroring is performed.
 	*/
@@ -750,6 +746,11 @@ void Camera::SetD3DDevice() {
 	pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+
+	//pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	//pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	//pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_DESTALPHA);
+
 
 	pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG0, D3DTA_DIFFUSE);
 	pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
