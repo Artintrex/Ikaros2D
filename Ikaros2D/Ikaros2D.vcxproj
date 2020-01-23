@@ -244,6 +244,7 @@
     <ClInclude Include="GameHeader.h" />
     <ClInclude Include="GameManager.hpp" />
     <ClInclude Include="Gods.hpp" />
+    <ClInclude Include="GodsThunder.hpp" />
     <ClInclude Include="Javelin.hpp" />
     <ClInclude Include="Player1.hpp" />
     <ClInclude Include="IkarosCore.h" />
