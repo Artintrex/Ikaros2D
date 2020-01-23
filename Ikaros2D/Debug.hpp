@@ -75,7 +75,7 @@ public:
 
 		ImGui::End();
 		*/
-		ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
 	}
 
 

@@ -17,13 +17,15 @@ REGISTER_COMPONENT(GameManager)
 REGISTER_COMPONENT(SceneAlpha)
 REGISTER_COMPONENT(Title)
 REGISTER_COMPONENT(Result)
+REGISTER_COMPONENT(SelectionScene)
 //
 //
 
-Scene SceneList[3] = { 
+Scene SceneList[4] = { 
 {"Title", "Assets/SceneData/Scene0.scene"},
 {"DebugLevel", "Assets/SceneData/Scene1.scene"},
-{"ResultScreen", "Assets/SceneData/Scene2.scene"}
+{"ResultScreen", "Assets/SceneData/Scene2.scene"},
+{"SelectionScreen", "Assets/SceneData/Scene3.scene"}
 };
 
 void ReadSceneFile(std::string FilePath);
