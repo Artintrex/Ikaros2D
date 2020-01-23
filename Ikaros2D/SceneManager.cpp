@@ -69,7 +69,9 @@ void SceneManager::LoadScene(std::string Path) {
 		scene.path = Path;
 		isLoaded = true;
 	}
+	Time.Start();
 	std::cout << "Scene " << scene.name << " is loaded" << std::endl;
+	std::cout << "Number of objects created: " << Object::ObjectList.size() << std::endl;
 }
 
 void SceneManager::LoadScene(int SceneNumber) {
@@ -90,6 +92,7 @@ void SceneManager::LoadScene(int SceneNumber) {
 		scene.path = SceneList[SceneNumber].path;
 		isLoaded = true;
 	}
+	Time.Start();
 	std::cout << "Scene" << SceneNumber << " " << scene.name << " is loaded" << std::endl;
 	std::cout << "Number of objects created: " << Object::ObjectList.size() << std::endl;
 }

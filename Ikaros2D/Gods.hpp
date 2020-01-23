@@ -12,8 +12,9 @@ public:
 	Sprite* zeus;
 
 	bool isHidden = true;
-	Vector3 HiddenPosition = Vector3(50, -300, 300);
-	Vector3 ElevatedPosition = Vector3(50, 30, 300);
+	bool isUp = false;
+	Vector3 HiddenPosition = Vector3(50, -300, 900);
+	Vector3 ElevatedPosition = Vector3(50, 30, 900);
 
 	float Speed = 15;
 	Renderer* zeusRenderer;
@@ -24,7 +25,7 @@ public:
 		zeusRenderer->sprite = zeus;
 
 		transform->position = HiddenPosition;
-		transform->scale = Vector3(50, 50, 1);
+		transform->scale = Vector3(100, 100, 1);
 	}
 
 	void Start() {
@@ -42,6 +43,7 @@ public:
 			if (transform->position.y < ElevatedPosition.y) {
 				transform->position.y += Speed * Time.DeltaTime;
 			}
+			else isUp = true;
 		}
 
 	}
