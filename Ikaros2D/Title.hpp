@@ -9,16 +9,38 @@ public:
 	}
 
 	GameObject* TitleBack;
-	GameObject* Option;
-	GameObject* Exit;
-	GameObject* Editor;
-	GameObject* ButtonBackdrop;
-	GameObject* MainCamera;
-	int BUTTON = 0, BACKDROPPOS = 0;
-	int BUTTONS[3] = { -790,-755,-830 };
 
+	GameObject* OptionButton;
+	GameObject* ExitButton;
+	GameObject* EditorButton;
+	GameObject* StartButton;
+
+	GameObject* MainCamera;
+
+	int BUTTON = 0;
+	int BUTTONPOS[4] = {-780,-780 ,-780 ,-780 };
 	ImGuiWindowFlags window_flags;
 
+	Renderer* OptionRenderer;
+	Renderer* ExitRenderer;
+	Renderer* StartRenderer;
+	Renderer* EditorRenderer;
+
+	Sprite* OptionSpr;
+	Sprite* ExitSpr;
+	Sprite* EditorSpr;
+	Sprite* StartSpr;
+
+	Sprite* OptionSpr1;
+	Sprite* ExitSpr1;
+	Sprite* EditorSpr1;
+	Sprite* StartSpr1;
+	int size[6] = { 720,1080,1920,2000,3000,4000 };
+	int  f = 0;
+	float  R = 720.0f;
+	int counter = 0;
+	int SOINZU = 0;
+	bool GUI_MENU = 0;
 	void Awake() {
 
 	}
@@ -35,56 +57,49 @@ public:
 
 
 	TitleBack = new GameObject("TiTleBack");
-	Option = new GameObject("Option");
-	Exit = new GameObject("Exit");
-	Editor = new GameObject("Editor");
-	ButtonBackdrop = new GameObject("ButtonBackdrop");
+	OptionButton = new GameObject("Option");
+	ExitButton = new GameObject("Exit");
+	EditorButton = new GameObject("Editor");
+	StartButton = new GameObject("Start2");
+
+	Sprite* TitleBackSpr = new Sprite("TitleBackground", Texture::LoadTexture("TitleBackTex", "assets/Textures/title.jpg"));
+	 OptionSpr = new Sprite("OptionButton", Texture::LoadTexture("OptionTex", "assets/Textures/TitleButtons/tOptions2.png"));
+	 ExitSpr = new Sprite("ExitButton", Texture::LoadTexture("ExitTex", "assets/Textures/TitleButtons/tExit2.png"));
+	 EditorSpr = new Sprite("EditorButton", Texture::LoadTexture("EditorTex", "assets/Textures/TitleButtons/tEditor2.png"));
+	 StartSpr = new Sprite("StartButton", Texture::LoadTexture("StartTex", "assets/Textures/TitleButtons/tStart2.png"));
+
+	 OptionSpr1 = new Sprite("OptionButton", Texture::LoadTexture("OptionTex", "assets/Textures/TitleButtons/tOptions2HL.png"));
+	 ExitSpr1 = new Sprite("ExitButton", Texture::LoadTexture("ExitTex", "assets/Textures/TitleButtons/tExit2HL.png"));
+	 EditorSpr1 = new Sprite("EditorButton", Texture::LoadTexture("EditorTex", "assets/Textures/TitleButtons/tEditor2HL.png"));
+	 StartSpr1 = new Sprite("StartButton", Texture::LoadTexture("StartTex", "assets/Textures/TitleButtons/tStart2HL.png"));
 
 
-	Texture* TitleBackTex = Texture::LoadTexture("TitleBackTex", "assets/Textures/title.jpg");
-	Texture* OptionTex = Texture::LoadTexture("OptionTex", "assets/Textures/option.png");
-	Texture* ExitTex = Texture::LoadTexture("ExitTex", "assets/Textures/exit.png");
-	Texture* EditorTex = Texture::LoadTexture("EditorTex", "assets/Textures/editor.png");
-	Texture* ButtonBackdropTex = Texture::LoadTexture("ButtonBackdropTex", "assets/Textures/ButtonBackdrop.png");
 
-	Sprite* TitleBackSpr = new Sprite();
-	Sprite* OptionSpr = new Sprite();
-	Sprite* ExitSpr = new Sprite();
-	Sprite* EditorSpr = new Sprite();
-	Sprite* ButtonBackdropSpr = new Sprite();
-	TitleBackSpr->texture = TitleBackTex;
-	OptionSpr->texture = OptionTex;
-	ExitSpr->texture = ExitTex;
-	EditorSpr->texture = EditorTex;
-	ButtonBackdropSpr->texture = ButtonBackdropTex;
-
-	TitleBackSpr->GenereteSprite();
-	OptionSpr->GenereteSprite();
-	ExitSpr->GenereteSprite();
-	EditorSpr->GenereteSprite();
-	ButtonBackdropSpr->GenereteSprite();
 
 	TitleBack->AddComponent<Renderer>()->sprite = TitleBackSpr;
 	TitleBack->transform->position = Vector3(0, 0, 0.0010);
 	TitleBack->transform->Scale(100, 100, 1);
 
-	ButtonBackdrop->AddComponent<Renderer>()->sprite = ButtonBackdropSpr;
-	ButtonBackdrop->transform->Scale(100, 100, 1);
-	ButtonBackdrop->transform->position = Vector3(-700, -BACKDROPPOS, 0011);
+	StartRenderer = StartButton->AddComponent<Renderer>();
+	StartRenderer->sprite = StartSpr;
+	StartButton->transform->Scale(70, 70, 1);
+	StartButton->transform->position = Vector3(750, 0, 0.0012);
 
-	Option->AddComponent<Renderer>()->sprite = OptionSpr;
-	Option->transform->position = Vector3(BUTTONS[0], 0, 0.0012);
-	Option->transform->Scale(100, 100, 1);
+	OptionRenderer = OptionButton->AddComponent<Renderer>();
+	OptionRenderer->sprite = StartSpr;
+	OptionButton->transform->position = Vector3(750, -100, 0.0012);
+	OptionButton->transform->Scale(70, 70, 1);
+
+	EditorRenderer = EditorButton->AddComponent<Renderer>();
+	EditorRenderer->sprite = EditorSpr;
+	EditorButton->transform->Scale(70, 70, 1);
+	EditorButton->transform->position = Vector3(750, -200, 0.0012);
 
 
-	Editor->AddComponent<Renderer>()->sprite = EditorSpr;
-	Editor->transform->Scale(100, 100, 1);
-	Editor->transform->position = Vector3(BUTTONS[1], -100, 0.0012);
-
-
-	Exit->AddComponent<Renderer>()->sprite = ExitSpr;
-	Exit->transform->Scale(100, 100, 1);
-	Exit->transform->position = Vector3(BUTTONS[2], -200, 0.0012);
+	ExitRenderer = ExitButton->AddComponent<Renderer>();
+	ExitRenderer->sprite = ExitSpr;
+	ExitButton->transform->Scale(70, 70, 1);
+	ExitButton->transform->position = Vector3(750, -300, 0.0012);
 
 	window_flags = 0;
 	window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -101,65 +116,141 @@ public:
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 	void Update() {
 		{
-			int size[6] = { 720,1080,1920,2000,3000,4000 };
-			static int  f = 0;
-			static float  R = 720.0f;
-			static int counter = 0;
-			static int SOINZU = 0;
-			ImGui::Begin("asd, world!", 0, window_flags);
-			ImGui::SetWindowPos(ImVec2(0, 50));
-			// Create a window called "Hello, world!" and append into it.
+			
 
-			ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-			//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-			//ImGui::Checkbox("Another Window", &show_another_window);
-
-
-
-			ImGui::SliderInt("float", &f, 0, 1000);            // Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-			if (ImGui::Button("REDUCE"))SOINZU--; if (SOINZU < 0)SOINZU = 5; ImGui::SameLine();
-			ImGui::Text("Resolution  %d", size[SOINZU]); ImGui::SameLine();
-			if (ImGui::Button("UP")) SOINZU++; if (SOINZU > 5)SOINZU = 0;
-
-			ImGui::SliderInt("Resolution", &size[SOINZU], 720.0f, 4000.0f);
-
-			enum Element { Element_720, Element_1080, Element_1K, Element_2K, Element_3K, Element_4k };
-			const char* element_names[Element_4k] = { "720P", "1080P", "2K", "3K","4k" };
-			static int current_element = Element_720;
-			const char* current_element_name = (current_element >= 0 && current_element < Element_4k) ? element_names[current_element] : "Unknown";
-			ImGui::SliderInt("slider Resolution", &current_element, 0, Element_4k - 1, current_element_name);
-
-
-
-
-
-			if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-				counter++;
-			ImGui::SameLine();//‚Â‚«‚ÍŒã‚ë‘‚­A‰üs‚µ‚È‚¢
-			ImGui::Text("counter = %d", counter);
-
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::End();
+			StartButton->transform->position = Vector3(BUTTONPOS[0], 0, 0.0012);
+			OptionButton->transform->position = Vector3(BUTTONPOS[1], -100, 0.0012);
+			EditorButton->transform->position = Vector3(BUTTONPOS[2], -200, 0.0012);
+			ExitButton->transform->position = Vector3(BUTTONPOS[3], -300, 0.0012);
+			
+			
 		}
 
-		if (GetKeyDown(DIK_S))
+		if(BUTTON==0)//start
+		{
+			BUTTONPOS[0] = -650;
+			StartRenderer->sprite = StartSpr1;
+
+			if (GetKeyDown(DIK_RETURN) ) {
+				SceneManager::LoadScene(3);
+				return;
+			}
+		}
+		else {
+			BUTTONPOS[0] = -780;
+			StartRenderer->sprite = StartSpr;
+		}
+		if (BUTTON == 1) //options
+		{
+			BUTTONPOS[1] = -650;
+			OptionRenderer->sprite = OptionSpr1;
+			if (GetKeyDown(DIK_RETURN) )
+			{
+				GUI_MENU = 1;
+			}
+		}
+		else {
+			BUTTONPOS[1] = -780;
+			OptionRenderer->sprite = OptionSpr;
+		}
+		if (BUTTON == 2)//editor
+		{
+			BUTTONPOS[2] = -650;
+			EditorRenderer->sprite = EditorSpr1;
+			
+		}
+		else
+		{
+			BUTTONPOS[2] = -780;
+			EditorRenderer->sprite = EditorSpr;
+
+		}
+
+		if (BUTTON == 3)//exit
+		{
+			BUTTONPOS[3] = -650;
+			ExitRenderer->sprite = ExitSpr1;
+			if (GetKeyDown(DIK_RETURN)) {
+				Shutdown();
+			}
+		
+		}
+		else
+		{
+			BUTTONPOS[3] = -780;
+			ExitRenderer->sprite = ExitSpr;
+
+		}
+		//‘I‚Ô
+		if (GetKeyDown(DIK_S)&& GUI_MENU == 0)
 		{
 			BUTTON++;
-			if (BUTTON > 2)BUTTON = 0;
-			BACKDROPPOS = BUTTON * 100;
+			if (BUTTON > 3)BUTTON = 0;
+			
 		}
-		if (GetKeyDown(DIK_W))
+		if (GetKeyDown(DIK_W)&& GUI_MENU == 0)
 		{
 			BUTTON--;
-			if (BUTTON < 0)BUTTON = 2;
-			BACKDROPPOS = BUTTON * 100;
+			if (BUTTON < 0)BUTTON = 3;
+			
 		}
-		ButtonBackdrop->transform->position = Vector3(-700, -BACKDROPPOS, 0.0011);
+		
 
-		if (GetKeyDown(DIK_RETURN) && BUTTON == 0) {
-			SceneManager::LoadScene(1);
+		
+		if (GUI_MENU == 1)//GUI_MENU‚É‚æ‚Á‚ÄGui‚ðŒÄ‚Ô
+		{
+			Gui_Options();
 		}
+		if (GetKeyDown(DIK_ESCAPE))
+		{
+			GUI_MENU = 0;
+		}
+
+		
+	}
+	void Gui_Options()
+	{
+		ImGui::SetNextWindowPos(ImVec2(50, 50));
+		ImGui::SetNextWindowSize(ImVec2(Camera::main->pixelWidth-100, Camera::main->pixelHeight-100));
+		ImGui::Begin("Option Menu", 0, window_flags);
+		ImGui::SetWindowFontScale(2.0f);
+
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("OPTIONS");
+		ImGui::SameLine(Camera::main->pixelWidth - 800);
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+		//ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+		//ImGui::Checkbox("Another Window", &show_another_window);
+
+
+
+		ImGui::SliderInt("float", &f, 0, 1000);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+		if (ImGui::Button("REDUCE"))SOINZU--; if (SOINZU < 0)SOINZU = 5; ImGui::SameLine();
+		ImGui::Text("Resolution  %d", size[SOINZU]); ImGui::SameLine();
+		if (ImGui::Button("UP")) SOINZU++; if (SOINZU > 5)SOINZU = 0;
+
+		ImGui::SliderInt("Resolution", &size[SOINZU], 720.0f, 4000.0f);
+
+		enum Element { Element_720, Element_1080, Element_1K, Element_2K, Element_3K, Element_4k };
+		const char* element_names[Element_4k] = { "720P", "1080P", "2K", "3K","4k" };
+		static int current_element = Element_720;
+		const char* current_element_name = (current_element >= 0 && current_element < Element_4k) ? element_names[current_element] : "Unknown";
+		ImGui::SliderInt("slider Resolution", &current_element, 0, Element_4k - 1, current_element_name);
+
+
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+
+		if (ImGui::Button("SAVE")) {
+
+		}
+
+		ImGui::End();
 	}
 };

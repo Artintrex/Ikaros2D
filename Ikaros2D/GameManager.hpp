@@ -76,12 +76,13 @@ public:
 			plmax = xP2;
 			pRmax = xP1;
 		}
-
+		//Zoom out
 		if (plmax < lmax.x + 3 || pRmax > Rmax.x - 3) {
-			MainCamera->transform->position.z *= 1.0007f;
+			MainCamera->transform->position.z *= 1.0009f;
 		}
+		//Zoom in
 		else if (plmax > lmax.x + 15 && pRmax < Rmax.x - 15) {
-			MainCamera->transform->position.z *= 0.9993f;
+			MainCamera->transform->position.z *= 0.9990f;
 		}
 
 		if (MainCamera->transform->position.z > -40)MainCamera->transform->position.z = -40;

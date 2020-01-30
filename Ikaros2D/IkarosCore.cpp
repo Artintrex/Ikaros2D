@@ -147,16 +147,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return true;
 
 	switch (uMsg) {
-	case WM_KEYDOWN:
-		if (wParam == VK_ESCAPE) {
-			SendMessage(hWnd, WM_CLOSE, 0, 0);
-		}
-		break;
-
 	case WM_CLOSE:
-				if (MessageBox(hWnd, "Are you sure you want to quit?", WINDOW_CAPTION, MB_OKCANCEL | MB_DEFBUTTON2) == IDOK) {
+				//if (MessageBox(hWnd, "Are you sure you want to quit?", WINDOW_CAPTION, MB_OKCANCEL | MB_DEFBUTTON2) == IDOK) {
 		DestroyWindow(hWnd);
-		}
+		//}
 		return 0;
 
 	case WM_DESTROY:
@@ -405,10 +399,10 @@ void Sprite::GenereteSprite(std::string Name) {
 			vertices[2].position = Vector3(-0.5f, -0.5f, 0);
 			vertices[3].position = Vector3(0.5f, -0.5f, 0);
 
-			vertices[0].uv = Vector2(0, 0);
-			vertices[1].uv = Vector2(1, 0);
-			vertices[2].uv = Vector2(0, 1);
-			vertices[3].uv = Vector2(1, 1);
+			vertices[0].uv = uvMatrix[0];
+			vertices[1].uv = uvMatrix[1];
+			vertices[2].uv = uvMatrix[2];
+			vertices[3].uv = uvMatrix[3];
 
 			size = Vector2((float)texture->Width / 100, (float)texture->Height / 100);
 
@@ -619,7 +613,7 @@ Vector3 Camera::WorldToScreenPoint(Vector3 position) {
 	D3DXVec3TransformCoord(&position, &position, &projection);
 
 	position.x = (position.x + 1) / 2;
-	position.y = (position.y + 1) / 2;
+	position.y = (position.y + 1) / -2;
 
 	position.x *= pixelWidth;
 	position.y *= pixelHeight;
@@ -671,8 +665,8 @@ void Camera::SetViewport() {
 	viewport.Width = pixelWidth;
 	viewport.Y = rect.Y * Screen.height;
 	viewport.Height = pixelHeight;
-	viewport.MinZ = nearClipPlane;
-	viewport.MaxZ = farClipPlane;
+	viewport.MinZ = 0;
+	viewport.MaxZ = 1;
 }
 
 void Camera::SetD3DDevice() {
@@ -682,11 +676,7 @@ void Camera::SetD3DDevice() {
 
 	//Turn off lighting
 	pD3DDevice->SetRenderState(D3DRS_LIGHTING, false);
-	//pD3DDevice->SetRenderState(D3DRS_ZENABLE, true);
-
-	//g_pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	//g_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	//g_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_DESTALPHA);
+	pD3DDevice->SetRenderState(D3DRS_ZENABLE, true);
 
 	/*
 	Tile the texture at every integer junction. For example, for u values between 0 and 3, the texture is repeated three times; no mirroring is performed.
@@ -750,6 +740,11 @@ void Camera::SetD3DDevice() {
 	pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+
+	//pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	//pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	//pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_DESTALPHA);
+
 
 	pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG0, D3DTA_DIFFUSE);
 	pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
@@ -1125,4 +1120,8 @@ void GameLoop() {
 	Object::DestroyList.clear();
 
 	Time.End();
+}
+
+void Shutdown() {
+	SendMessage(g_hWnd, WM_CLOSE, 0, 0);
 }

@@ -54,18 +54,21 @@ public:
 		rigidbody->Translate(20, 0, 0);
 
 		//Sword
-		GameObject* GOsword = new GameObject("SwordPlayer1");
+		GameObject* GOsword = new GameObject("Player1Sword");
 		GOsword->tag = "Sword";
 		GOsword->transform->position = Vector3(0, 1000, 0);
 		sword = GOsword->AddComponent<RigidBody>();
-		sword->AddBoxCollider(Vector2(2, 0.5));
+		sword->SetType(b2_dynamicBody);
+		sword->rigidbody->SetGravityScale(0.0f);
+		sword->rigidbody->SetFixedRotation(true);
+		sword->AddBoxCollider(Vector2(0.5, 0.5), Vector2(0,0), 0, 500);
 	}
 
 	int cnt = 0, direction = 1;
 	float Timer = 0.5;
 	bool JumpFlag = true;
 
-	int ActiveItem = 0;
+	int ActiveItem = gNoItem;
 	int JavelinCount = 0;
 
 	int AtkCnt = 0;
@@ -129,6 +132,8 @@ public:
 		if (GetKey(DIK_LSHIFT) && ActiveItem == gSword) {
 			if (isAttacking == false) {
 				AttackTimer = AttackDelay; AtkCnt = 0;
+				sword->Translate(transform->position.x + direction, transform->position.y - 2, 0);
+				sword->AddForce(Vector2(5 * direction, 0), VelocityChange);
 			}
 			isAttacking = true;
 		}
@@ -145,12 +150,10 @@ public:
 
 		if (isAttacking == true) {
 			renderer->sprite = AttackSprite[AtkCnt];
-			if (AtkCnt > 1) {
-				sword->Translate(transform->position.x + direction * 2.2 * AtkCnt, transform->position.y, 0);
-			}
 		}
 		else {
 			sword->Translate(0, 1000, 0);
+			sword->AddForce(Vector2(0, 0), VelocityChange);
 		}
 
 		UIUpdate();
@@ -180,14 +183,14 @@ public:
 	}
 
 	void OnCollisionEnter(Collision collider) {
-		if (collider.parent->tag == "Sword") {
+		if (collider.parent->tag == "Sword" && collider.parent->name != "Player1Sword") {
 			RecieveBlow();
 		}
 	}
 
 	void UIUpdate() {
 		Vector3 ScreenCoord = Camera::main->WorldToScreenPoint(transform->position);
-		ImGui::SetNextWindowPos(ImVec2(ScreenCoord.x, -ScreenCoord.y + Screen.height - 150));
+		ImGui::SetNextWindowPos(ImVec2(ScreenCoord.x, ScreenCoord.y + Screen.height - 150));
 		ImGui::SetNextWindowSize(ImVec2(100, 200));
 		ImGui::Begin("Player 1", 0, UIFlags);
 		ImGui::Text("PLAYER 1");

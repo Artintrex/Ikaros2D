@@ -118,7 +118,7 @@
     <ClInclude Include="Result.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
-    <ClInclude Include="GodsThunder.hpp">
+    <ClInclude Include="SelectionScene.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
   </ItemGroup>
