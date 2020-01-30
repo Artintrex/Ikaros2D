@@ -6,8 +6,7 @@
 #include "BoxSpawner.hpp"
 #include "Gods.hpp"
 
-#include "Player1.hpp"
-#include "Player2.hpp"
+#include "Player.hpp"
 #include "Title.hpp"
 #include "Result.hpp"
 

@@ -246,10 +246,9 @@
     <ClInclude Include="Gods.hpp" />
     <ClInclude Include="GodsThunder.hpp" />
     <ClInclude Include="Javelin.hpp" />
-    <ClInclude Include="Player1.hpp" />
+    <ClInclude Include="Player.hpp" />
     <ClInclude Include="IkarosCore.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="Player2.hpp" />
     <ClInclude Include="PlayerController.hpp" />
     <ClInclude Include="Result.hpp" />
     <ClInclude Include="SceneAlpha.hpp" />

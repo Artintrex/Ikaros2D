@@ -8,13 +8,13 @@ public:
 		mb_init();
 	}
 
-	float AppearTime = 50;
+	float AppearTime = 20;
 	Sprite* zeus;
 
 	bool isHidden = true;
 	bool isUp = false;
-	Vector3 HiddenPosition = Vector3(50, -300, 900);
-	Vector3 ElevatedPosition = Vector3(50, 30, 900);
+	Vector3 HiddenPosition = Vector3(50, -450, 900);
+	Vector3 ElevatedPosition = Vector3(50, 80, 900);
 
 	float Speed = 15;
 	Renderer* zeusRenderer;
