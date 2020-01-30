@@ -62,7 +62,7 @@ public:
 	EditorButton = new GameObject("Editor");
 	StartButton = new GameObject("Start2");
 
-	Sprite* TitleBackSpr = new Sprite("TitleBackground", Texture::LoadTexture("TitleBackTex", "assets/Textures/title.jpg"));
+	Sprite* TitleBackSpr = new Sprite("TitleBackground", Texture::LoadTexture("TitleBackTex", "assets/Textures/title.png"));
 	 OptionSpr = new Sprite("OptionButton", Texture::LoadTexture("OptionTex", "assets/Textures/TitleButtons/tOptions2.png"));
 	 ExitSpr = new Sprite("ExitButton", Texture::LoadTexture("ExitTex", "assets/Textures/TitleButtons/tExit2.png"));
 	 EditorSpr = new Sprite("EditorButton", Texture::LoadTexture("EditorTex", "assets/Textures/TitleButtons/tEditor2.png"));
@@ -78,7 +78,7 @@ public:
 
 	TitleBack->AddComponent<Renderer>()->sprite = TitleBackSpr;
 	TitleBack->transform->position = Vector3(0, 0, 0.0010);
-	TitleBack->transform->Scale(100, 100, 1);
+	TitleBack->transform->Scale(175, 175, 1);
 
 	StartRenderer = StartButton->AddComponent<Renderer>();
 	StartRenderer->sprite = StartSpr;
@@ -132,7 +132,7 @@ public:
 			StartRenderer->sprite = StartSpr1;
 
 			if (GetKeyDown(DIK_RETURN) ) {
-				SceneManager::LoadScene(3);
+				SceneManager::LoadScene(1);
 				return;
 			}
 		}
