@@ -3,7 +3,7 @@
 #include "Debug.hpp"
 
 #include "Javelin.hpp"
-#include "BoxSpawner.hpp"
+#include "Items.hpp"
 #include "Gods.hpp"
 
 #include "Player.hpp"

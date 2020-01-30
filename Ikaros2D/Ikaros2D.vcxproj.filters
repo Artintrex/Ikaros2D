@@ -100,9 +100,6 @@
     <ClInclude Include="GameHeader.h">
       <Filter>GameSources</Filter>
     </ClInclude>
-    <ClInclude Include="BoxSpawner.hpp">
-      <Filter>GameSource</Filter>
-    </ClInclude>
     <ClInclude Include="Gods.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
@@ -119,6 +116,9 @@
       <Filter>GameSource</Filter>
     </ClInclude>
     <ClInclude Include="Player.hpp">
+      <Filter>GameSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Items.hpp">
       <Filter>GameSource</Filter>
     </ClInclude>
   </ItemGroup>

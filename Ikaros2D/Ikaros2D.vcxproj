@@ -240,7 +240,7 @@
     <ClInclude Include="..\Libs\imgui\imgui_impl_dx9.h" />
     <ClInclude Include="..\Libs\imgui\imgui_impl_win32.h" />
     <ClInclude Include="..\Libs\imgui\imgui_internal.h" />
-    <ClInclude Include="BoxSpawner.hpp" />
+    <ClInclude Include="Items.hpp" />
     <ClInclude Include="GameHeader.h" />
     <ClInclude Include="GameManager.hpp" />
     <ClInclude Include="Gods.hpp" />

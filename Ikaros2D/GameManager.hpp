@@ -30,7 +30,10 @@ public:
 	}
 
 	void Start() {
-		parent->AddComponent<Debug>();
+		//parent->AddComponent<Debug>();
+
+		//Reset scores
+		fScore1 = fScore2 = fScore3 = fScore4 = 0;
 	}
 
 	float Timer = 360;

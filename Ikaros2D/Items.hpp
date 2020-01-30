@@ -5,6 +5,9 @@ enum ItemType {
 	gNoItem,
 	gSword,
 	gJavelin,
+	gSpear,
+	gShield,
+	gBow,
 
 	NUMBEROFITEMS
 };

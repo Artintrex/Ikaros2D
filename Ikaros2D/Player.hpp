@@ -2,46 +2,48 @@
 #include "IkarosCore.h"
 #include "Javelin.hpp"
 
+extern int fScore1, fScore2, fScore3, fScore4;
+
 class Player : public MonoBehavior {
 public:
 	Player() {
 		type = typeid(*this).name();
 		mb_init();
 
-		Left = DIK_A;
-		Right = DIK_D;
-		Jump = DIK_SPACE;
-		Throw = DIK_LCONTROL;
-		Attack = DIK_LSHIFT;
-		Activate = DIK_F;
+		iLeft = DIK_A;
+		iRight = DIK_D;
+		iJump = DIK_SPACE;
+		iThrow = DIK_LCONTROL;
+		iAttack = DIK_LSHIFT;
+		iActivate = DIK_F;
 	}
 
 	//Used for loading textures
 	std::string PlayerPath = "1P";
 
 	//Sprites
-	std::vector <Sprite*> s_ShieldThrow; //5
-	std::vector <Sprite*> s_SpearAttack; //4
-	std::vector <Sprite*> s_SwordAttack; //5
-	std::vector <Sprite*> s_BowDraw; //3
+	std::vector <Sprite*> sv_ShieldThrow; //5
+	std::vector <Sprite*> sv_SpearAttack; //4
+	std::vector <Sprite*> sv_SwordAttack; //5
+	std::vector <Sprite*> sv_BowDraw; //3
 
-	std::vector <Sprite*> s_Idle; //4
-	std::vector <Sprite*> s_BowIdle; //4
-	std::vector <Sprite*> s_ShieldIdle; //4
-	std::vector <Sprite*> s_SwordIdle; //4
-	std::vector <Sprite*> s_SpearIdle; //4
+	std::vector <Sprite*> sv_Idle; //4
+	std::vector <Sprite*> sv_BowIdle; //4
+	std::vector <Sprite*> sv_ShieldIdle; //4
+	std::vector <Sprite*> sv_SwordIdle; //4
+	std::vector <Sprite*> sv_SpearIdle; //4
 
-	std::vector <Sprite*> s_Running; //12
-	std::vector <Sprite*> s_BowRunning; //12
-	std::vector <Sprite*> s_ShieldRunning; //12
-	std::vector <Sprite*> s_SwordRunning; //12
-	std::vector <Sprite*> s_SpearRunning; //12
+	std::vector <Sprite*> sv_Running; //12
+	std::vector <Sprite*> sv_BowRunning; //12
+	std::vector <Sprite*> sv_ShieldRunning; //12
+	std::vector <Sprite*> sv_SwordRunning; //12
+	std::vector <Sprite*> sv_SpearRunning; //12
 
-	std::vector <Sprite*> s_Jump; //6
-	std::vector <Sprite*> s_BowJump; //6
-	std::vector <Sprite*> s_ShieldJump; //6
-	std::vector <Sprite*> s_SwordJump; //6
-	std::vector <Sprite*> s_SpearJump; //6
+	std::vector <Sprite*> sv_Jump; //6
+	std::vector <Sprite*> sv_BowJump; //6
+	std::vector <Sprite*> sv_ShieldJump; //6
+	std::vector <Sprite*> sv_SwordJump; //6
+	std::vector <Sprite*> sv_SpearJump; //6
 
 	RigidBody* rigidbody;
 	RigidBody* sword;
@@ -49,7 +51,7 @@ public:
 	Renderer* renderer;
 
 	//Controls
-	int Left,Right,Jump,Throw,Attack,Activate;
+	int iLeft,iRight,iJump,iThrow,iAttack,iActivate;
 
 	Vector3 scale = Vector3(0.8, 0.8, 1);
 
@@ -65,7 +67,7 @@ public:
 			std::string Name = PlayerPath + AnimName + textureName;
 			vector.push_back(new Sprite(Name + "_Sprite", Texture::LoadTexture(Name, path)));
 			vector[i]->doubleSided = true;
-			vector[i]->GenereteSprite(textureName);
+			vector[i]->GenereteSprite();
 		}
 	}
 
@@ -74,28 +76,28 @@ public:
 	}
 
 	void Start() {
-		LoadSprites(5, "ShieldThrow", s_ShieldThrow);
-		LoadSprites(4, "Pierce", s_SpearAttack);
-		LoadSprites(5, "Slash", s_SwordAttack);
-		LoadSprites(3, "BowDraw", s_BowDraw);
+		LoadSprites(5, "ShieldThrow", sv_ShieldThrow);
+		LoadSprites(4, "Pierce", sv_SpearAttack);
+		LoadSprites(5, "Slash", sv_SwordAttack);
+		LoadSprites(3, "BowDraw", sv_BowDraw);
 
-		LoadSprites(4, "Idle", s_Idle);
-		LoadSprites(4, "IdleBow", s_BowIdle);
-		LoadSprites(4, "IdleShield", s_ShieldIdle);
-		LoadSprites(4, "IdleSword", s_SwordIdle);
-		LoadSprites(4, "IdleSpear", s_SpearIdle);
+		LoadSprites(4, "Idle", sv_Idle);
+		LoadSprites(4, "IdleBow", sv_BowIdle);
+		LoadSprites(4, "IdleShield", sv_ShieldIdle);
+		LoadSprites(4, "IdleSword", sv_SwordIdle);
+		LoadSprites(4, "IdleSpear", sv_SpearIdle);
 
-		LoadSprites(12, "Run", s_Running);
-		LoadSprites(12, "RunBow", s_BowRunning);
-		LoadSprites(12, "RunShield", s_ShieldRunning);
-		LoadSprites(12, "RunSword", s_SwordRunning);
-		LoadSprites(12, "RunSpear", s_SpearRunning);
+		LoadSprites(12, "Run", sv_Running);
+		LoadSprites(12, "RunBow", sv_BowRunning);
+		LoadSprites(12, "RunShield", sv_ShieldRunning);
+		LoadSprites(12, "RunSword", sv_SwordRunning);
+		LoadSprites(12, "RunSpear", sv_SpearRunning);
 
-		LoadSprites(6, "Jump", s_Jump);
-		LoadSprites(6, "JumpBow", s_BowJump);
-		LoadSprites(6, "JumpShield", s_ShieldJump);
-		LoadSprites(6, "JumpSword", s_SwordJump);
-		LoadSprites(6, "JumpSpear", s_SpearJump);
+		LoadSprites(6, "Jump", sv_Jump);
+		LoadSprites(6, "JumpBow", sv_BowJump);
+		LoadSprites(6, "JumpShield", sv_ShieldJump);
+		LoadSprites(6, "JumpSword", sv_SwordJump);
+		LoadSprites(6, "JumpSpear", sv_SpearJump);
 
 		swordName = PlayerPath + "Sword";
 
@@ -107,21 +109,21 @@ public:
 		UIFlags |= ImGuiWindowFlags_NoResize;
 		UIFlags |= ImGuiWindowFlags_NoCollapse;
 		UIFlags |= ImGuiWindowFlags_NoNav;
-		UIFlags |= ImGuiWindowFlags_NoBackground;
+		//UIFlags |= ImGuiWindowFlags_NoBackground;
 		UIFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 		// UIFlags |= ImGuiWindowFlags_MenuBar;
 
 		renderer = parent->AddComponent<Renderer>();
 
 		parent->transform->scale = scale;
-		renderer->sprite = s_Running[0];
+		renderer->sprite = sv_Running[0];
 
 		rigidbody = parent->AddComponent<RigidBody>();
 		rigidbody->SetType(b2_dynamicBody);
 		rigidbody->rigidbody->SetGravityScale(5.0f);
 		rigidbody->rigidbody->SetFixedRotation(true);
-		rigidbody->AddBoxCollider(Vector2(s_Running[0]->size.x * parent->transform->scale.x * 0.5f,
-			s_Running[0]->size.y * parent->transform->scale.y * 0.8));
+		rigidbody->AddBoxCollider(Vector2(sv_Running[0]->size.x * parent->transform->scale.x * 0.5f,
+			sv_Running[0]->size.y * parent->transform->scale.y * 0.8));
 
 		//Sword
 		GameObject* GOsword = new GameObject(swordName);
@@ -134,35 +136,34 @@ public:
 		sword->AddBoxCollider(Vector2(0.5, 0.5), Vector2(0, 0), 0, 500);
 	}
 
-	int cnt = 0, direction = 1;
-	float Timer = 0.5;
+	int RunAnimCnt = 0, direction = 1;
+	float RunAnimTimer = 0.5;
 	bool JumpFlag = true;
 
-	int ActiveItem = gNoItem;
+	int ActiveItem = gSword;
 	int JavelinCount = 0;
 
-	int AtkCnt = 0;
-	bool isAttacking = false;
-	float AttackDelay = 0.2;
-	float AttackTimer = AttackDelay;
+	enum Animation {
+		ShieldThrow,
+		SpearAttack,
+		SwordAttack,
+		BowDraw,
+		Idle,
+		Running,
+		Jump,
+	};
+
+
+	float fSpeedMax = 9.0f;
+
+	int AnimType = Idle;
+	int AnimCnt = 0;
+	float AnimTime = 0;
+	float AnimDelay = 0.2;
 
 	void Update() {
-		if (Timer < 0) {
-			cnt++;
-			Timer = 0.5;
-		}
-		Timer -= Time.DeltaTime * abs(rigidbody->velocity.x);
-		if (cnt >= s_Running.size()) cnt = 0;
-
-		if (ActiveItem == 0) {
-			renderer->sprite = s_Running[cnt];
-		}
-		else if (ActiveItem == gSword)renderer->sprite = s_SwordRunning[cnt];
-
-
 		if (abs(rigidbody->velocity.y) > 0.1f)JumpFlag = false;
-
-		if (GetKey(Left)) {
+		if (GetKey(iLeft) && rigidbody->velocity.x > -fSpeedMax) {
 			if (JumpFlag) {
 				rigidbody->AddForce(Vector2(-600, 0), Force);
 			}
@@ -170,9 +171,12 @@ public:
 
 			transform->scale.x = -scale.x;
 			direction = -1;
+			if (AnimType == Idle) {
+				AnimType = Running;
+			}
 		}
 
-		if (GetKey(Right)) {
+		if (GetKey(iRight) && rigidbody->velocity.x < fSpeedMax) {
 			if (JumpFlag) {
 				rigidbody->AddForce(Vector2(600, 0), Force);
 			}
@@ -180,14 +184,21 @@ public:
 
 			transform->scale.x = scale.x;
 			direction = 1;
+			if (AnimType == Idle) {
+				AnimType = Running;
+			}
 		}
 
-		if (GetKeyDown(Jump) && JumpFlag) {
+		if (GetKeyDown(iJump) && JumpFlag && (AnimType == Idle || AnimType == Running)) {
 			rigidbody->AddForce(Vector2(0, 800), Impulse);
+			AnimCnt = 0;
+			AnimTime = AnimDelay;
+			AnimType = Jump;
 		}
 
-		if (GetKeyDown(Throw) && JavelinCount > 0) {
-			GameObject* jav = new GameObject("Javelin");
+		if (GetKeyDown(iThrow) && JavelinCount > 0) {
+			GameObject* jav = new GameObject(PlayerPath + "Javelin");
+			jav->tag = "Javelin";
 			jav->transform->position = Vector3(transform->position.x + (direction * 3),
 				transform->position.y,
 				transform->position.z);
@@ -198,33 +209,89 @@ public:
 			JavelinCount--;
 		}
 
-		AttackTimer -= Time.DeltaTime;
-
-		if (GetKey(Attack) && ActiveItem == gSword) {
-			if (isAttacking == false) {
-				AttackTimer = AttackDelay; AtkCnt = 0;
+		if (GetKey(iAttack) && ActiveItem == gSword) {
+			if (AnimType != SwordAttack) {
 				sword->Translate(transform->position.x + direction, transform->position.y - 2, 0);
 				sword->AddForce(Vector2(5 * direction, 0), VelocityChange);
+				AnimCnt = 0;
+				AnimTime = AnimDelay;
 			}
-			isAttacking = true;
+			AnimType = SwordAttack;
 		}
 
-		if (AttackTimer < 0) {
-			AtkCnt++;
-			AttackTimer = AttackDelay;
+		//Animation Timing
+		AnimTime -= Time.DeltaTime;
+		if (AnimTime < 0) {
+			AnimCnt++;
+			AnimTime = AnimDelay;
 		}
 
-		if (AtkCnt >= s_SwordAttack.size()) {
-			isAttacking = false;
-			AtkCnt = 0;
+		//Animation Flow
+		if (AnimType == ShieldThrow) {
+			if (AnimCnt >= sv_ShieldThrow.size()) {
+				AnimCnt = 0;
+			}
 		}
+		else if (AnimType == SpearAttack) {
+			if (AnimCnt >= sv_SpearAttack.size()) {
+				AnimCnt = 0;
+			}
+		}
+		else if (AnimType == SwordAttack) {
+			if (AnimCnt >= sv_SwordAttack.size()) {
+				AnimCnt = 0;
+				sword->Translate(0, 1000, 0);
+				sword->AddForce(Vector2(0, 0), VelocityChange);
 
-		if (isAttacking == true) {
-			renderer->sprite = s_SwordAttack[AtkCnt];
+				AnimType = Idle;
+			}
+			renderer->sprite = sv_SwordAttack[AnimCnt];
 		}
-		else {
-			sword->Translate(0, 1000, 0);
-			sword->AddForce(Vector2(0, 0), VelocityChange);
+		else if (AnimType == BowDraw) {
+			if (AnimCnt >= sv_BowDraw.size()) {
+				AnimCnt = 0;
+			}
+		}
+		else if (AnimType == Running) {
+			if (RunAnimTimer < 0) {
+				RunAnimCnt++;
+				RunAnimTimer = 0.5;
+			}
+			RunAnimTimer -= Time.DeltaTime * abs(rigidbody->velocity.x);
+			if (RunAnimCnt >= sv_Running.size()) RunAnimCnt = 0;
+
+			if (ActiveItem == gNoItem)renderer->sprite = sv_Running[RunAnimCnt];
+			else if (ActiveItem == gSword)renderer->sprite = sv_SwordRunning[RunAnimCnt];
+			else if (ActiveItem == gSpear)renderer->sprite = sv_SpearRunning[RunAnimCnt];
+			else if (ActiveItem == gShield)renderer->sprite = sv_ShieldRunning[RunAnimCnt];
+			else if (ActiveItem == gBow)renderer->sprite = sv_BowRunning[RunAnimCnt];
+
+			if (abs(rigidbody->velocity.x) < 2.0f) {
+				AnimType = Idle;
+			}
+		}
+		else if (AnimType == Jump) {
+			if (AnimCnt >= sv_Jump.size()) {
+				AnimCnt = sv_Jump.size()-1;
+			}
+
+			if (ActiveItem == gNoItem)renderer->sprite = sv_Jump[AnimCnt];
+ 			else if (ActiveItem == gSword)renderer->sprite = sv_SwordJump[AnimCnt];
+			else if (ActiveItem == gSpear)renderer->sprite = sv_SpearJump[AnimCnt];
+			else if (ActiveItem == gShield)renderer->sprite = sv_ShieldJump[AnimCnt];
+			else if (ActiveItem == gBow)renderer->sprite = sv_BowJump[AnimCnt];
+
+			if (JumpFlag && AnimCnt > 0)AnimType = Idle;
+		}else if (AnimType == Idle) {
+			if (AnimCnt >= sv_Idle.size()) {
+				AnimCnt = 0;
+			}
+
+			if (ActiveItem == gNoItem)renderer->sprite = sv_Idle[AnimCnt];
+			else if (ActiveItem == gSword)renderer->sprite = sv_SwordIdle[AnimCnt];
+			else if (ActiveItem == gSpear)renderer->sprite = sv_SpearIdle[AnimCnt];
+			else if (ActiveItem == gShield)renderer->sprite = sv_ShieldIdle[AnimCnt];
+			else if (ActiveItem == gBow)renderer->sprite = sv_BowIdle[AnimCnt];
 		}
 
 		UIUpdate();
@@ -236,7 +303,7 @@ public:
 		}
 
 		if (collider.parent->tag == "Box") {
-			if (GetKeyDown(Activate)) {
+			if (GetKeyDown(iActivate)) {
 				switch (collider.parent->GetComponent<Box>()->TypeOfBox) {
 				case 0:
 					ActiveItem = gSword;
@@ -249,22 +316,45 @@ public:
 		}
 	}
 
-	void RecieveBlow() {
-		//Do stuff aka reduce health gain score etc...
-	}
-
 	void OnCollisionEnter(Collision collider) {
 		if (collider.parent->tag == "Sword" && collider.parent->name != swordName) {
-			RecieveBlow();
+			std::string op = collider.parent->name.substr(0, 2);
+			if (op == "1P")fScore1 += 100;
+			else if (op == "2P")fScore2 += 100;
+			else if (op == "3P")fScore3 += 100;
+			else if (op == "4P")fScore4 += 100;
+		}
+		else if (collider.parent->tag == "Javelin") {
+			std::string op = collider.parent->name.substr(0, 2);
+			if (op != PlayerPath) {
+				if (op == "1P")fScore1 += 100;
+				else if (op == "2P")fScore2 += 100;
+				else if (op == "3P")fScore3 += 100;
+				else if (op == "4P")fScore4 += 100;
+
+				Destroy(collider.parent);
+			}
 		}
 	}
 
 	void UIUpdate() {
 		Vector3 ScreenCoord = Camera::main->WorldToScreenPoint(transform->position);
 		ImGui::SetNextWindowPos(ImVec2(ScreenCoord.x, ScreenCoord.y + Screen.height - 150));
-		ImGui::SetNextWindowSize(ImVec2(100, 200));
+		ImGui::SetNextWindowSize(ImVec2(100, 50));
 		ImGui::Begin(PlayerPath.c_str(), 0, UIFlags);
 		ImGui::Text("Javelin: %d", JavelinCount);
+		if (parent->name == "Player1") {
+			ImGui::Text("Score: %d", fScore1);
+		}
+		else if (parent->name == "Player2") {
+			ImGui::Text("Score: %d", fScore2);
+		}
+		else if (parent->name == "Player3") {
+			ImGui::Text("Score: %d", fScore3);
+		}
+		else if (parent->name == "Player4") {
+			ImGui::Text("Score: %d", fScore4);
+		}
 		ImGui::End();
 	}
 

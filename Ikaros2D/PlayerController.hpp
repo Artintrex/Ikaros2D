@@ -30,6 +30,7 @@ public:
 
 		if (bPlayer1) {
 			player1 = new GameObject("Player1");
+			player1->tag = "Player";
 			player1->transform->position = Vector3(-20, 20, 0);
 			gPlayer = player1->AddComponent<Player>();
 			vPlayers.push_back(gPlayer);
@@ -37,43 +38,46 @@ public:
 
 		if (bPlayer2) {
 			player2 = new GameObject("Player2");
+			player2->tag = "Player";
 			player2->transform->position = Vector3(0, 20, 0);
 			gPlayer = player2->AddComponent<Player>();
 			gPlayer->PlayerPath = "2P";
-			gPlayer->Left = DIK_LEFT;
-			gPlayer->Right = DIK_RIGHT;
-			gPlayer->Jump = DIK_UP;
-			gPlayer->Attack = DIK_RSHIFT;
-			gPlayer->Throw = DIK_RCONTROL;
-			gPlayer->Activate = DIK_RETURN;
+			gPlayer->iLeft = DIK_LEFT;
+			gPlayer->iRight = DIK_RIGHT;
+			gPlayer->iJump = DIK_UP;
+			gPlayer->iAttack = DIK_RSHIFT;
+			gPlayer->iThrow = DIK_RCONTROL;
+			gPlayer->iActivate = DIK_RETURN;
 			vPlayers.push_back(gPlayer);
 		}
 
 		if (bPlayer3) {
 			player3 = new GameObject("Player3");
+			player3->tag = "Player";
 			player3->transform->position = Vector3(20, 20, 0);
 			gPlayer = player3->AddComponent<Player>();
 			gPlayer->PlayerPath = "3P";
-			gPlayer->Left = DIK_LEFT;
-			gPlayer->Right = DIK_RIGHT;
-			gPlayer->Jump = DIK_UP;
-			gPlayer->Attack = DIK_RSHIFT;
-			gPlayer->Throw = DIK_RCONTROL;
-			gPlayer->Activate = DIK_RETURN;
+			gPlayer->iLeft = DIK_LEFT;
+			gPlayer->iRight = DIK_RIGHT;
+			gPlayer->iJump = DIK_UP;
+			gPlayer->iAttack = DIK_RSHIFT;
+			gPlayer->iThrow = DIK_RCONTROL;
+			gPlayer->iActivate = DIK_RETURN;
 			vPlayers.push_back(gPlayer);
 		}
 
 		if (bPlayer4) {
 			player4 = new GameObject("Player4");
+			player4->tag = "Player";
 			player4->transform->position = Vector3(40, 20, 0);
 			gPlayer = player4->AddComponent<Player>();
 			gPlayer->PlayerPath = "4P";
-			gPlayer->Left = DIK_LEFT;
-			gPlayer->Right = DIK_RIGHT;
-			gPlayer->Jump = DIK_UP;
-			gPlayer->Attack = DIK_RSHIFT;
-			gPlayer->Throw = DIK_RCONTROL;
-			gPlayer->Activate = DIK_RETURN;
+			gPlayer->iLeft = DIK_LEFT;
+			gPlayer->iRight = DIK_RIGHT;
+			gPlayer->iJump = DIK_UP;
+			gPlayer->iAttack = DIK_RSHIFT;
+			gPlayer->iThrow = DIK_RCONTROL;
+			gPlayer->iActivate = DIK_RETURN;
 			vPlayers.push_back(gPlayer);
 		}
 	}
