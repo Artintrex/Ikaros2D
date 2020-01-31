@@ -3,10 +3,6 @@
 
 class SceneAlpha : public MonoBehavior {
 public:
-	SceneAlpha() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 
 	std::vector <Sprite*> vBGSprite;
 	Sprite* sprFloor;

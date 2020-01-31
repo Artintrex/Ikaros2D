@@ -3,10 +3,6 @@
 
 class Debug : public MonoBehavior {
 public:
-	Debug() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 	ImGuiWindowFlags window_flags;
 	void Awake() {
 		window_flags = 0;

@@ -3,10 +3,6 @@
 
 class Result : public MonoBehavior {
 public:
-	Result() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 
 	GameObject* MainCamera;
 	Sprite* Background;

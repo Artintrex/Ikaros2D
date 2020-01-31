@@ -16,10 +16,6 @@ enum ItemType {
 
 class Box : public MonoBehavior {
 public:
-	Box() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 	
 	static Sprite* BoxSprite[BOX_MAX];
 	int TypeOfBox;

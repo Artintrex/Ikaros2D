@@ -3,10 +3,6 @@
 
 class Title : public MonoBehavior {
 public:
-	Title() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 
 	GameObject* TitleBack;
 

@@ -5,10 +5,6 @@
 
 class Thunderbolt : public MonoBehavior {
 public:
-	Thunderbolt() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 
 	std::vector <Sprite*> ThunderSprite;
 	std::vector<Sprite*> ThunderEffect;

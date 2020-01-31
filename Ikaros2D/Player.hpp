@@ -6,17 +6,6 @@ extern int fScore1, fScore2, fScore3, fScore4;
 
 class Player : public MonoBehavior {
 public:
-	Player() {
-		type = typeid(*this).name();
-		mb_init();
-
-		iLeft = DIK_A;
-		iRight = DIK_D;
-		iJump = DIK_SPACE;
-		iThrow = DIK_LCONTROL;
-		iAttack = DIK_LSHIFT;
-		iActivate = DIK_F;
-	}
 
 	//Used for loading textures
 	std::string PlayerPath = "1P";
@@ -51,7 +40,12 @@ public:
 	Renderer* renderer;
 
 	//Controls
-	int iLeft,iRight,iJump,iThrow,iAttack,iActivate;
+	int iLeft = DIK_A,
+		iRight = DIK_D,
+		iJump = DIK_SPACE,
+		iThrow = DIK_LCONTROL,
+		iAttack = DIK_LSHIFT,
+		iActivate = DIK_F;
 
 	Vector3 scale = Vector3(0.8, 0.8, 1);
 

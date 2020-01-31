@@ -408,6 +408,7 @@ private:
 	static std::vector<MonoBehavior*> MonoBehaviorList;
 
 	friend class SceneManager;
+	friend class GameObject;
 };
 
 class Texture : public Object {
@@ -625,6 +626,11 @@ public:
 		T* p = new T();
 		p->parent = this;
 		p->transform = transform;
+		p->type = GetTypeName<T>();
+		MonoBehavior* pmb = dynamic_cast<MonoBehavior*>(p);
+		if (pmb != nullptr) {
+			pmb->mb_init();
+		}
 		ComponentList.push_back((Component*)p);
 
 		return p;
@@ -633,18 +639,21 @@ public:
 	template <> Camera* AddComponent<Camera>() {
 		Camera* p = new Camera(this);
 		ComponentList.push_back((Component*)p);
+		p->type = GetTypeName<Camera>();
 		return p;
 	}
 
 	template <> RigidBody* AddComponent<RigidBody>() {
 		RigidBody* p = new RigidBody(this);
 		ComponentList.push_back((Component*)p);
+		p->type = GetTypeName<RigidBody>();
 		return p;
 	}
 
 	template <> Renderer* AddComponent<Renderer>() {
 		Renderer* p = new Renderer(this);
 		ComponentList.push_back((Component*)p);
+		p->type = GetTypeName<Renderer>();
 		return p;
 	}
 

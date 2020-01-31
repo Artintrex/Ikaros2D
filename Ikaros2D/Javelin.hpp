@@ -3,10 +3,6 @@
 
 class Javelin : public MonoBehavior {
 public:
-	Javelin() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 
 	static Sprite* SpearSprite;
 	RigidBody* rb_spear;

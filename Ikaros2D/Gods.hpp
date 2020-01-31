@@ -3,10 +3,6 @@
 
 class Zeus : public MonoBehavior {
 public:
-	Zeus() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 
 	float AppearTime = 20;
 	Sprite* zeus;

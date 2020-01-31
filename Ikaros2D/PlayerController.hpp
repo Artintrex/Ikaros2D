@@ -6,10 +6,6 @@ extern std::vector<Player*> vPlayers;
 
 class PlayerController : public MonoBehavior {
 public:
-	PlayerController() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 
 	GameObject* player1;
 	GameObject* player2;

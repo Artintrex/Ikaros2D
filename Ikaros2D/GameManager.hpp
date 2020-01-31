@@ -3,10 +3,6 @@
 
 class GameManager : public MonoBehavior {
 public:
-	GameManager() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 
 	GameObject* MainCamera;
 	Camera* MainCameraComponent;
