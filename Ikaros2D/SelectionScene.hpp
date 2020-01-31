@@ -9,11 +9,11 @@ public:
 	}
 
 	int PLAYERKAZU = 0;
-	int Pick1 = 0, P1_Ope = 0, P1_Wea = 0;
-	int Pick2 = 0, P2_Ope = 2, P2_Wea = 0;
-	int Pick3 = 0, P3_Ope = 2, P3_Wea = 0;
-	int Pick4 = 0, P4_Ope = 2, P4_Wea = 0;
-
+	int P1_Opn, P1_Wea;
+	int P2_Opn, P2_Wea;
+	int P3_Opn, P3_Wea;
+	int P4_Opn, P4_Wea;
+	
 
 	GameObject* SelectionCamera;//ÉJÉÅÉâ
 	GameObject* SelectionBackdrop;//îwåi
@@ -28,6 +28,11 @@ public:
 	GameObject* SelectionRim2;//ëIÇ‘UIÇR
 	Renderer* SelectionRim2Ren;
 	Sprite* SelectionRim2Spr;
+	GameObject* SelectionGO;
+	Renderer* SelectionGORen;
+	Sprite* SelectionGOSpr;
+
+
 
 	GameObject* SelectionNoPlayer;
 	GameObject* SelectionPlayer1;//playerÇÃäG
@@ -95,6 +100,10 @@ public:
 		SelectionPlayer2Weapon = new GameObject("SelectionPlayer2Weapon");
 		SelectionPlayer3Weapon = new GameObject("SelectionPlayer3Weapon");
 		SelectionPlayer4Weapon = new GameObject("SelectionPlayer4Weapon");
+		SelectionGO = new GameObject("SelectionGO");
+
+		SelectionGOSpr = new Sprite("SelectionGO", Texture::LoadTexture("SelectionGO", "assets/Selection/SelectionGo.png"));
+
 
 		SelectionBackdropSpr = new Sprite("SelectionBackdrop", Texture::LoadTexture("TitleBackTex", "assets/Selection/SelectionBackdrop.png"));
 		
@@ -184,33 +193,267 @@ public:
 		SelectionPlayer4Weapon->transform->position = Vector3(600, -350, 0.0012);
 		SelectionPlayer4Weapon->transform->Scale(75, 75, 1);
 
+		SelectionGO->AddComponent<Renderer>()->sprite = SelectionGOSpr;
+		SelectionGO->transform->position = Vector3(800, 0, 0.0012);
+		SelectionGO->transform->Scale(75, 75, 1);
+
+
 	}
 
 	void Update() {
-		
-		if (GetKey(DIK_END)) {
+		SelectionRim2->transform->position = Vector3(Option_x, Option_y, 0.0013);
+		SelectionPlayer1Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+		SelectionPlayer2Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+		SelectionPlayer3Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+		SelectionPlayer4Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+
+		SelectionPlayer1Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+		SelectionPlayer2Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+		SelectionPlayer3Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+		SelectionPlayer4Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+
+		SelectionPlayer3->AddComponent<Renderer>()->sprite = SelectionNoPlayerSpr;
+		SelectionPlayer4->AddComponent<Renderer>()->sprite = SelectionNoPlayerSpr;
+
+
+		if (GetKey(DIK_UP)) {
 			PLAYERKAZU ++;
 		}
-		if (GetKey(DIK_HOME)) {
+		if (GetKey(DIK_DOWN)) {
 			PLAYERKAZU --;
 		}
 		if (PLAYERKAZU < 0) {
 			PLAYERKAZU = 5;
 		}
+		if (PLAYERKAZU == 0) {
+			if (GetKeyDown(DIK_A)) {
+				P1_Opn--;
+			}
+			if (GetKeyDown(DIK_D)) {
+				P1_Opn++;
+			}
+			if (P1_Opn == 0) {
+				SelectionPlayer1Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+
+			}
+			if (P1_Opn == 1) {
+				SelectionPlayer1Oper->AddComponent<Renderer>()->sprite = SelectionFeat;
+
+			}
+			if (P1_Opn < 0) {
+				P1_Opn = 1;
+			}
+			if (P1_Opn>1) {
+				P1_Opn = 0;
+			}
+		}
 		if (PLAYERKAZU == 1) {
-			Option_x = 600;
-			Option_y = 300;
+			Option_x = -300;
+			Option_y = 150;
+			if (GetKeyDown(DIK_A)) {
+				P1_Wea--;
+			}
+			if (GetKeyDown(DIK_D)) {
+				P1_Wea++;
+			}
+			if (P1_Wea == 0) {
+				
+				SelectionPlayer1Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+			}
+			if (P1_Wea == 1) {
+				SelectionPlayer1Oper->AddComponent<Renderer>()->sprite = SelectionShield;
+
+			}
+			if (P1_Wea == 2) {
+				SelectionPlayer1Oper->AddComponent<Renderer>()->sprite = SelectionJavelin;
+			}
+			if (P1_Wea == 3)
+			{
+				SelectionPlayer1Oper->AddComponent<Renderer>()->sprite = SelectionBow;
+			}
+			if (P1_Wea < 0) {
+				P1_Wea = 3;
+			}
+			if (P1_Wea > 3) {
+				P1_Wea = 0;
+			}
+
 		}
 		if (PLAYERKAZU == 2) {
-			Option_x = -300;
-			Option_y = -350;
-		}
+			Option_x = 600;
+			Option_y = 300;
+			if (GetKeyDown(DIK_A)) {
+				P2_Opn--;
+			}
+			if (GetKeyDown(DIK_D)) {
+				P2_Opn++;
+			}
+			if (P2_Opn == 0) {
+				SelectionPlayer2Oper->AddComponent<Renderer>()->sprite = SelectionKey;
 
+			}
+			if (P2_Opn == 1) {
+				SelectionPlayer2Oper->AddComponent<Renderer>()->sprite = SelectionFeat;
+
+			}
+			if (P2_Opn < 0) {
+				P2_Opn = 1;
+			}
+			if (P2_Opn > 1) {
+				P2_Opn = 0;
+			}
+		}
 		if (PLAYERKAZU == 3) {
 			Option_x = 600;
+			Option_y = 150; 
+			if (GetKeyDown(DIK_A)) {
+				P2_Wea--;
+			}
+			if (GetKeyDown(DIK_D)) {
+				P2_Wea++;
+			}
+			if (P2_Wea == 0) {
+
+				SelectionPlayer2Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+			}
+			if (P2_Wea == 1) {
+				SelectionPlayer2Oper->AddComponent<Renderer>()->sprite = SelectionShield;
+
+			}
+			if (P2_Wea == 2) {
+				SelectionPlayer2Oper->AddComponent<Renderer>()->sprite = SelectionJavelin;
+			}
+			if (P2_Wea == 3)
+			{
+				SelectionPlayer2Oper->AddComponent<Renderer>()->sprite = SelectionBow;
+			}
+			if (P2_Wea < 0) {
+				P2_Wea = 3;
+			}
+			if (P2_Wea > 3) {
+				P2_Wea = 0;
+			}
+		}
+		if (PLAYERKAZU == 4) {
+			Option_x = -300;
+			Option_y = -200;
+			SelectionPlayer3->AddComponent<Renderer>()->sprite = SelectionPlayer3pSpr;
+			if (GetKeyDown(DIK_A)) {
+				P3_Opn--;
+			}
+			if (GetKeyDown(DIK_D)) {
+				P3_Opn++;
+			}
+			if (P3_Opn == 0) {
+				SelectionPlayer3Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+
+			}
+			if (P3_Opn == 1) {
+				SelectionPlayer3Oper->AddComponent<Renderer>()->sprite = SelectionFeat;
+
+			}
+			if (P3_Opn < 0) {
+				P3_Opn = 1;
+			}
+			if (P3_Opn > 1) {
+				P3_Opn = 0;
+			}
+		}
+		if (PLAYERKAZU == 5) {
+			Option_x = -300;
 			Option_y = -350;
+		
+			if (GetKeyDown(DIK_A)) {
+				P3_Wea--;
+			}
+			if (GetKeyDown(DIK_D)) {
+				P3_Wea++;
+			}
+			if (P3_Wea == 0) {
+
+				SelectionPlayer3Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+			}
+			if (P3_Wea == 1) {
+				SelectionPlayer3Oper->AddComponent<Renderer>()->sprite = SelectionShield;
+
+			}
+			if (P3_Wea == 2) {
+				SelectionPlayer3Oper->AddComponent<Renderer>()->sprite = SelectionJavelin;
+			}
+			if (P3_Wea == 3)
+			{
+				SelectionPlayer3Oper->AddComponent<Renderer>()->sprite = SelectionBow;
+			}
+			if (P3_Wea < 0) {
+				P3_Wea = 3;
+			}
+			if (P3_Wea > 3) {
+				P3_Wea = 0;
+			}
+		}
+		if (PLAYERKAZU == 6) {
+			Option_x = 600;
+			Option_y = -200;
+			SelectionPlayer4->AddComponent<Renderer>()->sprite = SelectionPlayer4pSpr;
+			if (GetKeyDown(DIK_A)) {
+				P4_Opn--;
+			}
+			if (GetKeyDown(DIK_D)) {
+				P4_Opn++;
+			}
+			if (P4_Opn == 0) {
+				SelectionPlayer4Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+
+			}
+			if (P4_Opn == 1) {
+				SelectionPlayer4Oper->AddComponent<Renderer>()->sprite = SelectionFeat;
+
+			}
+			if (P4_Opn < 0) {
+				P4_Opn = 1;
+			}
+			if (P4_Opn > 1) {
+				P4_Opn = 0;
+			}
+		}
+
+		if (PLAYERKAZU == 7) {
+			Option_x = 600;
+			Option_y = -350;
+			if (GetKeyDown(DIK_A)) {
+				P4_Wea--;
+			}
+			if (GetKeyDown(DIK_D)) {
+				P4_Wea++;
+			}
+			if (P4_Wea == 0) {
+
+				SelectionPlayer4Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+			}
+			if (P4_Wea == 1) {
+				SelectionPlayer4Oper->AddComponent<Renderer>()->sprite = SelectionShield;
+
+			}
+			if (P4_Wea == 2) {
+				SelectionPlayer4Oper->AddComponent<Renderer>()->sprite = SelectionJavelin;
+			}
+			if (P4_Wea == 3)
+			{
+				SelectionPlayer4Oper->AddComponent<Renderer>()->sprite = SelectionBow;
+			}
+			if (P4_Wea < 0) {
+				P4_Wea = 3;
+			}
+			if (P4_Wea > 3) {
+				P4_Wea = 0;
+			}
+		}
+		if (PLAYERKAZU == 8) {
+			Option_x = 800;
+			Option_y = 0;
+			SceneManager::LoadScene(1);
+			return;
 		}
 	}
 }
-
-;
+ÅG
