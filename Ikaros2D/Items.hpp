@@ -28,8 +28,8 @@ public:
 	Camera* mainCamera;
 
 	void Awake() {
-		BoxSprite[0] = new Sprite("BoxSprite1", Texture::LoadTexture("BoxTexture1", "Assets/Textures/crate.png"));
-		BoxSprite[1] = new Sprite("BoxSprite2", Texture::LoadTexture("BoxTexture2", "Assets/Textures/crate.png"));
+		BoxSprite[0] = new Sprite("BoxSprite1", Texture::LoadTexture("BoxTexture1", "Assets/Textures/Objects/Weapons/SwordCase.png"));
+		BoxSprite[1] = new Sprite("BoxSprite2", Texture::LoadTexture("BoxTexture2", "Assets/Textures/Objects/Weapons/LanceCase.png"));
 	}
 
 	void Start() {

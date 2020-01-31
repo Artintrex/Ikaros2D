@@ -8,115 +8,131 @@ public:
 		mb_init();
 	}
 
-	Texture* texBG[7];
-	Sprite* sprBG[7];
-
-	Texture* texFloor;
+	std::vector <Sprite*> vBGSprite;
 	Sprite* sprFloor;
 
 	void Awake() {
-		texBG[0] = Texture::LoadTexture("clouds1Sprite", "Assets/Textures/BG/clouds_1.png");
-		texBG[1] = Texture::LoadTexture("clouds2Sprite", "Assets/Textures/BG/clouds_2.png");
-		texBG[2] = Texture::LoadTexture("clouds3Sprite", "Assets/Textures/BG/clouds_3.png");
-		texBG[3] = Texture::LoadTexture("clouds4Sprite", "Assets/Textures/BG/clouds_4.png");
-		texBG[4] = Texture::LoadTexture("rocks1Sprite", "Assets/Textures/BG/rocks_1.png");
-		texBG[5] = Texture::LoadTexture("rocks2Sprite", "Assets/Textures/BG/rocks_2.png");
-		texBG[6] = Texture::LoadTexture("skySprite", "Assets/Textures/BG/sky.png");
+		vBGSprite.push_back(new Sprite("clouds1Sprite", Texture::LoadTexture("clouds1Texture", "Assets/Textures/BG/clouds_1.png")));
+		vBGSprite.push_back(new Sprite("clouds2Sprite", Texture::LoadTexture("clouds2Texture", "Assets/Textures/BG/clouds_2.png")));
+		vBGSprite.push_back(new Sprite("clouds3Sprite", Texture::LoadTexture("clouds3Texture", "Assets/Textures/BG/clouds_3.png")));
+		vBGSprite.push_back(new Sprite("clouds4Sprite", Texture::LoadTexture("clouds4Texture", "Assets/Textures/BG/clouds_4.png")));
+		vBGSprite.push_back(new Sprite("rocks1Sprite", Texture::LoadTexture("rocks1Texture", "Assets/Textures/BG/rocks_1.png")));
+		vBGSprite.push_back(new Sprite("rocks2Sprite", Texture::LoadTexture("rocks2Texture", "Assets/Textures/BG/rocks_2.png")));
+		vBGSprite.push_back(new Sprite("skySprite", Texture::LoadTexture("skyTexture", "Assets/Textures/BG/sky.png")));
+		vBGSprite.push_back(new Sprite("treeSprite", Texture::LoadTexture("treeTexture", "Assets/Textures/BG/tree.png")));
+		vBGSprite.push_back(new Sprite("ground2Sprite", Texture::LoadTexture("ground2Texture", "Assets/Textures/BG/ground.png")));
 
-		for (int i = 0; i < 7; i++)
-		{
-			sprBG[i] = new Sprite();
-			sprBG[i]->texture = texBG[i];
-			sprBG[i]->GenereteSprite();
-		}
-
-		texFloor = Texture::LoadTexture("floor", "Assets/Textures/floor.png");
-		sprFloor = new Sprite();
-		sprFloor->texture = texFloor;
-		sprFloor->GenereteSprite();
+		sprFloor = new Sprite("ground1Sprite", Texture::LoadTexture("floor", "Assets/Textures/floor.png"));
 	}
 
 	void Start() {
 		GameObject* sky = new GameObject("sky1");
-		sky->AddComponent<Renderer>()->sprite = sprBG[6];
+		sky->AddComponent<Renderer>()->sprite = vBGSprite[6];
 		sky->transform->position = Vector3(0, 0, 1000);
 		sky->transform->scale = Vector3(150, 150, 1);
 
 		GameObject* sky2 = new GameObject("sky2");
-		sky2->AddComponent<Renderer>()->sprite = sprBG[6];
-		sky2->transform->position = Vector3(sprBG[6]->size.x * 150 - 5, 0, 999.9);
+		sky2->AddComponent<Renderer>()->sprite = vBGSprite[6];
+		sky2->transform->position = Vector3(vBGSprite[6]->size.x * 150 - 5, 0, 999.9);
 		sky2->transform->scale = Vector3(150, 150, 1);
 
 		GameObject* sky3 = new GameObject("sky3");
-		sky3->AddComponent<Renderer>()->sprite = sprBG[6];
-		sky3->transform->position = Vector3(sprBG[6]->size.x * -150 + 5, 0, 999.9);
+		sky3->AddComponent<Renderer>()->sprite = vBGSprite[6];
+		sky3->transform->position = Vector3(vBGSprite[6]->size.x * -150 + 5, 0, 999.9);
 		sky3->transform->scale = Vector3(150, 150, 1);
 
 		GameObject* Brocks1 = new GameObject("Brocks1");
-		Brocks1->AddComponent<Renderer>()->sprite = sprBG[4];
+		Brocks1->AddComponent<Renderer>()->sprite = vBGSprite[4];
 		Brocks1->transform->position = Vector3(0, 0, 600);
 		Brocks1->transform->scale = Vector3(75, 75, 1);
 
 		GameObject* Brocks2 = new GameObject("Brocks2");
-		Brocks2->AddComponent<Renderer>()->sprite = sprBG[4];
-		Brocks2->transform->position = Vector3(sprBG[4]->size.x * 75 - 0.1, 0, 599.9);
+		Brocks2->AddComponent<Renderer>()->sprite = vBGSprite[4];
+		Brocks2->transform->position = Vector3(vBGSprite[4]->size.x * 75 - 0.1, 0, 599.9);
 		Brocks2->transform->scale = Vector3(75, 75, 1);
 
 		GameObject* Brocks3 = new GameObject("Brocks3");
-		Brocks3->AddComponent<Renderer>()->sprite = sprBG[4];
-		Brocks3->transform->position = Vector3(sprBG[4]->size.x * -75 + 0.1, 0, 599.9);
+		Brocks3->AddComponent<Renderer>()->sprite = vBGSprite[4];
+		Brocks3->transform->position = Vector3(vBGSprite[4]->size.x * -75 + 0.1, 0, 599.9);
 		Brocks3->transform->scale = Vector3(75, 75, 1);
 
 		GameObject* Frocks1 = new GameObject("Frocks1");
-		Frocks1->AddComponent<Renderer>()->sprite = sprBG[5];
+		Frocks1->AddComponent<Renderer>()->sprite = vBGSprite[5];
 		Frocks1->transform->position = Vector3(0, -25, 200);
 		Frocks1->transform->scale = Vector3(30, 30, 1);
 
 		GameObject* Frocks2 = new GameObject("Frocks2");
-		Frocks2->AddComponent<Renderer>()->sprite = sprBG[5];
-		Frocks2->transform->position = Vector3(sprBG[4]->size.x * 30 - 0.1, -25, 199.9);
+		Frocks2->AddComponent<Renderer>()->sprite = vBGSprite[5];
+		Frocks2->transform->position = Vector3(vBGSprite[4]->size.x * 30 - 0.1, -25, 199.9);
 		Frocks2->transform->scale = Vector3(30, 30, 1);
 
 		GameObject* Frocks3 = new GameObject("Frocks3");
-		Frocks3->AddComponent<Renderer>()->sprite = sprBG[5];
-		Frocks3->transform->position = Vector3(sprBG[4]->size.x * -30 + 0.1, -25, 199.9);
+		Frocks3->AddComponent<Renderer>()->sprite = vBGSprite[5];
+		Frocks3->transform->position = Vector3(vBGSprite[4]->size.x * -30 + 0.1, -25, 199.9);
 		Frocks3->transform->scale = Vector3(30, 30, 1);
 
 		GameObject* Bclouds1 = new GameObject("Bclouds1");
-		Bclouds1->AddComponent<Renderer>()->sprite = sprBG[0];
+		Bclouds1->AddComponent<Renderer>()->sprite = vBGSprite[0];
 		Bclouds1->transform->position = Vector3(0, 0, 350);
 		Bclouds1->transform->scale = Vector3(40, 40, 1);
 
 		GameObject* Bclouds2 = new GameObject("Bclouds2");
-		Bclouds2->AddComponent<Renderer>()->sprite = sprBG[0];
-		Bclouds2->transform->position = Vector3(sprBG[0]->size.x * 40 - 0.1, 0, 349.9);
+		Bclouds2->AddComponent<Renderer>()->sprite = vBGSprite[0];
+		Bclouds2->transform->position = Vector3(vBGSprite[0]->size.x * 40 - 0.1, 0, 349.9);
 		Bclouds2->transform->scale = Vector3(40, 40, 1);
 
 		GameObject* Bclouds3 = new GameObject("Bclouds3");
-		Bclouds3->AddComponent<Renderer>()->sprite = sprBG[0];
-		Bclouds3->transform->position = Vector3(sprBG[0]->size.x * -40 + 0.1, 0, 349.9);
+		Bclouds3->AddComponent<Renderer>()->sprite = vBGSprite[0];
+		Bclouds3->transform->position = Vector3(vBGSprite[0]->size.x * -40 + 0.1, 0, 349.9);
 		Bclouds3->transform->scale = Vector3(40, 40, 1);
 
 		GameObject* Fclouds1 = new GameObject("Fclouds1");
-		Fclouds1->AddComponent<Renderer>()->sprite = sprBG[1];
+		Fclouds1->AddComponent<Renderer>()->sprite = vBGSprite[1];
 		Fclouds1->transform->position = Vector3(200, -10, 250);
 		Fclouds1->transform->scale = Vector3(15, 15, 1);
 
 		GameObject* Fclouds2 = new GameObject("Fclouds2");
-		Fclouds2->AddComponent<Renderer>()->sprite = sprBG[2];
+		Fclouds2->AddComponent<Renderer>()->sprite = vBGSprite[2];
 		Fclouds2->transform->position = Vector3(-200, -10, 150);
 		Fclouds2->transform->scale = Vector3(15, 15, 1);
 
 		GameObject* Fclouds3 = new GameObject("Fclouds3");
-		Fclouds3->AddComponent<Renderer>()->sprite = sprBG[3];
+		Fclouds3->AddComponent<Renderer>()->sprite = vBGSprite[3];
 		Fclouds3->transform->position = Vector3(-400, -50, 150);
 		Fclouds3->transform->scale = Vector3(15, 15, 1);
 
+		GameObject* Trees1 = new GameObject("Trees1");
+		Trees1->AddComponent<Renderer>()->sprite = vBGSprite[7];
+		Trees1->transform->scale = Vector3(5, 5, 1);
+		Trees1->transform->position = Vector3(-vBGSprite[7]->size.x * Trees1->transform->scale.x, -49, 10);
+		
+		for (float i = Trees1->transform->position.y - ((vBGSprite[7]->size.y * 5 + vBGSprite[8]->size.y * 5) / 2); i > -150; i -= vBGSprite[8]->size.y * 5) {
+			CreateUnderground(Trees1->transform->position.x, i);
+		}
+		GameObject* Trees2 = new GameObject("Trees2");
+		Trees2->AddComponent<Renderer>()->sprite = vBGSprite[7];
+		Trees2->transform->scale = Vector3(5, 5, 1);
+		Trees2->transform->position = Vector3(0, -49, 10);
+
+		for (float i = Trees2->transform->position.y - ((vBGSprite[7]->size.y * 5 + vBGSprite[8]->size.y * 5) / 2); i > -150; i -= vBGSprite[8]->size.y * 5) {
+			CreateUnderground(Trees2->transform->position.x, i);
+		}
+
+		GameObject* Trees3 = new GameObject("Trees3");
+		Trees3->AddComponent<Renderer>()->sprite = vBGSprite[7];
+		Trees3->transform->scale = Vector3(5, 5, 1);
+		Trees3->transform->position = Vector3(vBGSprite[7]->size.x * Trees3->transform->scale.x, -49, 10);
+
+		for (float i = Trees3->transform->position.y - ((vBGSprite[7]->size.y * 5 + vBGSprite[8]->size.y * 5) / 2); i > -150; i -= vBGSprite[8]->size.y * 5) {
+			CreateUnderground(Trees3->transform->position.x, i);
+		}
+
 		//GroundCollider
+		/*
 		for (float i = 150; i > -150; i -= 3.6) {
 			CreateFloor(i, -50);
 		}
-
+		*/
 		GameObject* GroundCollider;
 		GroundCollider = new GameObject("GroundCollider");
 		GroundCollider->tag = "Ground";
@@ -182,5 +198,14 @@ public:
 		floorblock->transform->position = Vector3(x, y, 0);
 
 		numberofFloor++;
+	}
+	int numberofUG = 0;
+	void CreateUnderground(float x, float y) {
+		GameObject* floorblock = new GameObject((std::string)"Underground" + std::to_string(numberofUG));
+		floorblock->AddComponent<Renderer>()->sprite = vBGSprite[8];
+		floorblock->transform->position = Vector3(x, y, 10.1);
+		floorblock->transform->scale = Vector3(5, 5, 1);
+
+		numberofUG++;
 	}
 };

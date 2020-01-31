@@ -140,7 +140,7 @@ public:
 	float RunAnimTimer = 0.5;
 	bool JumpFlag = true;
 
-	int ActiveItem = gSword;
+	int ActiveItem = gNoItem;
 	int JavelinCount = 0;
 
 	enum Animation {
@@ -303,12 +303,14 @@ public:
 		}
 
 		if (collider.parent->tag == "Box") {
-			if (GetKeyDown(iActivate)) {
+			if (GetKey(iActivate)) {
 				switch (collider.parent->GetComponent<Box>()->TypeOfBox) {
 				case 0:
 					ActiveItem = gSword;
+					break;
 				case 1:
 					JavelinCount += 2;
+					break;
 				}
 
 				Destroy(collider.parent);
