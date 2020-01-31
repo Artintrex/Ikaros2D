@@ -14,16 +14,13 @@ public:
 	int P3_Opn, P3_Wea;
 	int P4_Opn, P4_Wea;
 	
-
 	GameObject* SelectionCamera;//ÉJÉÅÉâ
 	GameObject* SelectionBackdrop;//îwåi
 	
-
 	Renderer* SelectionBackdropRen;
 	Sprite* SelectionBackdropSpr;
 	Renderer* SelectionRim0Ren;
 	Sprite* SelectionRim0Spr;
-
 
 	GameObject* SelectionRim2;//ëIÇ‘UIÇR
 	Renderer* SelectionRim2Ren;
@@ -31,8 +28,6 @@ public:
 	GameObject* SelectionGO;
 	Renderer* SelectionGORen;
 	Sprite* SelectionGOSpr;
-
-
 
 	GameObject* SelectionNoPlayer;
 	GameObject* SelectionPlayer1;//playerÇÃäG
@@ -455,5 +450,4 @@ public:
 			return;
 		}
 	}
-}
-ÅG
+};

@@ -104,7 +104,7 @@ public:
 		GameObject* Trees1 = new GameObject("Trees1");
 		Trees1->AddComponent<Renderer>()->sprite = vBGSprite[7];
 		Trees1->transform->scale = Vector3(5, 5, 1);
-		Trees1->transform->position = Vector3(-vBGSprite[7]->size.x * Trees1->transform->scale.x, -49, 10);
+		Trees1->transform->position = Vector3(-vBGSprite[7]->size.x * Trees1->transform->scale.x, -47.5, 10);
 		
 		for (float i = Trees1->transform->position.y - ((vBGSprite[7]->size.y * 5 + vBGSprite[8]->size.y * 5) / 2); i > -150; i -= vBGSprite[8]->size.y * 5) {
 			CreateUnderground(Trees1->transform->position.x, i);
@@ -112,7 +112,7 @@ public:
 		GameObject* Trees2 = new GameObject("Trees2");
 		Trees2->AddComponent<Renderer>()->sprite = vBGSprite[7];
 		Trees2->transform->scale = Vector3(5, 5, 1);
-		Trees2->transform->position = Vector3(0, -49, 10);
+		Trees2->transform->position = Vector3(0, -47.5, 10);
 
 		for (float i = Trees2->transform->position.y - ((vBGSprite[7]->size.y * 5 + vBGSprite[8]->size.y * 5) / 2); i > -150; i -= vBGSprite[8]->size.y * 5) {
 			CreateUnderground(Trees2->transform->position.x, i);
@@ -121,7 +121,7 @@ public:
 		GameObject* Trees3 = new GameObject("Trees3");
 		Trees3->AddComponent<Renderer>()->sprite = vBGSprite[7];
 		Trees3->transform->scale = Vector3(5, 5, 1);
-		Trees3->transform->position = Vector3(vBGSprite[7]->size.x * Trees3->transform->scale.x, -49, 10);
+		Trees3->transform->position = Vector3(vBGSprite[7]->size.x * Trees3->transform->scale.x, -47.5, 10);
 
 		for (float i = Trees3->transform->position.y - ((vBGSprite[7]->size.y * 5 + vBGSprite[8]->size.y * 5) / 2); i > -150; i -= vBGSprite[8]->size.y * 5) {
 			CreateUnderground(Trees3->transform->position.x, i);

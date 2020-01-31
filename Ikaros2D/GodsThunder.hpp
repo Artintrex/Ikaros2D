@@ -73,16 +73,16 @@ public:
 		GodsThunderTime -= Time.DeltaTime;
 
 	}
-};
 
-void OnCollisionEnter(Collision collider) {
+	void OnCollisionEnter(Collision collider) {
 
-	if (collider.parent->tag == "Ground") {
+		if (collider.parent->tag == "Ground") {
 
 
-		//effect
-		//ThunderEffect[0] = new Sprite("ThunderEffect");
+			//effect
+			//ThunderEffect[0] = new Sprite("ThunderEffect");
+
+		}
 
 	}
-
-}
+};
