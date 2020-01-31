@@ -132,7 +132,7 @@ public:
 			StartRenderer->sprite = StartSpr1;
 
 			if (GetKeyDown(DIK_RETURN) ) {
-				SceneManager::LoadScene(3);
+				SceneManager::LoadScene(1);
 				return;
 			}
 		}

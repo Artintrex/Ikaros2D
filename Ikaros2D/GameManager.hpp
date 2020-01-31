@@ -30,24 +30,50 @@ public:
 	}
 
 	void Start() {
-		parent->AddComponent<Debug>();
+		//parent->AddComponent<Debug>();
+
+		//Reset scores
+		fScore1 = fScore2 = fScore3 = fScore4 = 0;
 	}
 
-	float Timer = 120;
+	float Timer = 360;
 	void Update() {
+		float xP1;
+		float xP2;
 
-		//Camera Animation Calculation
-		float xP1 = gPlayerController->player1->transform->position.x;
-		float xP2 = gPlayerController->player2->transform->position.x;
+		float yP1;
+		float yP2;
+
+		xP1 = vPlayers[0]->transform->position.x;
+		xP2 = vPlayers[0]->transform->position.x;
+		for (int i = 1; i < vPlayers.size(); ++i) {
+			if (vPlayers[i]->transform->position.x < xP1) {
+				xP1 = vPlayers[i]->transform->position.x;
+			}
+			else if (vPlayers[i]->transform->position.x > xP2) {
+				xP2 = vPlayers[i]->transform->position.x;
+			}
+		}
+
+		yP1 = vPlayers[0]->transform->position.y;
+		yP2 = vPlayers[0]->transform->position.y;
+		for (int i = 1; i < vPlayers.size(); ++i) {
+			if (vPlayers[i]->transform->position.y < yP1) {
+				yP1 = vPlayers[i]->transform->position.y;
+			}
+			else if (vPlayers[i]->transform->position.y > yP2) {
+				yP2 = vPlayers[i]->transform->position.y;
+			}
+		}
 
 		float dxP1 = xP1 - MainCamera->transform->position.x;
 		float dxP2 = xP2 - MainCamera->transform->position.x;
 
 		float Xavg = (xP1 + xP2) / 2;
-		float Yavg = (gPlayerController->player1->transform->position.y + gPlayerController->player2->transform->position.y) / 2;
+		float Yavg = (yP1 + yP2) / 2;
 
 		float speed = abs(MainCamera->transform->position.x - Xavg);
-		float speedY = abs(MainCamera->transform->position.y - Yavg);
+		float speedY = abs(MainCamera->transform->position.y - Yavg) / 0.1f;
 
 		if (MainCamera->transform->position.x > Xavg + 0.2f) {
 			MainCamera->transform->position.x -= speed * Time.DeltaTime;
@@ -56,10 +82,10 @@ public:
 			MainCamera->transform->position.x += speed * Time.DeltaTime;
 		}
 
-		if (MainCamera->transform->position.y > Yavg + 15.0f) {
+		if (MainCamera->transform->position.y > Yavg) {
 			MainCamera->transform->position.y -= speedY * Time.DeltaTime;
 		}
-		else if (MainCamera->transform->position.y < Yavg + 5.0f) {
+		else if (MainCamera->transform->position.y < Yavg) {
 			MainCamera->transform->position.y += speedY * Time.DeltaTime;
 		}
 

@@ -10,8 +10,6 @@
 //
 //Add your classes here so scene loader can recognize them
 REGISTER_COMPONENT(Debug)
-REGISTER_COMPONENT(Player1)
-REGISTER_COMPONENT(Player2)
 REGISTER_COMPONENT(PlayerController)
 REGISTER_COMPONENT(GameManager)
 REGISTER_COMPONENT(SceneAlpha)

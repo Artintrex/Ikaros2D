@@ -1,6 +1,8 @@
 #pragma once
 #include "IkarosCore.h"
-#include "Player1.hpp"
+
+extern bool bPlayer1, bPlayer2, bPlayer3, bPlayer4;
+extern std::vector<Player*> vPlayers;
 
 class PlayerController : public MonoBehavior {
 public:
@@ -11,72 +13,73 @@ public:
 
 	GameObject* player1;
 	GameObject* player2;
-
-	std::vector <Sprite*> RunningSprite;
-	std::vector <Sprite*> RunningSpriteWithSword;
-	std::vector <Sprite*> AttackSprite;
-	std::vector <Sprite*> IdleSprite;
+	GameObject* player3;
+	GameObject* player4;
 
 	void Awake() {
-		//Load running animation without weapon
-		for (int i = 0; i < 6; i++)
-		{
-			std::string textureName = "player_running_test_" + std::to_string(i + 1);
-			std::string path = "Assets/Textures/Player/" + textureName + ".png";
-
-			RunningSprite.push_back(new Sprite(textureName + "Sprite", Texture::LoadTexture(textureName, path)));
-			RunningSprite[i]->doubleSided = true;
-			RunningSprite[i]->GenereteSprite(textureName);
-		}
-
-		//Load Running animation with weapon
-		for (int i = 0; i < 6; i++)
-		{
-			std::string textureName = "player_running_sword_test_" + std::to_string(i + 1);
-			std::string path = "Assets/Textures/Player/" + textureName + ".png";
-
-			RunningSpriteWithSword.push_back(new Sprite(textureName + "Sprite", Texture::LoadTexture(textureName, path)));
-			RunningSpriteWithSword[i]->doubleSided = true;
-			RunningSpriteWithSword[i]->GenereteSprite(textureName);
-		}
-
-		//Load Attack animation with weapon
-		for (int i = 0; i < 3; i++)
-		{
-			std::string textureName = "player_attack_sword_test_" + std::to_string(i + 1);
-			std::string path = "Assets/Textures/Player/" + textureName + ".png";
-
-			AttackSprite.push_back(new Sprite(textureName + "Sprite", Texture::LoadTexture(textureName, path)));
-			AttackSprite[i]->doubleSided = true;
-			AttackSprite[i]->GenereteSprite(textureName);
-		}
-
-		//Load idle animation
-		for (int i = 0; i < 1; i++)
-		{
-			std::string textureName = "player_idle_test_" + std::to_string(i + 1);
-			std::string path = "Assets/Textures/Player/" + textureName + ".png";
-
-			IdleSprite.push_back(new Sprite(textureName + "Sprite", Texture::LoadTexture(textureName, path)));
-			IdleSprite[i]->doubleSided = true;
-			IdleSprite[i]->GenereteSprite(textureName);
-		}
+		//FOR TESTING ONLY these need to be set in selection menu
+		bPlayer1 = true;
+		bPlayer2 = true;
+		bPlayer3 = false;
+		bPlayer4 = false;
 	}
 
 	void Start() {
-		player1 = new GameObject("Player1");
-		Player1* gP1 = player1->AddComponent<Player1>();
-		gP1->RunningSprite = RunningSprite;
-		gP1->RunningSpriteWithSword = RunningSpriteWithSword;
-		gP1->AttackSprite = AttackSprite;
-		gP1->IdleSprite = IdleSprite;
+		vPlayers.clear();
+		Player* gPlayer;
 
-		player2 = new GameObject("Player2");
-		Player2* gP2 = player2->AddComponent<Player2>();
-		gP2->RunningSprite = RunningSprite;
-		gP2->RunningSpriteWithSword = RunningSpriteWithSword;
-		gP2->AttackSprite = AttackSprite;
-		gP2->IdleSprite = IdleSprite;
+		if (bPlayer1) {
+			player1 = new GameObject("Player1");
+			player1->tag = "Player";
+			player1->transform->position = Vector3(-20, 20, 0);
+			gPlayer = player1->AddComponent<Player>();
+			vPlayers.push_back(gPlayer);
+		}
+
+		if (bPlayer2) {
+			player2 = new GameObject("Player2");
+			player2->tag = "Player";
+			player2->transform->position = Vector3(0, 20, 0);
+			gPlayer = player2->AddComponent<Player>();
+			gPlayer->PlayerPath = "2P";
+			gPlayer->iLeft = DIK_LEFT;
+			gPlayer->iRight = DIK_RIGHT;
+			gPlayer->iJump = DIK_UP;
+			gPlayer->iAttack = DIK_RSHIFT;
+			gPlayer->iThrow = DIK_RCONTROL;
+			gPlayer->iActivate = DIK_RETURN;
+			vPlayers.push_back(gPlayer);
+		}
+
+		if (bPlayer3) {
+			player3 = new GameObject("Player3");
+			player3->tag = "Player";
+			player3->transform->position = Vector3(20, 20, 0);
+			gPlayer = player3->AddComponent<Player>();
+			gPlayer->PlayerPath = "3P";
+			gPlayer->iLeft = DIK_LEFT;
+			gPlayer->iRight = DIK_RIGHT;
+			gPlayer->iJump = DIK_UP;
+			gPlayer->iAttack = DIK_RSHIFT;
+			gPlayer->iThrow = DIK_RCONTROL;
+			gPlayer->iActivate = DIK_RETURN;
+			vPlayers.push_back(gPlayer);
+		}
+
+		if (bPlayer4) {
+			player4 = new GameObject("Player4");
+			player4->tag = "Player";
+			player4->transform->position = Vector3(40, 20, 0);
+			gPlayer = player4->AddComponent<Player>();
+			gPlayer->PlayerPath = "4P";
+			gPlayer->iLeft = DIK_LEFT;
+			gPlayer->iRight = DIK_RIGHT;
+			gPlayer->iJump = DIK_UP;
+			gPlayer->iAttack = DIK_RSHIFT;
+			gPlayer->iThrow = DIK_RCONTROL;
+			gPlayer->iActivate = DIK_RETURN;
+			vPlayers.push_back(gPlayer);
+		}
 	}
 
 	void Update() {
