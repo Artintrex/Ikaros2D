@@ -3,10 +3,6 @@
 
 class SelectionScene : public MonoBehavior {
 public:
-	SelectionScene() {
-		type = typeid(*this).name();
-		mb_init();
-	}
 
 	int PLAYERKAZU = 0;
 	int P1_Opn, P1_Wea;
@@ -222,11 +218,11 @@ public:
 					P1_Opn++;
 				}
 				if (P1_Opn == 0) {
-					SelectionPlayer1Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+					SelectionPlayer1Oper->GetComponent<Renderer>()->sprite = SelectionKey;
 
 				}
 				if (P1_Opn == 1) {
-				SelectionPlayer1Oper->AddComponent<Renderer>()->sprite = SelectionFeat;
+				SelectionPlayer1Oper->GetComponent<Renderer>()->sprite = SelectionFeat;
 
 				}
 				if (P1_Opn < 0) {
@@ -247,18 +243,18 @@ public:
 				}
 				if (P1_Wea == 0) {
 
-					SelectionPlayer1Weapon->AddComponent<Renderer>()->sprite = SelectionSword;
+					SelectionPlayer1Weapon->GetComponent<Renderer>()->sprite = SelectionSword;
 				}
 				if (P1_Wea == 1) {
-					SelectionPlayer1Weapon->AddComponent<Renderer>()->sprite = SelectionShield;
+					SelectionPlayer1Weapon->GetComponent<Renderer>()->sprite = SelectionShield;
 
 				}
 				if (P1_Wea == 2) {
-					SelectionPlayer1Weapon->AddComponent<Renderer>()->sprite = SelectionJavelin;
+					SelectionPlayer1Weapon->GetComponent<Renderer>()->sprite = SelectionJavelin;
 				}
 				if (P1_Wea == 3)
 				{
-					SelectionPlayer1Weapon->AddComponent<Renderer>()->sprite = SelectionBow;
+					SelectionPlayer1Weapon->GetComponent<Renderer>()->sprite = SelectionBow;
 				}
 				if (P1_Wea < 0) {
 					P1_Wea = 3;
@@ -277,11 +273,11 @@ public:
 					P2_Opn++;
 				}
 				if (P2_Opn == 0) {
-					SelectionPlayer2Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+					SelectionPlayer2Oper->GetComponent<Renderer>()->sprite = SelectionKey;
 
 				}
 				if (P2_Opn == 1) {
-					SelectionPlayer2Oper->AddComponent<Renderer>()->sprite = SelectionFeat;
+					SelectionPlayer2Oper->GetComponent<Renderer>()->sprite = SelectionFeat;
 				}
 				if (P2_Opn < 0) {
 					P2_Opn = 1;
@@ -301,18 +297,18 @@ public:
 					}
 					if (P2_Wea == 0) {
 
-						SelectionPlayer2Weapon->AddComponent<Renderer>()->sprite = SelectionSword;
+						SelectionPlayer2Weapon->GetComponent<Renderer>()->sprite = SelectionSword;
 					}
 					if (P2_Wea == 1) {
-						SelectionPlayer2Weapon->AddComponent<Renderer>()->sprite = SelectionShield;
+						SelectionPlayer2Weapon->GetComponent<Renderer>()->sprite = SelectionShield;
 
 					}
 					if (P2_Wea == 2) {
-						SelectionPlayer2Weapon->AddComponent<Renderer>()->sprite = SelectionJavelin;
+						SelectionPlayer2Weapon->GetComponent<Renderer>()->sprite = SelectionJavelin;
 					}
 					if (P2_Wea == 3)
 					{
-						SelectionPlayer2Weapon->AddComponent<Renderer>()->sprite = SelectionBow;
+						SelectionPlayer2Weapon->GetComponent<Renderer>()->sprite = SelectionBow;
 					}
 					if (P2_Wea < 0) {
 						P2_Wea = 3;
@@ -324,7 +320,7 @@ public:
 				if (PLAYERKAZU == 4) {
 					Option_x = -300;
 					Option_y = -200;
-					SelectionPlayer3->AddComponent<Renderer>()->sprite = SelectionPlayer3pSpr;
+					SelectionPlayer3->GetComponent<Renderer>()->sprite = SelectionPlayer3pSpr;
 					if (GetKeyDown(DIK_A)) {
 						P3_Opn--;
 					}
@@ -332,11 +328,11 @@ public:
 						P3_Opn++;
 					}
 					if (P3_Opn == 0) {
-						SelectionPlayer3Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+						SelectionPlayer3Oper->GetComponent<Renderer>()->sprite = SelectionKey;
 
 					}
 					if (P3_Opn == 1) {
-						SelectionPlayer3Oper->AddComponent<Renderer>()->sprite = SelectionFeat;
+						SelectionPlayer3Oper->GetComponent<Renderer>()->sprite = SelectionFeat;
 
 					}
 					if (P3_Opn < 0) {
@@ -358,18 +354,18 @@ public:
 					}
 					if (P3_Wea == 0) {
 
-						SelectionPlayer3Weapon->AddComponent<Renderer>()->sprite = SelectionSword;
+						SelectionPlayer3Weapon->GetComponent<Renderer>()->sprite = SelectionSword;
 					}
 					if (P3_Wea == 1) {
-						SelectionPlayer3Weapon->AddComponent<Renderer>()->sprite = SelectionShield;
+						SelectionPlayer3Weapon->GetComponent<Renderer>()->sprite = SelectionShield;
 
 					}
 					if (P3_Wea == 2) {
-						SelectionPlayer3Weapon->AddComponent<Renderer>()->sprite = SelectionJavelin;
+						SelectionPlayer3Weapon->GetComponent<Renderer>()->sprite = SelectionJavelin;
 					}
 					if (P3_Wea == 3)
 					{
-						SelectionPlayer3Weapon->AddComponent<Renderer>()->sprite = SelectionBow;
+						SelectionPlayer3Weapon->GetComponent<Renderer>()->sprite = SelectionBow;
 					}
 					if (P3_Wea < 0) {
 						P3_Wea = 3;
@@ -381,7 +377,7 @@ public:
 				if (PLAYERKAZU == 6) {
 					Option_x = 600;
 					Option_y = -200;
-					SelectionPlayer4->AddComponent<Renderer>()->sprite = SelectionPlayer4pSpr;
+					SelectionPlayer4->GetComponent<Renderer>()->sprite = SelectionPlayer4pSpr;
 					if (GetKeyDown(DIK_A)) {
 						P4_Opn--;
 					}
@@ -389,11 +385,11 @@ public:
 						P4_Opn++;
 					}
 					if (P4_Opn == 0) {
-						SelectionPlayer4Oper->AddComponent<Renderer>()->sprite = SelectionKey;
+						SelectionPlayer4Oper->GetComponent<Renderer>()->sprite = SelectionKey;
 
 					}
 					if (P4_Opn == 1) {
-						SelectionPlayer4Oper->AddComponent<Renderer>()->sprite = SelectionFeat;
+						SelectionPlayer4Oper->GetComponent<Renderer>()->sprite = SelectionFeat;
 
 					}
 					if (P4_Opn < 0) {
@@ -415,18 +411,18 @@ public:
 					}
 					if (P4_Wea == 0) {
 
-						SelectionPlayer4Weapon->AddComponent<Renderer>()->sprite = SelectionSword;
+						SelectionPlayer4Weapon->GetComponent<Renderer>()->sprite = SelectionSword;
 					}
 					if (P4_Wea == 1) {
-						SelectionPlayer4Weapon->AddComponent<Renderer>()->sprite = SelectionShield;
+						SelectionPlayer4Weapon->GetComponent<Renderer>()->sprite = SelectionShield;
 
 					}
 					if (P4_Wea == 2) {
-						SelectionPlayer4Weapon->AddComponent<Renderer>()->sprite = SelectionJavelin;
+						SelectionPlayer4Weapon->GetComponent<Renderer>()->sprite = SelectionJavelin;
 					}
 					if (P4_Wea == 3)
 					{
-						SelectionPlayer4Weapon->AddComponent<Renderer>()->sprite = SelectionBow;
+						SelectionPlayer4Weapon->GetComponent<Renderer>()->sprite = SelectionBow;
 					}
 					if (P4_Wea < 0) {
 						P4_Wea = 3;
